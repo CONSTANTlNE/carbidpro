@@ -17,6 +17,7 @@
                         Customer
                     </a>
                 </th>
+                <th>Status</th>
                 <th>Date</th>
                 <th>Action</th>
             </tr>
@@ -47,6 +48,13 @@
                             @if (!empty($car->customer))
                                 {{ $car->customer->contact_name }}
                             @endif
+                        </td>
+                        <td>
+                            @if (!empty($car->CarStatus))
+                                <a
+                                    href="{{ route('car.showStatus', $car->CarStatus->slug) }}">{{ $car->CarStatus->name }}</a>
+                            @endif
+
                         </td>
                         <td>
                             <div class="datetime">{{ $car->created_at }}</div>

@@ -26,8 +26,7 @@ class CarController extends Controller
         $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
         // Base query with eager loading
-        $cars = Car::with(['dispatch', 'customer', 'state'])->orderBy('created_at'); // Keep eager loading for relationships
-
+        $cars = Car::with(['dispatch', 'customer', 'state','CarStatus'])->orderBy('created_at'); // Keep eager loading for relationships
         // Check if there is a search query
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -61,7 +60,6 @@ class CarController extends Controller
         $cars = $cars->select('cars.*')->paginate(50);
 
         $car_status = CarStatus::withCount('cars')->get();
-
 
         return view('pages.cars.index', compact('cars', 'car_status'));
     }

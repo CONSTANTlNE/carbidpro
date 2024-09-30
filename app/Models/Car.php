@@ -94,12 +94,17 @@ class Car extends Model implements HasMedia, Sortable
 
     public function dispatch()
     {
-        return $this->hasOne(User::class, 'id','dispatch_id');
+        return $this->hasOne(User::class, 'id', 'dispatch_id');
     }
 
     public function customer()
     {
         return $this->hasOne(Customer::class, 'id', 'customer_id');
+    }
+
+    public function CarStatus()
+    {
+        return $this->hasOne(CarStatus::class, 'id');
     }
 
     public function scopeSortByCustomer(Builder $query, $direction = 'asc')
