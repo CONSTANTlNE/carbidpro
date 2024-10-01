@@ -25,12 +25,7 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">
-                        <div>LOT: <span>{{ $car->lot }}</span></div>
-                        <div>Gate/Iaai: <span>{{ $car->gate_or_member }}</span></div>
-                        <div>Model: <span>{{ $car->make_model_year }}</span></div>
-                        <div>VIN: <span>{{ $car->vin }}</span></div>
-                    </td>
+                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
@@ -144,7 +139,7 @@
                     let submitBtn = $('#submit-btn-' + recordId);
 
                     // Compare the start date with today's date
-                    if (start.isBefore(today)) {
+                    if (start.isAfter(today)) {
                         // If the start date is before today, disable the submit button
                         submitBtn.attr('disabled', true);
                     } else {
@@ -161,7 +156,7 @@
                 let submitBtn = $('#submit-btn-' + recordId);
 
                 // Compare the initial start date with today's date
-                if (initialStartDate.isBefore(today)) {
+                if (initialStartDate.isAfter(today)) {
                     // If the start date is before today, disable the submit button
                     submitBtn.attr('disabled', true);
                 } else {

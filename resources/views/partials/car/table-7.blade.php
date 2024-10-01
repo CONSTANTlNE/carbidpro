@@ -42,12 +42,7 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">
-                        <div>LOT: <span>{{ $car->lot }}</span></div>
-                        <div>Gate/Iaai: <span>{{ $car->gate_or_member }}</span></div>
-                        <div>Model: <span>{{ $car->make_model_year }}</span></div>
-                        <div>VIN: <span>{{ $car->vin }}</span></div>
-                    </td>
+                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="status"

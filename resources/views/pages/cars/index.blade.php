@@ -149,6 +149,18 @@
 
     @push('js')
         <script>
+            $('.copy').on('click', function() {
+                const text = $(this).prev('strong').find('span').text().trim();
+                navigator.clipboard.writeText(text).then(function() {
+                    console.log('Copied to clipboard:', text);
+                }).catch(function(error) {
+                    console.error('Failed to copy:', error);
+                });
+            });
+        </script>
+
+
+        <script>
             $(function() {
                 var availableWarehouse = [
                     "MTL- New jersey",

@@ -26,12 +26,7 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">
-                        <div>LOT: <span>{{ $car->lot }}</span></div>
-                        <div>Gate/Iaai: <span>{{ $car->gate_or_member }}</span></div>
-                        <div>Model: <span>{{ $car->make_model_year }}</span></div>
-                        <div>VIN: <span>{{ $car->vin }}</span></div>
-                    </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
@@ -56,13 +51,13 @@
                             @endif
                         </td>
                         <td>
-                            <input type="text" data-record-id="{{ $car->id }}"
-                                value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
+                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>{{ $car->title }}</td>
                         <td>
                             <label for="company_name">Storage:</label><br>
-                            <input type="text" name="storage" class="form-control storage" id="storage">
+                            <input type="text" name="storage" class="form-control storage" id="storage" required>
                             <br>
                             <label for="contact_info">Cost:</label><br>
                             <input type="number" value="0" class="form-control" name="cost" required>
@@ -142,11 +137,13 @@
                 }, function(start, end, label) {
                     let today = moment().startOf('day'); // Get today's date at 00:00:00
 
+                    console.log(today)
+                    console.log(recordId)
                     // Get the corresponding submit button for the current daterange
                     let submitBtn = $('#submit-btn-' + recordId);
 
                     // Compare the start date with today's date
-                    if (start.isBefore(today)) {
+                    if (start.isAfter(today)) {
                         // If the start date is before today, disable the submit button
                         submitBtn.attr('disabled', true);
                     } else {
@@ -162,8 +159,9 @@
                 // Get the corresponding submit button for the current daterange
                 let submitBtn = $('#submit-btn-' + recordId);
 
+                console.log(initialStartDate);
                 // Compare the initial start date with today's date
-                if (initialStartDate.isBefore(today)) {
+                if (initialStartDate.isAfter(today)) {
                     // If the start date is before today, disable the submit button
                     submitBtn.attr('disabled', true);
                 } else {

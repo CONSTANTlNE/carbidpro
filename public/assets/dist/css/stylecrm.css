@@ -7445,5 +7445,19 @@ label {
     max-width: 130px;
 }
 
-.car_info div{font-weight: bold;}
+.car_info div{display: flex;gap: 10px;justify-content: space-between;margin: 1px 0;}
+.car_info div strong{display: flex;gap: 5px;}
 .car_info div span{font-weight: 500;}
+
+.copy {
+    background-color: #4e6270;
+    cursor: pointer;
+    border-radius: 5px;
+    min-width: 20px;
+    padding: 2px;
+    width: 20px;
+}
+
+.copy:active {
+    background-color: #414c53;
+}

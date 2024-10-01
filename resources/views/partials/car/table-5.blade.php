@@ -42,17 +42,12 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">
-                        <div>LOT: <span>{{ $car->lot }}</span></div>
-                        <div>Gate/Iaai: <span>{{ $car->gate_or_member }}</span></div>
-                        <div>Model: <span>{{ $car->make_model_year }}</span></div>
-                        <div>VIN: <span>{{ $car->vin }}</span></div>
-                    </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                       <td>@include('partials.car.table_content-parts.field-from')</td>
+                        <td>@include('partials.car.table_content-parts.field-from')</td>
                         <td>
                             {{ $car->warehouse }}
                         </td>
@@ -123,8 +118,8 @@
                                                 id="recordIdInput">
 
                                             <!-- FilePond input for multiple image uploads -->
-                                            <input type="file" data-car_id="{{ $car->id }}" id="filepond"
-                                                name="images[]" multiple>
+                                            <input type="file" data-car_id="{{ $car->id }}" class="filepond"
+                                                id="filepond" name="images[]" multiple>
 
                                             <!-- Section to display existing images -->
                                             @if ($car->getMedia('images')->isNotEmpty())
@@ -169,10 +164,10 @@
                         </td>
 
                         <td>
-                            <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm">
+                            <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm"
+                                {{ $car->getMedia('images')->isNotEmpty() ? '' : 'disabled' }}>
                                 Next
                             </button>
-
                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                 data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
                                 <i class="fa fa-trash-o"></i>
@@ -224,40 +219,60 @@
                 FilePondPluginFileValidateSize // for validating file size
             );
 
-            // Turn input element into a pond
-            // Get the car_id from the input element
-            const inputElement = document.querySelector('input[type="file"]');
-            const carId = inputElement.getAttribute('data-car_id');
+            // Select all file input elements
+            const inputElements = document.querySelectorAll('.filepond');
 
-            // Initialize FilePond with car_id passed in the process data
-            const pond = FilePond.create(inputElement, {
-                allowMultiple: true, // Allow multiple file uploads
-                maxFiles: 15, // Limit to 10 files
-                acceptedFileTypes: ['image/*'], // Only accept image files
-                maxFileSize: '10MB', // Maximum file size of 2MB
+            // Iterate over each input element and initialize FilePond
+            inputElements.forEach(function(inputElement) {
+                // Get the car_id from each input element
+                const carId = inputElement.getAttribute('data-car_id');
+                const submitBtn = $('#submit-btn-' + carId);
 
-                // FilePond server configuration
-                server: {
-                    process: {
-                        url: '{{ route('upload.images.spatie') }}',
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                // Initialize FilePond for each input element
+                const pond = FilePond.create(inputElement, {
+                    allowMultiple: true, // Allow multiple file uploads
+                    maxFiles: 15, // Limit to 15 files
+                    acceptedFileTypes: ['image/*'], // Only accept image files
+                    maxFileSize: '10MB', // Maximum file size of 10MB
+
+                    // FilePond server configuration
+                    server: {
+                        process: {
+                            url: '{{ route('upload.images.spatie') }}',
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            // Add extra data (car_id) to the request
+                            ondata: (formData) => {
+                                formData.append('car_id', carId);
+                                return formData;
+                            },
+                            onload: (response) => console.log('Upload successful!', response),
+                            onerror: (response) => console.error('Upload error:', response)
                         },
-                        // Add extra data (car_id) to the request
-                        ondata: (formData) => {
-                            formData.append('car_id', carId);
-                            return formData;
-                        },
-                        onload: (response) => console.log('Upload successful!', response),
-                        onerror: (response) => console.error('Upload error:', response)
-                    },
-                    revert: null, // Revert uploaded image if necessary
-                }
+                        revert: null, // Revert uploaded image if necessary
+                    }
+                });
+
+                // Disable submit button initially
+
+                // Enable submit button only when files are added
+                pond.on('addfile', (error, file) => {
+                    if (!error) {
+                        submitBtn.prop('disabled', false);
+                    }
+                });
+
+                // Disable submit button when no files are present
+                pond.on('removefile', () => {
+                    if (pond.getFiles().length === 0) {
+                        submitBtn.prop('disabled', true);
+                    }
+                });
             });
 
         });
-
 
 
 
