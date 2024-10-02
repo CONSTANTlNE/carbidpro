@@ -75,7 +75,7 @@
 
 
                                         <div class="form-group">
-                                            <label>Dispatch</label>
+                                            <label>Broker</label>
                                             <select name="dispatch_id" class="form-control" id="dispatch_id">
                                                 <option value=""></option>
                                                 @foreach ($dispatchers as $dispatch)

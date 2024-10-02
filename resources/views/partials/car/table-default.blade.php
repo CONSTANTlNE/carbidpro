@@ -8,7 +8,7 @@
                 <th>
                     <a
                         href="{{ request()->fullUrlWithQuery(['sort' => 'dispatcher.name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dispatcher
+                        Broker
                     </a>
                 </th>
                 <th>
