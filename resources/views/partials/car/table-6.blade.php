@@ -176,8 +176,7 @@
 
                         <td>
                             <button type="submit" id="submit-btn-{{ $car->id }}"
-                                class="btn btn-success btn-sm"
-                                {{ $car->getMedia('images')->isNotEmpty() ? '' : 'disabled' }}>
+                                class="btn btn-success btn-sm">
                                 Next
                             </button>
 
