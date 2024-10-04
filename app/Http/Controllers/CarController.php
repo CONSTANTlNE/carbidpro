@@ -205,7 +205,7 @@ class CarController extends Controller
         $car->owner_id_number = $request->input('owner_id_number');
         $car->owner_phone_number = $request->input('owner_phone_number');
         $car->container_number = $request->input('container_number');
-        $car->warehgwarehouse = $request->input('warehouse');
+        $car->warehouse = $request->input('warehouse');
 
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
