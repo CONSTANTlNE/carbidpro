@@ -20,7 +20,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
+                
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -48,9 +48,7 @@
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                        <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            {{ $car->warehouse }}
-                        </td>
+                        
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>
@@ -147,7 +145,7 @@
                                 id="payment_address" class="form-control" required>
 
                             <div class="record-row">
-                                <label for="payment_photo_1">Payment Photo</label>
+                                <label for="payment_photo_1">Recipte</label>
                                 <input type="file" id="payment_photo_1" name="payment_photo" accept="image/*"
                                     onchange="previewImage(event, 'preview_{{ $car->id }}')">
                                 <br>
@@ -157,7 +155,7 @@
                                     <a href="{{ Storage::url($car->payment_photo) }}" target="_blank">
 
                                         <img src="{{ Storage::url($car->payment_photo) }}" style="max-width: 150px;"
-                                            alt="Payment Photo">
+                                            alt="Recipte">
                                     </a>
                                 @endif
 

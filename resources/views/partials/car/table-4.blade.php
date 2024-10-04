@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
+                
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -14,8 +14,8 @@
                         Dealer
                     </a>
                 </th>
-                <th>Pickup & Delivery Dates</th>
                 <th>Title</th>
+                <th>Pickup & Delivery Dates</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -25,15 +25,13 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            {{ $car->warehouse }}
-                        </td>
+                         
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>
@@ -54,11 +52,11 @@
                                 {{ $car->customer->contact_name }}
                             @endif
                         </td>
+                        <td>{{ $car->title }}</td>
                         <td>
                             <input type="text" data-record-id="{{ $car->id }}"
                                 value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
                         </td>
-                        <td>{{ $car->title }}</td>
 
                         <td>
                             <button type="submit" id="submit-btn-{{ $car->id }}" disabled

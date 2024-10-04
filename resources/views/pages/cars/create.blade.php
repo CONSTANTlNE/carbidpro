@@ -150,7 +150,7 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-4">
+                                                <div class="col-md-2">
                                                     <label for="fromState">From State</label>
                                                     <select name="from_state" id="fromState"
                                                         class="form-control select2">
@@ -173,6 +173,12 @@
                                                     <label for="zip_code">Exact location-zip</label>
                                                     <input type="text" class="form-control" name="zip_code"
                                                         id="zip_code" value="{{ old('zip_code') }}">
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label for="warehouse">Warehouse</label>
+                                                    <input type="text" value="TRT - New Jersey" class="form-control" name="warehouse"
+                                                        id="warehouse" value="{{ old('warehouse') }}" required>
                                                 </div>
 
                                             </div>

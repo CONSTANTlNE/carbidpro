@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
+              
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -32,9 +32,7 @@
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            {{ $car->warehouse }}
-                        </td>
+                       
                         <td>
                             ${{ $car->internal_shipping }}
                         </td>
@@ -60,10 +58,10 @@
                             <input type="text" name="storage" class="form-control storage" id="storage" required>
                             <br>
                             <label for="contact_info">Cost:</label><br>
-                            <input type="number" value="0" class="form-control" name="cost" required>
+                            <input type="number" class="form-control" name="cost" required>
                         </td>
                         <td>
-                            <button type="submit" id="submit-btn-{{ $car->id }}" disabled
+                            <button type="submit" id="submit-btn-{{ $car->id }}"
                                 class="btn btn-success btn-sm">
                                 Next
                             </button>
@@ -102,13 +100,26 @@
             const suggestedWords = [
                 'Driver',
                 'Owner',
+                'No storage',
             ];
 
             // Initialize jQuery UI autocomplete
             function initializeAutocomplete() {
                 $(".storage").autocomplete({
                     source: suggestedWords,
-                    minLength: 0 // Show suggestions even when no input is typed
+                    minLength: 0,
+                    select: function(event, ui) {
+                        let selectedWord = ui.item.value; // Get the selected word
+                        let correspondingCost = 0
+
+                        // Set the value of the .cost input
+                        if (selectedWord == 'No storage') {
+                            $(this).closest('td').find('input[name="cost"]').val(correspondingCost);
+                        }else{
+                            $(this).closest('td').find('input[name="cost"]').val('');
+                        }
+
+                    }
                 }).focus(function() {
                     // Force the dropdown to show when the input gains focus
                     $(this).autocomplete("search", "");
@@ -142,32 +153,8 @@
                     // Get the corresponding submit button for the current daterange
                     let submitBtn = $('#submit-btn-' + recordId);
 
-                    // Compare the start date with today's date
-                    if (start.isAfter(today)) {
-                        // If the start date is before today, disable the submit button
-                        submitBtn.attr('disabled', true);
-                    } else {
-                        // If the start date is today or after today, enable the submit button
-                        submitBtn.attr('disabled', false);
-                    }
                 });
 
-                // On page load, check the current value of the date range picker
-                let initialStartDate = daterangeInput.data('daterangepicker').startDate;
-                let today = moment().startOf('day'); // Get today's date at 00:00:00
-
-                // Get the corresponding submit button for the current daterange
-                let submitBtn = $('#submit-btn-' + recordId);
-
-                console.log(initialStartDate);
-                // Compare the initial start date with today's date
-                if (initialStartDate.isAfter(today)) {
-                    // If the start date is before today, disable the submit button
-                    submitBtn.attr('disabled', true);
-                } else {
-                    // If the start date is today or after today, enable the submit button
-                    submitBtn.attr('disabled', false);
-                }
             });
         });
     </script>

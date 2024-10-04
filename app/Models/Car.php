@@ -15,7 +15,7 @@ class Car extends Model implements HasMedia, Sortable
     use SortableTrait;
     use HasFactory;
     use InteractsWithMedia;
-    public $sortable = ['customer', 'dispatcher'];  // Add other sortable columns as needed
+    public $sortable = ['customer', 'dispatcher', 'car_statuses'];  // Add other sortable columns as needed
 
     protected $fillable = [
         'make_model_year',
@@ -87,9 +87,9 @@ class Car extends Model implements HasMedia, Sortable
         return $this->belongsTo(LoadType::class, 'load_type_id');
     }
 
-    public function auction()
+    public function Auction()
     {
-        return $this->belongsTo(Auction::class, 'auction_id');
+        return $this->hasOne(Auction::class, 'id', 'auction');
     }
 
     public function dispatch()

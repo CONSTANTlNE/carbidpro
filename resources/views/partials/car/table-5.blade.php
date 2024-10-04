@@ -20,7 +20,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
+                 
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -48,9 +48,7 @@
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            {{ $car->warehouse }}
-                        </td>
+                       
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>
@@ -76,6 +74,7 @@
                                 value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>
+                            <label for="title_delivery"> {{ $car->title }}</label>
                             @if ($car->title == 'no')
                                 <select name="title_delivery" class="form-control" id="title_delivery" disabled>
                                     <option value=""></option>
@@ -164,8 +163,7 @@
                         </td>
 
                         <td>
-                            <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm"
-                                {{ $car->getMedia('images')->isNotEmpty() ? '' : 'disabled' }}>
+                            <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm">
                                 Next
                             </button>
                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
@@ -258,18 +256,18 @@
                 // Disable submit button initially
 
                 // Enable submit button only when files are added
-                pond.on('addfile', (error, file) => {
-                    if (!error) {
-                        submitBtn.prop('disabled', false);
-                    }
-                });
+                // pond.on('addfile', (error, file) => {
+                //     if (!error) {
+                //         submitBtn.prop('disabled', false);
+                //     }
+                // });
 
-                // Disable submit button when no files are present
-                pond.on('removefile', () => {
-                    if (pond.getFiles().length === 0) {
-                        submitBtn.prop('disabled', true);
-                    }
-                });
+                // // Disable submit button when no files are present
+                // pond.on('removefile', () => {
+                //     if (pond.getFiles().length === 0) {
+                //         submitBtn.prop('disabled', true);
+                //     }
+                // });
             });
 
         });
@@ -317,14 +315,49 @@
                     autoUpdateInput: true // Automatically updates input with default value
                 }, function(start, end, label) {
                     let today = moment().startOf('day'); // Get today's date at 00:00:00
+                    let endDate = end.startOf(
+                        'day'); // Ensure the selected end date is also at 00:00:00
 
                     // Get the corresponding submit button for the current daterange
                     let submitBtn = $('#submit-btn-' + recordId);
 
+                    console.log(today);
+                    console.log(endDate.isBefore(today)); // Log if the end date is before today
+                    console.log(endDate);
 
+                    // Disable the button if the selected delivery date is in the future (endDate is after today)
+                    if (endDate.isAfter(today)) {
+                        submitBtn.attr('disabled',
+                            true
+                        ); // Disable the submit button because delivery date is in the future
+                    } else {
+                        submitBtn.attr('disabled',
+                            false
+                        ); // Enable the submit button if the delivery date is today or earlier
+                    }
                 });
 
+                // On page load, check the current value of the date range picker
+                let initialEndDate = daterangeInput.data('daterangepicker').endDate.startOf(
+                    'day'); // Get the initial end date and reset time to 00:00:00
+                let today = moment().startOf('day'); // Get today's date at 00:00:00
 
+
+                // Get the corresponding submit button for the current daterange
+                let submitBtn = $('#submit-btn-' + recordId);
+
+                // Compare the initial start date with today's date
+                if (initialEndDate.isAfter(today)) {
+                    // If the start date is before today, disable the submit button
+                    submitBtn.attr('disabled', true);
+                    $('.buttonexport .btn.btn-primary').addClass('btn-danger');
+
+                } else {
+                    // If the start date is today or after today, enable the submit button
+                    submitBtn.attr('disabled', false);
+                    $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
+
+                }
             });
         });
     </script>

@@ -17,7 +17,10 @@
                         Customer
                     </a>
                 </th>
-                <th>Status</th>
+                <th><a
+                        href="{{ request()->fullUrlWithQuery(['sort' => 'car_statuses.name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
+                        Status
+                    </a></th>
                 <th>Date</th>
                 <th>Action</th>
             </tr>

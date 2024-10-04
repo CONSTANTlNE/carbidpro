@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
+
                 <th>Price</th>
                 <th>Carrier Info</th>
                 <th>
@@ -14,6 +14,7 @@
                         Dealer
                     </a>
                 </th>
+                <th>Title</th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Action</th>
             </tr>
@@ -24,15 +25,13 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                       <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            {{ $car->warehouse }}
-                        </td>
+                        <td>@include('partials.car.table_content-parts.field-from')</td>
+
                         <td>
                             <label for="internal_shipping">Rate</label>
                             <input id="internal_shipping" value="{{ $car->internal_shipping }}" type="number"
@@ -52,6 +51,7 @@
                                 {{ $car->customer->contact_name }}
                             @endif
                         </td>
+                        <td>{{ $car->title }}</td>
                         <td>
                             <input type="text" name="pickup_dates" class="form-control daterange" />
                         </td>

@@ -26,7 +26,7 @@ class CarController extends Controller
         $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
         // Base query with eager loading
-        $cars = Car::with(['dispatch', 'customer', 'state','CarStatus'])->orderBy('created_at'); // Keep eager loading for relationships
+        $cars = Car::with(['dispatch', 'customer', 'state', 'CarStatus', 'auction']); // Keep eager loading for relationships
         // Check if there is a search query
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -50,14 +50,24 @@ class CarController extends Controller
         // Apply sorting based on the requested column
         if ($sortColumn == 'customers.contact_name') {
             $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
+                ->select('cars.*', 'customers.contact_name') // Select the customer name for sorting
                 ->orderBy('customers.contact_name', $sortDirection);
         } elseif ($sortColumn == 'dispatcher.name') {
             $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
+                ->select('cars.*', 'dispatcher.name as dispatcher_name') // Select the dispatcher name for sorting
                 ->orderBy('dispatcher.name', $sortDirection);
+        } elseif ($sortColumn == 'car_statuses.name') {
+            $cars = $cars->join('car_statuses', 'cars.status', '=', 'car_statuses.id')
+                ->select('cars.*', 'car_statuses.name as status_name') // Select the status name for sorting
+                ->orderBy('car_statuses.name', $sortDirection);
+        } else {
+            // Default sort by created_at if no special sort column is requested
+            $cars = $cars->orderBy('cars.created_at', $sortDirection);
         }
 
+
         // Select cars columns only to avoid ambiguity
-        $cars = $cars->select('cars.*')->paginate(50);
+        $cars = $cars->paginate(50);
 
         $car_status = CarStatus::withCount('cars')->get();
 
@@ -236,7 +246,7 @@ class CarController extends Controller
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
             // Base query with eager loading
-            $cars = Car::with(['dispatch', 'customer', 'state'])->where('status', $carStatus->id); // Keep eager loading for relationships
+            $cars = Car::with(['dispatch', 'customer', 'state', 'Auction'])->where('status', $carStatus->id); // Keep eager loading for relationships
 
             // Check if there is a search query
             if ($request->filled('search')) {
@@ -274,7 +284,7 @@ class CarController extends Controller
             $sortColumn = $request->get('sort', 'dispatcher.name'); // Default sort by customer
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
-            $cars = Car::with(['state', 'dispatch', 'customer'])->where('status', $carStatus->id)->where('dispatch_id', auth()->user()->id);
+            $cars = Car::with(['state', 'dispatch', 'customer', 'auction'])->where('status', $carStatus->id)->where('dispatch_id', auth()->user()->id);
             // Check if there is a search query
             if ($request->filled('search')) {
                 $searchTerm = $request->input('search');

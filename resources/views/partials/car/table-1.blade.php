@@ -5,7 +5,6 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Warehouse</th>
                 <th>Price</th>
                 <th>
                     <a
@@ -13,6 +12,7 @@
                         Dealer
                     </a>
                 </th>
+                <th>Title</th>
                 <th>Created at</th>
                 <th>Action</th>
             </tr>
@@ -23,15 +23,13 @@
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                       <td>@include('partials.car.table_content-parts.field-from')</td>
-                        <td>
-                            <input id="warehouse" class="form-control" name="warehouse" required>
-                        </td>
+                        <td>@include('partials.car.table_content-parts.field-from')</td>
+
                         <td>
                             <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
                                 required>
@@ -42,7 +40,10 @@
                                 {{ $car->customer->contact_name }}
                             @endif
                         </td>
-                        <td>{{ $car->created_at }}</td>
+                        <td>{{ $car->title }}</td>
+                        <td>
+                            <div class="datetime">{{ $car->created_at }}</div>
+                        </td>
 
                         <td>
                             <button type="submit" class="btn btn-success btn-sm">
