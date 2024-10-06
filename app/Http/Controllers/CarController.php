@@ -48,21 +48,25 @@ class CarController extends Controller
         }
 
         // Apply sorting based on the requested column
-        if ($sortColumn == 'customers.contact_name') {
-            $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
-                ->select('cars.*', 'customers.contact_name') // Select the customer name for sorting
-                ->orderBy('customers.contact_name', $sortDirection);
-        } elseif ($sortColumn == 'dispatcher.name') {
-            $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
-                ->select('cars.*', 'dispatcher.name as dispatcher_name') // Select the dispatcher name for sorting
-                ->orderBy('dispatcher.name', $sortDirection);
-        } elseif ($sortColumn == 'car_statuses.name') {
-            $cars = $cars->join('car_statuses', 'cars.status', '=', 'car_statuses.id')
-                ->select('cars.*', 'car_statuses.name as status_name') // Select the status name for sorting
-                ->orderBy('car_statuses.name', $sortDirection);
+        if (isset($_GET['sort'])) {
+            if ($sortColumn == 'customers.contact_name') {
+                $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
+                    ->select('cars.*', 'customers.contact_name') // Select the customer name for sorting
+                    ->orderBy('customers.contact_name', $sortDirection);
+            } elseif ($sortColumn == 'dispatcher.name') {
+                $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
+                    ->select('cars.*', 'dispatcher.name as dispatcher_name') // Select the dispatcher name for sorting
+                    ->orderBy('dispatcher.name', $sortDirection);
+            } elseif ($sortColumn == 'car_statuses.name') {
+                $cars = $cars->join('car_statuses', 'cars.status', '=', 'car_statuses.id')
+                    ->select('cars.*', 'car_statuses.name as status_name') // Select the status name for sorting
+                    ->orderBy('car_statuses.name', $sortDirection);
+            } else {
+                // Default sort by created_at if no special sort column is requested
+                $cars = $cars->orderBy('cars.created_at', $sortDirection);
+            }
         } else {
-            // Default sort by created_at if no special sort column is requested
-            $cars = $cars->orderBy('cars.created_at', $sortDirection);
+            $cars = $cars->orderBy('cars.created_at', 'desc');
         }
 
 
@@ -183,6 +187,12 @@ class CarController extends Controller
      */
     public function store(Request $request)
     {
+
+
+        $request->validate([
+            'vin' => 'required|unique:cars,vin',
+        ]);
+
         // Create new car
         $car = new Car();
 
@@ -269,14 +279,20 @@ class CarController extends Controller
                 });
             }
 
-            // Apply sorting based on the requested column
-            if ($sortColumn == 'customers.contact_name') {
-                $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
-                    ->orderBy('customers.contact_name', $sortDirection);
-            } elseif ($sortColumn == 'dispatcher.name') {
-                $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
-                    ->orderBy('dispatcher.name', $sortDirection);
+            if (isset($_GET['sort'])) {
+                if ($sortColumn == 'customers.contact_name') {
+                    $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
+                        ->orderBy('customers.contact_name', $sortDirection);
+                } elseif ($sortColumn == 'dispatcher.name') {
+                    $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
+                        ->orderBy('dispatcher.name', $sortDirection);
+                } else {
+                    $cars = $cars->orderBy('cars.created_at', 'desc');
+                }
+            } else {
+                $cars = $cars->orderBy('cars.created_at', 'desc');
             }
+
 
             // Select cars columns only to avoid ambiguity
             $cars = $cars->select('cars.*')->paginate(50);
@@ -306,9 +322,18 @@ class CarController extends Controller
                 });
             }
 
-            if ($sortColumn == 'dispatcher.name') {
-                $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
-                    ->orderBy('dispatcher.name', $sortDirection);
+            if (isset($_GET['sort'])) {
+                if ($sortColumn == 'customers.contact_name') {
+                    $cars = $cars->join('customers', 'cars.customer_id', '=', 'customers.id')
+                        ->orderBy('customers.contact_name', $sortDirection);
+                } elseif ($sortColumn == 'dispatcher.name') {
+                    $cars = $cars->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
+                        ->orderBy('dispatcher.name', $sortDirection);
+                } else {
+                    $cars = $cars->orderBy('cars.created_at', 'desc');
+                }
+            } else {
+                $cars = $cars->orderBy('cars.created_at', 'desc');
             }
 
             // Select cars columns only to avoid ambiguity

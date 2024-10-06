@@ -7461,3 +7461,7 @@ label {
 .copy:active {
     background-color: #414c53;
 }
+
+.error {
+    color: red;
+}

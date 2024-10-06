@@ -20,7 +20,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                
+
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -31,6 +31,7 @@
                 </th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Title delivery</th>
+                <th>Title</th>
                 <th>Photos</th>
                 <th>Payment Information</th>
                 <th>Action</th>
@@ -38,17 +39,26 @@
         </thead>
         <tbody>
             @foreach ($cars as $car)
+                @if ($car->title_delivery == 'no' || !$car->getMedia('images')->isNotEmpty())
+                    <script>
+                        var isEmpty = true;
+                    </script>
+                @else
+                    <script>
+                        var isEmpty = false;
+                    </script>
+                @endif
                 <tr>
 
                     <td>
                         {{ $car->id }}</td>
-                    <td class="car_info">                         @include('partials.car.table_content-parts.car-info')                     </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                       <td>@include('partials.car.table_content-parts.field-from')</td>
-                        
+                        <td>@include('partials.car.table_content-parts.field-from')</td>
+
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>
@@ -73,12 +83,16 @@
                             {{ $car->pickup_dates }}
                         </td>
                         <td>
-                            {{ $car->title_delivery }}
+                            <span
+                                class="{{ $car->title_delivery == 'no' ? 'error' : '' }}">{{ $car->title_delivery }}</span>
                         </td>
+                        <td>{{ $car->title }}</td>
                         <td>
                             <!-- Button to open the modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                data-target="#imageUploadModal" data-record-id="{{ $car->id }}">
+                            <button type="button"
+                                class="btn {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                data-toggle="modal" data-target="#imageUploadModal"
+                                data-record-id="{{ $car->id }}">
                                 Images
                             </button>
 
@@ -103,6 +117,8 @@
                                             <input type="file" style="display: none"
                                                 data-car_id="{{ $car->id }}" id="filepond" name="images[]"
                                                 multiple>
+
+
 
                                             <!-- Section to display existing images -->
                                             @if ($car->getMedia('images')->isNotEmpty())
@@ -213,6 +229,11 @@
 
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
+
+
+
+
+
             // Register FilePond plugins
             FilePond.registerPlugin(
                 FilePondPluginImagePreview, // for showing image preview
@@ -259,6 +280,12 @@
 
 
         $(function() {
+
+            if (isEmpty) {
+                $('.buttonexport .btn.btn-primary').addClass('btn-danger');
+            } else {
+                $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
+            }
 
             // Example words for autocomplete
             const suggestedWords = [

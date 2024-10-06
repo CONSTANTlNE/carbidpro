@@ -20,7 +20,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                
+
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -31,6 +31,7 @@
                 </th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Title delivery</th>
+                <th>Title</th>
                 <th>Photos</th>
                 <th>Payment Information</th>
                 <th>Action</th>
@@ -38,6 +39,15 @@
         </thead>
         <tbody>
             @foreach ($cars as $car)
+                @if ($car->title_delivery == 'no' || !$car->getMedia('images')->isNotEmpty())
+                    <script>
+                        var isEmpty = true;
+                    </script>
+                @else
+                    <script>
+                        var isEmpty = false;
+                    </script>
+                @endif
                 <tr>
 
                     <td>
@@ -74,17 +84,21 @@
                         </td>
                         <td>
 
-                            <select name="title_delivery" class="form-control" id="title_delivery" required>
+                            <select name="title_delivery"
+                                class="form-control {{ $car->title_delivery == 'no' ? 'error' : '' }}"
+                                id="title_delivery" required>
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
                                 </option>
                                 <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
                             </select>
                         </td>
+                        <td>{{ $car->title }}</td>
                         <td>
                             <!-- Button to open the modal -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                data-target="#imageUploadModal-{{ $car->id }}"
+                            <button type="button"
+                                class="btn {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
                                 data-record-id="{{ $car->id }}">
                                 Upload
                             </button>
@@ -106,8 +120,10 @@
                                                 id="recordIdInput">
 
                                             <!-- FilePond input for multiple image uploads -->
-                                            <input type="file" data-car_id="{{ $car->id }}" class="filepond" id="filepond"
-                                                name="images[]" multiple>
+                                            <input type="file" data-car_id="{{ $car->id }}" class="filepond"
+                                                id="filepond" name="images[]" multiple>
+
+
 
                                             <!-- Section to display existing images -->
                                             @if ($car->getMedia('images')->isNotEmpty())
@@ -152,8 +168,8 @@
 
                             <div class="record-row">
                                 <label for="payment_photo_1">Recipte</label>
-                                <input type="file" id="payment_photo_1" name="payment_photo" required accept="image/*"
-                                    onchange="previewImage(event, 'preview_{{ $car->id }}')">
+                                <input type="file" id="payment_photo_1" name="payment_photo" required
+                                    accept="image/*" onchange="previewImage(event, 'preview_{{ $car->id }}')">
                                 <br>
                                 <br>
 
@@ -303,6 +319,13 @@
 
 
         $(function() {
+
+            console.log(isEmpty);
+            if (isEmpty) {
+                $('.buttonexport .btn.btn-primary').addClass('btn-danger');
+            } else {
+                $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
+            }
 
             // Example words for autocomplete
             const suggestedWords = [

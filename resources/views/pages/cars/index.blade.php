@@ -37,6 +37,13 @@
                 <small>List of Car</small>
             </div>
         </section>
+        <div class="container">
+            @if (session('success'))
+                <div class="alert alert-success" style="text-align: center;font-size: 20px;text-transform: uppercase;font-weight: bold;max-width: 600px;margin: 1rem  auto 0;">
+                    {{ session('success') }}
+                </div>
+            @endif
+        </div>
         <!-- Main content -->
         <section class="content">
             <div class="row">
@@ -63,8 +70,19 @@
                                         @endphp
 
                                         @foreach ($car_status as $status)
+                                            @php
+                                                $hasError = '';
+                                                if ($status->id >= 4) {
+                                                    // Check if any car related to this status has title_delivery set to 'no'
+                                                    $hasError = $status->cars->contains(function ($car) {
+                                                        return $car->title_delivery == 'no' ||
+                                                            !$car->getMedia('images')->isNotEmpty();
+                                                    });
+                                                }
+
+                                            @endphp
                                             <a href="{{ route('car.showStatus', $status->slug) }}"
-                                                class="btn {{ $currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary' }}">
+                                                class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
                                                 {{ $status->name }} {{ $status->cars_count }}
                                             </a>
                                         @endforeach

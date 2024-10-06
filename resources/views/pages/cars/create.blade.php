@@ -21,6 +21,7 @@
     @include('partials.aside')
     <!-- =============================================== -->
 
+
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -32,6 +33,20 @@
                 <small>Car list</small>
             </div>
         </section>
+
+        <div class="container">
+            @if ($errors->any())
+                <div class="alert alert-danger" style="margin-top: 1rem;margin-bottom: 0;">
+                    <ul style="margin:0;padding:0;">
+                        @foreach ($errors->all() as $error)
+                            <li style="list-style: none;">{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        </div>
+
+
         <!-- Main content -->
         <div class="content">
             <div class="row">
@@ -65,7 +80,9 @@
                                             <select name="customer_id" class="form-control" id="customer_id">
                                                 <option value=""></option>
                                                 @foreach ($customers as $customer)
-                                                    <option value="{{ $customer->id }}">
+                                                    <option value="{{ $customer->id }}"
+                                                        {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+
                                                         {{ $customer->contact_name }}</option>
                                                 @endforeach
                                             </select>
@@ -73,7 +90,8 @@
 
                                         <div class="form-group">
                                             <label>Make/Model/Year</label>
-                                            <input type="text" name="make_model_year" class="form-control">
+                                            <input type="text" name="make_model_year" class="form-control"
+                                                value="{{ old('make_model_year') }}">
                                         </div>
 
 
@@ -82,7 +100,8 @@
                                             <select name="dispatch_id" class="form-control" id="dispatch_id">
                                                 <option value=""></option>
                                                 @foreach ($dispatchers as $dispatch)
-                                                    <option value="{{ $dispatch->id }}">
+                                                    <option value="{{ $dispatch->id }}"
+                                                        {{ old('dispatch_id') == $dispatch->id ? 'selected' : '' }}>
                                                         {{ $dispatch->name }}</option>
                                                 @endforeach
                                             </select>
@@ -90,36 +109,42 @@
 
                                         <div class="form-group">
                                             <label>Lot</label>
-                                            <input type="text" name="lot" class="form-control">
+                                            <input type="text" name="lot" class="form-control"
+                                                value="{{ old('lot') }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Vin</label>
-                                            <input type="text" name="vin" class="form-control">
+                                            <input type="text" name="vin" class="form-control"
+                                                value="{{ old('vin') }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Percent</label>
-                                            <input type="text" name="percent" class="form-control">
+                                            <input type="text" name="percent" class="form-control"
+                                                value="{{ old('percent') }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Gate or Member</label>
-                                            <input type="text" name="gate_or_member" class="form-control">
+                                            <input type="text" name="gate_or_member" class="form-control"
+                                                value="{{ old('gate_or_member') }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Title</label>
                                             <select name="title" class="form-control" id="title">
                                                 <option value=""></option>
-                                                <option value="no">NO
+                                                <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
                                                 </option>
-                                                <option value="yes">YES
-                                                </option>
-                                                <option value="bypost">
-                                                    BY POST</option>
-                                                <option value="pending">PENDING</option>
+                                                <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
+                                                    YES</option>
+                                                <option value="bypost"
+                                                    {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST</option>
+                                                <option value="pending"
+                                                    {{ old('title') == 'pending' ? 'selected' : '' }}>PENDING</option>
                                             </select>
+
                                         </div>
 
 
@@ -130,7 +155,8 @@
                                                     <select id="auction" name="auction" class="form-control select2">
                                                         <option value="">Select an option</option>
                                                         @foreach ($auctions as $auction)
-                                                            <option value="{{ $auction->id }}">
+                                                            <option value="{{ $auction->id }}"
+                                                                {{ old('auction') == $auction->id ? 'selected' : '' }}>
                                                                 {{ $auction->name }}
                                                             </option>
                                                         @endforeach
@@ -177,8 +203,9 @@
 
                                                 <div class="col-md-2">
                                                     <label for="warehouse">Warehouse</label>
-                                                    <input type="text" value="TRT - New Jersey" class="form-control" name="warehouse"
-                                                        id="warehouse" value="{{ old('warehouse') }}" required>
+                                                    <input type="text" value="TRT - New Jersey"
+                                                        class="form-control" name="warehouse" id="warehouse"
+                                                        value="{{ old('warehouse') }}" required>
                                                 </div>
 
                                             </div>
@@ -189,15 +216,18 @@
                                             <label>Type of Fuel</label><br>
 
                                             <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Petrol" type="radio" required>
+                                                <input name="type_of_fuel" value="Petrol" type="radio"
+                                                    {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}>
                                                 Petrol
                                             </label>
 
                                             <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Hybrid" type="radio" required>
+                                                <input name="type_of_fuel" value="Hybrid" type="radio"
+                                                    {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}>
                                                 Hybrid
                                             </label>
                                         </div>
+
 
                                     </div>
 

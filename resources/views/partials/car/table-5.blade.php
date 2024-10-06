@@ -20,7 +20,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                 
+
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -31,6 +31,7 @@
                 </th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Title delivery</th>
+                <th>Title</th>
                 <th>Photos</th>
                 <th>Payment Information</th>
                 <th>Action</th>
@@ -48,7 +49,7 @@
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>@include('partials.car.table_content-parts.field-from')</td>
-                       
+
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>
@@ -74,7 +75,6 @@
                                 value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>
-                            <label for="title_delivery"> {{ $car->title }}</label>
                             @if ($car->title == 'no')
                                 <select name="title_delivery" class="form-control" id="title_delivery" disabled>
                                     <option value=""></option>
@@ -91,6 +91,7 @@
                                 </select>
                             @endif
                         </td>
+                        <td>{{ $car->title }}</td>
                         <td>
                             <!-- Button to open the modal -->
                             <button type="button" class="btn btn-primary" data-toggle="modal"

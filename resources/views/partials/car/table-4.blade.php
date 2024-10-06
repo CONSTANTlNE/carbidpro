@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                
+
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>
@@ -31,7 +31,7 @@
                         <input type="hidden" name="status"
                             value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>@include('partials.car.table_content-parts.field-from')</td>
-                         
+
                         <td>
                             <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
                                 ${{ $car->internal_shipping }}</div>

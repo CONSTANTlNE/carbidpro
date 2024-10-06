@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>CAR</th>
                 <th>From</th>
-                <th>Price</th>
+                <th style="width:10%">Price</th>
                 <th>
                     <a
                         href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
@@ -31,8 +31,7 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
-                                required>
+                            <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"  required>
 
                         </td>
                         <td>

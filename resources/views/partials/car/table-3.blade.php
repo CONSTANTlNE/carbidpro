@@ -147,9 +147,6 @@
                     autoUpdateInput: true // Automatically updates input with default value
                 }, function(start, end, label) {
                     let today = moment().startOf('day'); // Get today's date at 00:00:00
-
-                    console.log(today)
-                    console.log(recordId)
                     // Get the corresponding submit button for the current daterange
                     let submitBtn = $('#submit-btn-' + recordId);
 
