@@ -8,14 +8,9 @@
               
                 <th>Price</th>
                 <th>Carrier</th>
-                <th>
-                    <a
-                        href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dealer
-                    </a>
-                </th>
+                
                 <th>Pickup & Delivery Dates</th>
-                <th>Title</th>
+                <th>Title Status</th>
                 <th>Storage</th>
                 <th>Action</th>
             </tr>
@@ -42,11 +37,6 @@
                             <br>
                             <label for="contact_info">Contact info:</label><br>
                             {{ $car->contact_info }}
-                        </td>
-                        <td>
-                            @if (!empty($car->customer))
-                                {{ $car->customer->contact_name }}
-                            @endif
                         </td>
                         <td>
                             <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"

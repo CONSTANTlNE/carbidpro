@@ -8,13 +8,8 @@
 
                 <th>Price</th>
                 <th>Carrier Info</th>
-                <th>
-                    <a
-                        href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dealer
-                    </a>
-                </th>
-                <th>Title</th>
+               
+                <th>Title Status</th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Action</th>
             </tr>
@@ -46,11 +41,7 @@
                             <input id="contact_info" value="{{ $car->contact_info }}" type="text"
                                 class="form-control" name="contact_info" required>
                         </td>
-                        <td>
-                            @if (!empty($car->customer))
-                                {{ $car->customer->contact_name }}
-                            @endif
-                        </td>
+                    
                         <td>{{ $car->title }}</td>
                         <td>
                             <input type="text" name="pickup_dates" class="form-control daterange" />

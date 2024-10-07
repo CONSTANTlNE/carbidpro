@@ -55,8 +55,6 @@
                             <div class="btn-group d-flex" role="group">
                                 <div class="row" style="justify-content: space-between;width: 100%;">
 
-
-
                                     <div class="buttonexport">
                                         @if (auth()->user()->role == 'Admin')
                                             <a href="{{ route('car.create') }}" class="btn btn-add"><i
@@ -72,7 +70,7 @@
                                         @foreach ($car_status as $status)
                                             @php
                                                 $hasError = '';
-                                                if ($status->id >= 4) {
+                                                if ($status->id == 7) {
                                                     // Check if any car related to this status has title_delivery set to 'no'
                                                     $hasError = $status->cars->contains(function ($car) {
                                                         return $car->title_delivery == 'no' ||

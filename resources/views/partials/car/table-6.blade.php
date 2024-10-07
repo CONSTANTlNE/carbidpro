@@ -23,14 +23,8 @@
 
                 <th>Price</th>
                 <th>Carrier</th>
-                <th>
-                    <a
-                        href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dealer
-                    </a>
-                </th>
+
                 <th>Pickup & Delivery Dates</th>
-                <th>Title delivery</th>
                 <th>Title</th>
                 <th>Photos</th>
                 <th>Payment Information</th>
@@ -39,7 +33,11 @@
         </thead>
         <tbody>
             @foreach ($cars as $car)
-                @if ($car->title_delivery == 'no' || !$car->getMedia('images')->isNotEmpty())
+                @if ($car->title == 'yes' && $car->title_delivery == 'no')
+                    <script>
+                        var isEmpty = true;
+                    </script>
+                @elseif(!$car->getMedia('images')->isNotEmpty())
                     <script>
                         var isEmpty = true;
                     </script>
@@ -73,19 +71,19 @@
                             <label for="contact_info">Contact info:</label><br>
                             {{ $car->contact_info }}
                         </td>
-                        <td>
-                            @if (!empty($car->customer))
-                                {{ $car->customer->contact_name }}
-                            @endif
-                        </td>
-                        <td>
-                            <input type="text" data-record-id="{{ $car->id }}"
-                                value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
-                        </td>
-                        <td>
 
+                        <td>
+                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange" />
+                        </td>
+                        <td>
+                            <label style="margin: 0;padding:0">Title Status</label>
+                            <br>
+                            <span> {{ $car->title }}</span>
+
+                            <label class="mt-2" for="title_delivery">Title delivery</label>
                             <select name="title_delivery"
-                                class="form-control {{ $car->title_delivery == 'no' ? 'error' : '' }}"
+                                class="form-control {{ $car->title == 'yes' && $car->title_delivery ? 'error' : '' }}"
                                 id="title_delivery" required>
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
@@ -93,11 +91,12 @@
                                 <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
                             </select>
                         </td>
-                        <td>{{ $car->title }}</td>
+
+
                         <td>
                             <!-- Button to open the modal -->
                             <button type="button"
-                                class="btn {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
                                 data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
                                 data-record-id="{{ $car->id }}">
                                 Upload

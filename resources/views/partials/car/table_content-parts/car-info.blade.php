@@ -1,4 +1,9 @@
 <div>
+    <strong>DEALER:<span>{{ !empty($car->customer) ? $car->customer->contact_name : '' }}</span></strong>
+    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+</div>
+
+<div>
     <strong>LOT:<span>{{ $car->lot }}</span></strong>
     <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
 </div>

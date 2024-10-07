@@ -23,14 +23,7 @@
 
                 <th>Price</th>
                 <th>Carrier</th>
-                <th>
-                    <a
-                        href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dealer
-                    </a>
-                </th>
                 <th>Pickup & Delivery Dates</th>
-                <th>Title delivery</th>
                 <th>Title</th>
                 <th>Photos</th>
                 <th>Payment Information</th>
@@ -66,32 +59,25 @@
                             {{ $car->contact_info }}
                         </td>
                         <td>
-                            @if (!empty($car->customer))
-                                {{ $car->customer->contact_name }}
-                            @endif
-                        </td>
-                        <td>
                             <input type="text" data-record-id="{{ $car->id }}"
                                 value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>
-                            @if ($car->title == 'no')
-                                <select name="title_delivery" class="form-control" id="title_delivery" disabled>
-                                    <option value=""></option>
-                                    <option value="yes">YES</option>
-                                    <option value="no">NO</option>
-                                </select>
-                            @else
-                                <select name="title_delivery" class="form-control" id="title_delivery" required>
-                                    <option value=""></option>
-                                    <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
-                                    </option>
-                                    <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO
-                                    </option>
-                                </select>
-                            @endif
+                            <label style="margin: 0;padding:0">Title Status</label>
+                            <br>
+                            <span> {{ $car->title }}</span>
+                            <br>
+
+                            <label class="mt-2" for="title_delivery">Title delivery</label>
+                            <select name="title_delivery"
+                                class="form-control {{ $car->title == 'yes' && $car->title_delivery ? 'error' : '' }}"
+                                id="title_delivery" required>
+                                <option value=""></option>
+                                <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
+                                </option>
+                                <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
+                            </select>
                         </td>
-                        <td>{{ $car->title }}</td>
                         <td>
                             <!-- Button to open the modal -->
                             <button type="button" class="btn btn-primary" data-toggle="modal"

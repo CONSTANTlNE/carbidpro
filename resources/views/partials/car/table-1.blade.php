@@ -6,13 +6,8 @@
                 <th>CAR</th>
                 <th>From</th>
                 <th style="width:10%">Price</th>
-                <th>
-                    <a
-                        href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Dealer
-                    </a>
-                </th>
-                <th>Title</th>
+                
+                <th>Title Status</th>
                 <th>Created at</th>
                 <th>Action</th>
             </tr>
@@ -34,11 +29,7 @@
                             <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"  required>
 
                         </td>
-                        <td>
-                            @if (!empty($car->customer))
-                                {{ $car->customer->contact_name }}
-                            @endif
-                        </td>
+                       
                         <td>{{ $car->title }}</td>
                         <td>
                             <div class="datetime">{{ $car->created_at }}</div>
