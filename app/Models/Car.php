@@ -84,7 +84,7 @@ class Car extends Model implements HasMedia, Sortable
 
     public function loadType()
     {
-        return $this->belongsTo(LoadType::class, 'load_type_id');
+        return $this->belongsTo(LoadType::class, 'load_type');
     }
 
     public function Auction()
@@ -124,4 +124,8 @@ class Car extends Model implements HasMedia, Sortable
         });
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(ContainerGroup::class, 'container_group_container');
+    }
 }

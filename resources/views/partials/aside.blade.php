@@ -34,6 +34,16 @@
                 </li>
             @endif
 
+
+            @if (auth()->user()->hasRole('Admin'))
+                <li class="">
+                    <a href="/dashboard/containers/status/for-load">
+                        <i class="fa fa-ship"></i><span>Containers</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @endif
+
         </ul>
     </div>
     <!-- /.sidebar -->

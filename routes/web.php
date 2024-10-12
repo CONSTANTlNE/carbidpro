@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/car/edit/{id}', [CarController::class, 'update'])->name(name: 'car.update');
     Route::post('/dashboard/car/list-update/{id}', [CarController::class, 'listUpdate'])->name(name: 'car.listupdate');
     Route::get('/dashboard/cars/status/{slug}', [CarController::class, 'showStatus'])->name(name: 'car.showStatus');
+    Route::delete('/dashboard/car/{user}', [CarController::class, 'destroy'])->name('car.destroy');
+
 
     Route::post('/calculate-shipping-cost', [CarController::class, 'calculateShippingCost'])->name('calculate.shipping.cost');
     Route::post('/fetch-locations', [CarController::class, 'fetchLocations'])->name('fetch.locations');
@@ -47,6 +50,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/fetch-from-states', [CarController::class, 'fetchFromStates'])->name('fetch.from.states');
 
     Route::post('/upload-images', [ImageUploadController::class, 'store'])->name('upload.images.spatie');
+
+
+    // Containers
+     Route::post('/dashboard/container/group-create', [ContainerController::class, 'groupSelectedCars'])->name(name: 'container.selected');
+    Route::post('/dashboard/container/create', [ContainerController::class, 'store'])->name(name: 'container.store');
+    Route::get('/dashboard/container/edit/{id}', [ContainerController::class, 'edit'])->name(name: 'container.edit');
+    Route::post('/dashboard/container/edit/{id}', [ContainerController::class, 'update'])->name(name: 'container.update');
+    Route::post('/dashboard/container/list-update/{id}', [ContainerController::class, 'listUpdate'])->name(name: 'container.listupdate');
+    Route::get('/dashboard/containers/status/{slug}', [ContainerController::class, 'showStatus'])->name(name: 'container.showStatus');
+    Route::post('/dashboard/containers/update/group', [ContainerController::class, 'updateGroup'])->name(name: 'container.updateGroup');
+    Route::post('/dashboard/containers/send-email', [ContainerController::class, 'sendEmail'])->name(name: 'container.sendEmail');
 
 });
 

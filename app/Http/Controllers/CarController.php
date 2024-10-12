@@ -466,6 +466,11 @@ class CarController extends Controller
 
 
         $car->status = $car->status + 1;
+
+        if ($car->status == 7) {
+            $car->container_status = 1;
+        }
+
         $car->save();
 
 
@@ -478,8 +483,14 @@ class CarController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Car $car)
+    public function destroy($id)
     {
-        //
+        $car = Car::findOrFail($id);
+        $car->delete();
+
+        // Return success response
+        return response()->json([
+            'message' => 'Car deleted successfully!',
+        ]);
     }
 }

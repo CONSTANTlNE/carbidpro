@@ -68,7 +68,7 @@
                             </a>
 
                             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                data-target="#deleteCarModal" data-car-id="{{ $car->id }}">
+                                data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
                                 <i class="fa fa-trash-o"></i>
                             </button>
                             <br>
