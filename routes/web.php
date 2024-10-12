@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/containers/status/{slug}', [ContainerController::class, 'showStatus'])->name(name: 'container.showStatus');
     Route::post('/dashboard/containers/update/group', [ContainerController::class, 'updateGroup'])->name(name: 'container.updateGroup');
     Route::post('/dashboard/containers/send-email', [ContainerController::class, 'sendEmail'])->name(name: 'container.sendEmail');
+    Route::post('/dashboard/containers/get-avaliable-cars', [ContainerController::class, 'availableCars'])->name(name: 'container.availableCars');
+    Route::post('/dashboard/containers/replace-car', [ContainerController::class, 'replaceCar'])->name(name: 'container.replaceCar');
 
 });
 

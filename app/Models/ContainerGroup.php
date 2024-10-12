@@ -14,6 +14,7 @@ class ContainerGroup extends Model
         'container_id',
         'photo',
         'cost',
+        'booking_id',
     ];
 
     public function cars()

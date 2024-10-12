@@ -75,7 +75,7 @@
                                             @endphp
                                             <a href="{{ route('container.showStatus', $status->slug) }}"
                                                 class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-                                                {{ $status->name }} {{ $status->cars_count }}
+                                                {{ $status->name }} {{ $status->container_status_count }}
                                             </a>
                                         @endforeach
 

@@ -30,9 +30,9 @@ class ContainerController extends Controller
 
         if (auth()->user()->hasRole('Admin')) {
 
-            $container_status = ContainerStatus::withCount('cars')->get();
+            $container_status = ContainerStatus::withCount('cars','containerStatus')->get();
         } else {
-            $container_status = ContainerStatus::withCount([
+            $container_status = ContainerStatus::withCount(['containerStatus',
                 'cars' => function ($query) {
                     $query->where('dispatch_id', auth()->id());
                 }
@@ -59,6 +59,7 @@ class ContainerController extends Controller
             $groups = ContainerGroup::with('cars')->get();
         }
 
+ 
         return view('pages.containers.index', compact('cars', 'groups', 'container_status'));
 
     }
@@ -85,13 +86,51 @@ class ContainerController extends Controller
         $car_ids_array = explode(",", $carIds[0]);
 
         Car::whereIn('id', $car_ids_array)->increment('container_status', 1);
-
+        $availableCars = Car::whereNotIn('id', $car_ids_array)->get();
 
         $group->cars()->attach($car_ids_array); // Laravel will create separate rows for each car ID
 
 
 
         return redirect()->back()->with(['message' => 'Cars grouped successfully', 'group' => $group]);
+    }
+
+    public function availableCars(Request $request)
+    {
+
+        $car_ids = DB::table('container_group_container')
+            ->where('container_group_id', $request->container_id)
+            ->pluck('car_id')
+            ->toArray();
+
+
+        $availableCars = Car::whereNotIn('id', $car_ids)->get(); // Or apply filtering logic if necessary
+
+        // Return the cars in a JSON format
+        return response()->json([
+            'cars' => $availableCars
+        ]);
+    }
+
+    public function replaceCar(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'original_car_id' => 'required|exists:cars,id',
+            'new_car_id' => 'required|exists:cars,id',
+        ]);
+
+        // Fetch the original car
+        $originalCar = ContainerGroup::findOrFail($request->container_id);
+        $original_car_id = Car::where('id', $request->original_car_id)->first();
+
+        // Detach the old car from the group
+        $originalCar->cars()->detach($original_car_id->id);
+
+        // Attach the new car to the group
+        $originalCar->cars()->attach($request->new_car_id);
+
+        return response()->json(['message' => 'Car replaced successfully']);
     }
 
     public function listUpdate(Request $request)
@@ -137,8 +176,8 @@ class ContainerController extends Controller
             $container->cost = $request->container_cost;
         }
 
-        if ($request->has('container_cost')) {
-            $container->cost = $request->container_cost;
+        if ($request->has('booking_id')) {
+            $container->booking_id = $request->booking_id;
         }
 
         if ($request->hasFile('bol_photo')) {
@@ -180,7 +219,7 @@ class ContainerController extends Controller
 
 
 
-        Mail::to('info@test.com')->send(new CarGroupEmail($cars));
+        Mail::to('kvachakhiadimitri@gmail.com')->send(new CarGroupEmail($cars));
 
 
         // Return a response for AJAX

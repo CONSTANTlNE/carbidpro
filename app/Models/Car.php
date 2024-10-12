@@ -42,7 +42,6 @@ class Car extends Model implements HasMedia, Sortable
         'title_received',
         'key',
         'record_color',
-        'status',
         'comment',
         'is_deleted',
         'balance_accounting',

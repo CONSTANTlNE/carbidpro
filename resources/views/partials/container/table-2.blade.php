@@ -12,6 +12,7 @@
                         <th>Warehouse</th>
                         <th>Owner</th>
                         <th style="width: 10%;">Dispatch day count</th>
+                        <th style="width: 10%;">Booking #</th>
                         <th style="width: 10%;">Container #
                         </th>
                         <th style="width: 10%;">Container Cost
@@ -32,7 +33,11 @@
                             <th></th>
                             <th></th>
                             <th></th>
-                            <th style="width: 10%;"></th>
+                            <th></th>
+                            <th style="width: 10%;">
+                                <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
+                                    class="form-control" name="booking_id" id="booking_id">
+                            </th>
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
                                     class="form-control" name="container" id="container">
@@ -116,12 +121,19 @@
                                     {{ $daysGone }} Day
 
                                 </td>
+                                <td>{{ $cargroup->booking_id }}</td>
                                 <td>{{ $car->container_number }}</td>
                                 <td>{{ $cargroup->cost }}</td>
                                 <td></td>
 
                                 <td>
+                                    <!-- Button to trigger the modal -->
 
+                                    <button data-car-id="{{ $car->id }}" data-container-id="{{ $cargroup->id }}"
+                                        data-toggle="modal" class="btn btn-dark open-modal"
+                                        data-target="#replaceCarModal" type="button">
+                                        Replace
+                                    </button>
                                 </td>
                             </form>
 
@@ -134,10 +146,119 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="replaceCarModal" tabindex="-1" aria-labelledby="replaceCarModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="replaceCarModalLabel">Replace Car</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="replaceCarForm">
+                            <input type="hidden" name="original_car_id" id="original_car_id">
+
+                            <div class="form-group">
+                                <label for="new_car_id">Select a new car:</label>
+                                <select name="new_car_id" id="new_car_id" class="form-control">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-container-id='0' class="btn btn-primary"
+                            id="saveCarReplacement">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 @endforeach
 
 @push('js')
     <script>
+        $(document).ready(function() {
+            // Handle opening the modal and fetching available cars
+            $('.open-modal').on('click', function() {
+                var carId = $(this).data('car-id');
+                var container_id = $(this).data('container-id');
+                $('#original_car_id').val(carId); // Set the original car ID in the modal form
+
+                // Clear any existing options in the select dropdown
+                $('#new_car_id').empty();
+
+                console.log(container_id)
+                $('#saveCarReplacement').attr('data-container-id', container_id);
+
+
+                // Fetch available cars via AJAX
+                $.ajax({
+                    url: '{{ route('container.availableCars') }}', // Your endpoint to fetch available cars
+                    method: 'POST',
+                    data: {
+                        carId: carId,
+                        container_id: container_id,
+                    },
+                    success: function(response) {
+                        // Loop through the response and populate the select dropdown
+                        $('#new_car_id').append(
+                            $('<option>', {
+                                value: '',
+                                text: ''
+                            })
+                        );
+                        response.cars.forEach(function(car) {
+                            $('#new_car_id').append(
+                                $('<option>', {
+                                    value: car.id,
+                                    text: car.make_model_year + '- ' + car.vin
+                                })
+                            );
+                        });
+                        // Show the modal after cars are loaded
+                        $('#replaceCarModal').modal('show');
+
+                    },
+                    error: function(xhr) {
+                        alert('Failed to load available cars.');
+                    }
+                });
+            });
+
+            // Handle saving the replacement
+            $('#saveCarReplacement').on('click', function() {
+                var originalCarId = $('#original_car_id').val();
+                var newCarId = $('#new_car_id').val();
+                var container_id = $(this).data('container-id');
+
+                // Send an AJAX request to replace the car
+                $.ajax({
+                    url: '{{ route('container.replaceCar') }}', // Laravel route for replacing cars
+                    method: 'POST',
+                    data: {
+                        original_car_id: originalCarId,
+                        new_car_id: newCarId,
+                        container_id: container_id,
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        alert('Car replaced successfully!');
+                        $('#replaceCarModal').modal('hide'); // Close the modal on success
+                        location.reload(); // Optionally, reload the page to reflect changes
+                    },
+                    error: function(xhr) {
+                        alert('Failed to replace car.');
+                    }
+                });
+            });
+        });
+
+
+
         $(document).on('click', '.sendEmail', function() {
             var container_id = $(this).data('container-id');
             sendEmail(container_id);
