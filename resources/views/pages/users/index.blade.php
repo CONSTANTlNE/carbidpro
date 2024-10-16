@@ -153,6 +153,10 @@
                                                     <option value="Admin">Admin</option>
                                                     <option value="Editor">Editor</option>
                                                     <option value="Dispatch">Dispatch</option>
+                                                    <option value="Loader">Loader</option>
+                                                    <option value="Finance">Finance</option>
+                                                    <option value="Terminal Agent">Terminal Agent</option>
+                                                    
                                                 </select>
                                             </div>
                                             <div class="col-md-12 form-group user-form-group">

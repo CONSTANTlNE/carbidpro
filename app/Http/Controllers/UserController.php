@@ -79,7 +79,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id, // Ensure the email is unique, except for this user
-            'role' => 'required|in:Admin,Editor,Dispatch', // Ensure role is one of the predefined roles
+            'role' => 'required|in:Admin,Editor,Dispatch,Loader,Finance,Terminal Agent', // Ensure role is one of the predefined roles
             'password' => 'nullable|confirmed|min:6', // Validate password and confirmation, but it's optional (nullable)
         ]);
 

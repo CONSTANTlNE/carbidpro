@@ -6,6 +6,9 @@ use App\Mail\CarGroupEmail;
 use App\Models\CarStatus;
 use App\Models\ContainerGroup;
 use App\Models\ContainerStatus;
+use App\Models\LoadType;
+use App\Models\Port;
+use App\Models\PortCity;
 use DB;
 use Illuminate\Http\Request;
 use App\Models\Car;
@@ -29,10 +32,10 @@ class ContainerController extends Controller
         $containerStatus = ContainerStatus::where('slug', $slug)->first();
 
         if (auth()->user()->hasRole('Admin')) {
-
-            $container_status = ContainerStatus::withCount('cars','containerStatus')->get();
+            $container_status = ContainerStatus::withCount('cars', 'containerStatus')->get();
         } else {
-            $container_status = ContainerStatus::withCount(['containerStatus',
+            $container_status = ContainerStatus::withCount([
+                'containerStatus',
                 'cars' => function ($query) {
                     $query->where('dispatch_id', auth()->id());
                 }
@@ -41,26 +44,73 @@ class ContainerController extends Controller
 
         $groups = '';
         $cars = '';
+
+
         if ($slug == 'for-load') {
-            if (auth()->user()->hasRole('Admin')) {
-                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
-                    ->where('container_status', 1)->paginate(50);
+
+            if (isset($_GET)) {
+                $query = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
+                    ->where('container_status', 1);
+
+                // Apply filters based on GET parameters if they exist
+                if ($request->has('to_port_id') && !empty($request->to_port_id)) {
+                    $query->where('to_port_id', $request->to_port_id);
+                }
+
+                if ($request->has('load_type') && !empty($request->load_type)) {
+                    $query->where('load_type', $request->load_type);
+                }
+
+                if ($request->has('type_of_fuel') && !empty($request->type_of_fuel)) {
+                    $query->where('type_of_fuel', $request->type_of_fuel);
+                }
+
+                if ($request->has('title') && !is_null($request->title)) {
+                    $query->where('title', $request->title); // Assuming 1 = Yes, 0 = No
+                }
+
+                $cars = $query->paginate(50);
+
 
             } else {
-
-                $cars = Car::with(relations: ['state', 'dispatch', 'customer', 'auction', 'loadType'])
-                    ->where(
-                        'container_status',
-                        $containerStatus->id
-                    )->where('dispatch_id', auth()->user()->id)
-                    ->paginate(50);
+                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
+                    ->where('container_status', 1)->paginate(50);
             }
+
         } elseif ($slug == 'loading-pending') {
-            $groups = ContainerGroup::with('cars')->get();
+
+            $groups = ContainerGroup::with('cars')
+                ->whereHas('cars', function ($query) {
+                    $query->where('container_status', 2);  // Filter cars where container_status is 2
+                })
+                ->get();
+
+        } else {
+
+            $groups = ContainerGroup::with('cars')
+                ->whereHas('cars', function ($query) {
+                    $query->where('container_status', 3);  // Filter cars where container_status is 2
+                })
+                ->get();
         }
 
- 
-        return view('pages.containers.index', compact('cars', 'groups', 'container_status'));
+
+
+
+
+        $ports = Port::all();
+        $loadtypes = LoadType::all();
+
+        return view(
+            'pages.containers.index',
+            compact(
+                'cars',
+                'groups',
+                'container_status',
+                'ports',
+                'loadtypes'
+            )
+        );
 
     }
 
@@ -74,10 +124,6 @@ class ContainerController extends Controller
         ]);
 
 
-        // Create a new car group dynamically
-        $group = ContainerGroup::create([
-            'group_name' => 'Group ' . now()->timestamp,  // Example group name
-        ]);
 
         // Attach selected cars to this group
 
@@ -85,18 +131,40 @@ class ContainerController extends Controller
 
         $car_ids_array = explode(",", $carIds[0]);
 
+        $cars = Car::whereIn('id', $car_ids_array)->pluck('to_port_id');
+
+
+        // Create a new car group dynamically
+        $group = ContainerGroup::create([
+            'group_name' => 'Group ' . now()->timestamp,
+        ]);
+
+
+        $cars = Car::whereIn('id', $car_ids_array)->pluck('to_port_id');
+
+        // Check if all from_state_id are the same
+        if ($cars->unique()->count() === 1) {
+            // All records have the same from_state_id
+            $sameState = true;
+            $group->update(['to_port_id' => $cars[0]]);
+        } else {
+            return redirect()->back()->with(['message' => 'Cars Port need same', 'alert-type' => 'error']);
+        }
+
+
         Car::whereIn('id', $car_ids_array)->increment('container_status', 1);
         $availableCars = Car::whereNotIn('id', $car_ids_array)->get();
 
         $group->cars()->attach($car_ids_array); // Laravel will create separate rows for each car ID
 
 
-
-        return redirect()->back()->with(['message' => 'Cars grouped successfully', 'group' => $group]);
+        return redirect()->route('container.showStatus', 'loading-pending')->with(['message' => 'Cars grouped successfully', 'group' => $group]);
     }
 
     public function availableCars(Request $request)
     {
+
+
 
         $car_ids = DB::table('container_group_container')
             ->where('container_group_id', $request->container_id)
@@ -104,7 +172,13 @@ class ContainerController extends Controller
             ->toArray();
 
 
-        $availableCars = Car::whereNotIn('id', $car_ids)->get(); // Or apply filtering logic if necessary
+        if ($request->has('to_port_id')) {
+            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->where('to_port_id', $request->to_port_id)->get(); // Or apply filtering logic if necessary
+        } else {
+            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->get(); // Or apply filtering logic if necessary
+
+        }
+
 
         // Return the cars in a JSON format
         return response()->json([
@@ -133,9 +207,36 @@ class ContainerController extends Controller
         return response()->json(['message' => 'Car replaced successfully']);
     }
 
+    public function addCarToGroup(Request $request)
+    {
+        // Fetch the original car
+        $containerGroup = ContainerGroup::findOrFail($request->container_id);
+        $containerGroup->cars()->attach($request->car_id);
+        $containerGroup->is_email_sent = 0;
+        $containerGroup->save();
+
+        return redirect()->back()->with('success', 'Container updated successfully.');
+    }
+
+    public function removeFromList(Request $request)
+    {
+
+        // Fetch the original car
+        $originalCar = ContainerGroup::findOrFail($request->container_id);
+        $car = Car::where('id', $request->carId)->first();
+        // Detach the old car from the group
+        $originalCar->cars()->detach($car->id);
+        $car->container_status = 1;
+        $originalCar->is_email_sent = 0;
+        $originalCar->save();
+        $car->save();
+
+        return response()->json(['message' => 'Car Removed From List']);
+    }
+
     public function listUpdate(Request $request)
     {
-        $car = Car::with('statusRelation')->findOrFail($request->id);
+        $car = Car::with('statusRelation')->findOrFail($request->carid);
 
         if ($request->has('title')) {
             $car->title = $request->title;
@@ -190,11 +291,51 @@ class ContainerController extends Controller
             $container->photo = $path;
         }
 
+        if ($request->has('arrival_time')) {
+            $container->arrival_time = $request->arrival_time;
+            Car::whereIn('id', $car_ids)->update(['arrival_time' => $request->arrival_time]);
+
+        }
+
+
+        if ($request->hasFile('invoice_file')) {
+            // Get the uploaded file (single file)
+            $invoice_file = $request->file('invoice_file');
+
+            // Store the file in 'public/payment_invoice_files' directory
+            $path = $invoice_file->store('invoice_file', 'public');
+            // Save the path in the database
+            $container->invoice_file = $path;
+        }
+
+        if ($request->hasFile('thc_invoice')) {
+            // Get the uploaded file (single file)
+            $thc_invoice = $request->file('thc_invoice');
+
+            // Store the file in 'public/payment_thc_invoices' directory
+            $path = $thc_invoice->store('thc_invoice', 'public');
+            // Save the path in the database
+            $container->thc_invoice = $path;
+        }
+
+
+        if ($request->has('thc_cost')) {
+            $container->thc_cost = $request->thc_cost;
+        }
+
+        if ($request->has('thc_agent')) {
+            $container->thc_agent = $request->thc_agent;
+        }
+
+        
+
 
         $container->save();
 
-        // Optionally, you can redirect or return a response
-        return redirect()->back()->with('success', 'Container updated successfully.');
+        Car::whereIn('id', $car_ids)->update(['container_status' => 3]);
+
+
+        return redirect()->route('container.showStatus', 'loaded-payments')->with(['message' => 'Container updated successfully']);
 
 
 
@@ -217,10 +358,11 @@ class ContainerController extends Controller
 
         $cars = Car::whereIn('id', $car_ids)->get();
 
-
-
         Mail::to('kvachakhiadimitri@gmail.com')->send(new CarGroupEmail($cars));
 
+        $container = ContainerGroup::findOrFail($request->container_id);
+        $container->is_email_sent = 1;
+        $container->save();
 
         // Return a response for AJAX
         return response()->json(['message' => 'Email sent successfully!']);

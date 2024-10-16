@@ -18,6 +18,7 @@
                 </li>
             @endif
 
+
             @if (auth()->user()->hasRole('Dispatch'))
                 <li class="{{ Route::is('car.showStatus') ? 'active' : '' }}">
                     <a href="/dashboard/cars/status/for-dispatch">
@@ -25,7 +26,7 @@
                         <span class="pull-right-container"></span>
                     </a>
                 </li>
-            @else
+            @elseif(auth()->user()->hasRole('Admin'))
                 <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
                     <a href="{{ route('cars.index') }}">
                         <i class="fa fa-automobile"></i><span>Cars</span>
@@ -35,10 +36,26 @@
             @endif
 
 
-            @if (auth()->user()->hasRole('Admin'))
+            @if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Loader'))
                 <li class="">
                     <a href="/dashboard/containers/status/for-load">
                         <i class="fa fa-ship"></i><span>Containers</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @elseif(auth()->user()->hasRole('Finance'))
+                <li class="">
+                    <a href="{{ route('container.showStatus', 'loaded-payments') }}">
+                        <i class="fa fa-ship"></i><span>Containers</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @endif
+
+            @if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Terminal Agent'))
+                <li class="">
+                    <a href="{{ route('arrived.index') }}">
+                        <i class="fa fa-anchor"></i><span>Arrived</span>
                         <span class="pull-right-container"></span>
                     </a>
                 </li>

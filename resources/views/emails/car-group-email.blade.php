@@ -6,18 +6,16 @@
 </head>
 
 <body>
-    <h1>Car Group Details</h1>
+    <h1>Load Vehicles in container</h1>
 
-    <p>Hello,</p>
+    <p>Hello</p>
 
-    <p>List of Cars in this Container:</p>
+    <p>Please Load this Vehicles:</p>
     <ul>
         @foreach ($carGroup as $car)
-            <li>VIN: {{ $car->vin }}</li>
-            <li>Owner Name: {{ $car->vehicle_owner_name }}</li>
-            <li>Owner ID Number: {{ $car->owner_id_number }}</li>
-            <li>Owner Phone: {{ $car->owner_phone_number }}</li>
-            <li>Container: {{ $car->container_number }}</li>
+            <li style="color:rgb(47,85,151)">Vin# {{ $car->vin }} / {{ $car->make_model_year }}
+                ({{ $car->vehicle_owner_name }} {{ $car->owner_id_number }})
+            </li>
         @endforeach
     </ul>
 

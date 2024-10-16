@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArrivedController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\ImageUploadController;
@@ -53,16 +54,26 @@ Route::middleware('auth')->group(function () {
 
 
     // Containers
-     Route::post('/dashboard/container/group-create', [ContainerController::class, 'groupSelectedCars'])->name(name: 'container.selected');
+    Route::post('/dashboard/container/group-create', [ContainerController::class, 'groupSelectedCars'])->name(name: 'container.selected');
     Route::post('/dashboard/container/create', [ContainerController::class, 'store'])->name(name: 'container.store');
     Route::get('/dashboard/container/edit/{id}', [ContainerController::class, 'edit'])->name(name: 'container.edit');
     Route::post('/dashboard/container/edit/{id}', [ContainerController::class, 'update'])->name(name: 'container.update');
-    Route::post('/dashboard/container/list-update/{id}', [ContainerController::class, 'listUpdate'])->name(name: 'container.listupdate');
+    Route::post('/dashboard/container/list-update', [ContainerController::class, 'listUpdate'])->name(name: 'container.listupdate');
     Route::get('/dashboard/containers/status/{slug}', [ContainerController::class, 'showStatus'])->name(name: 'container.showStatus');
     Route::post('/dashboard/containers/update/group', [ContainerController::class, 'updateGroup'])->name(name: 'container.updateGroup');
     Route::post('/dashboard/containers/send-email', [ContainerController::class, 'sendEmail'])->name(name: 'container.sendEmail');
     Route::post('/dashboard/containers/get-avaliable-cars', [ContainerController::class, 'availableCars'])->name(name: 'container.availableCars');
     Route::post('/dashboard/containers/replace-car', [ContainerController::class, 'replaceCar'])->name(name: 'container.replaceCar');
+    Route::post('/dashboard/containers/remove-from-list', [ContainerController::class, 'removeFromList'])->name(name: 'container.removeFromList');
+    Route::post('/dashboard/containers/add-car-to-group', [ContainerController::class, 'addCarToGroup'])->name(name: 'container.addCarToGroup');
+    Route::post('/dashboard/containers/filter', [ContainerController::class, 'addCarToGroup'])->name(name: 'container.filter');
+
+    // Arrived
+    Route::get('/dashboard/arrived/index', [ArrivedController::class, 'index'])->name(name: 'arrived.index');
+    Route::post('/dashboard/arrived/container/{id}/save', [ArrivedController::class, 'update'])->name(name: 'arrived.update');
+    Route::post('/dashboard/arrived/car/{id}/update', [ArrivedController::class, 'updateCar'])->name(name: 'arrived.car-update');
+    Route::get('/dashboard/arrived/car/{id}/show-image/', [ArrivedController::class, 'showImages'])->name(name: 'arrived.showImages');
+
 
 });
 

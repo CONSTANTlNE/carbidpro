@@ -57,7 +57,12 @@ class Car extends Model implements HasMedia, Sortable
         'payment_address',
         'customer_id',
         'dispatch_id',
-        'zip_code'
+        'zip_code',
+        'arrival_time',
+        'title_take',
+        'remark',
+        'bill_of_loading',
+        'container_images',
     ];
 
     public function statusRelation()

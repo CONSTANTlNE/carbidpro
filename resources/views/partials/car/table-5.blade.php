@@ -44,12 +44,7 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
-                                ${{ $car->internal_shipping }}</div>
-                            <div class="d-flex" style="gap: 5px"><strong>Storage: </strong> ${{ $car->storage_cost }}
-                            </div>
-                            <div class="d-flex" style="gap: 5px"><strong>Sum: </strong>
-                                ${{ $car->internal_shipping + $car->storage_cost }}</div>
+                            @include('partials.car.table_content-parts.car-price')
                         </td>
                         <td>
                             <label for="company_name">Company name:</label><br>
@@ -59,8 +54,8 @@
                             {{ $car->contact_info }}
                         </td>
                         <td>
-                            <input type="text" data-record-id="{{ $car->id }}"
-                                value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
+                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>
                             <label style="margin: 0;padding:0">Title Status</label>

@@ -10,6 +10,7 @@
                 padding: 5px 15px;
             }
         </style>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     @endpush
 @section('body-class', 'hold-transition sidebar-mini sidebar-collapse')
 
@@ -38,11 +39,26 @@
             </div>
         </section>
         <div class="container">
-            @if (session('success'))
-                <div class="alert alert-success"
-                    style="text-align: center;font-size: 20px;text-transform: uppercase;font-weight: bold;max-width: 600px;margin: 1rem  auto 0;">
-                    {{ session('success') }}
-                </div>
+            @if (session('message'))
+                <style>
+                    .alert {
+                        text-align: center;
+                        font-size: 20px;
+                        text-transform: uppercase;
+                        font-weight: bold;
+                        max-width: 600px;
+                        margin: 1rem auto 0;
+                    }
+                </style>
+                @if (session('alert-type') == 'success')
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @elseif (session('alert-type') == 'error')
+                    <div class="alert alert-danger">
+                        {{ session('message') }}
+                    </div>
+                @endif
             @endif
         </div>
         <!-- Main content -->
@@ -65,39 +81,35 @@
                                         @foreach ($container_status as $status)
                                             @php
                                                 $hasError = '';
-                                                // if ($status->id == 7) {
-                                                //     // Check if any car related to this status has title_delivery set to 'no'
-                                                //     $hasError = $status->cars->contains(function ($car) {
-                                                //         return $car->title_delivery == 'no' ||
-                                                //             !$car->getMedia('images')->isNotEmpty();
-                                                //     });
-                                                // }
                                             @endphp
-                                            <a href="{{ route('container.showStatus', $status->slug) }}"
-                                                class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-                                                {{ $status->name }} {{ $status->container_status_count }}
-                                            </a>
+                                            @if (auth()->user()->hasRole('Finance') && $status->slug == 'loaded-payments')
+                                                <a href="{{ route('container.showStatus', $status->slug) }}"
+                                                    class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
+                                                    {{ $status->name }} {{ $status->container_status_count }}
+                                                </a>
+                                            @elseif(!auth()->user()->hasRole('Finance'))
+                                                <a href="{{ route('container.showStatus', $status->slug) }}"
+                                                    class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
+                                                    {{ $status->name }} {{ $status->container_status_count }}
+                                                </a>
+                                            @endif
                                         @endforeach
 
 
                                     </div>
 
                                     <div style="display: flex;flex-direction: column;gap: 30px;align-items: flex-end;">
-                                        <form class="form-inline my-2 my-lg-0" method="GET">
 
-                                            <input class="form-control mr-sm-2"
-                                                value="{{ isset($_GET['search']) ? $_GET['search'] : '' }}"
-                                                name="search" type="search" placeholder="Search" aria-label="Search">
-                                            <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
-                                        </form>
-
-                                        <form action="{{ route('container.selected') }}"
-                                            class="form-inline my-2 my-lg-0 mt-5 mb-3" method="post">
-                                            @csrf
-                                            <input type="hidden" class="carids" id="carids" name="car_ids[]"
-                                                value="">
-                                            <button class="btn btn-primary my-2 my-sm-0 mb-3" type="submit">Next</button>
-                                        </form>
+                                        @if ($currentStatus == 'for-load')
+                                            <form action="{{ route('container.selected') }}"
+                                                class="form-inline my-2 my-lg-0 mt-5 mb-3" method="post">
+                                                @csrf
+                                                <input type="hidden" class="carids" id="carids" name="car_ids[]"
+                                                    value="">
+                                                <button class="btn btn-primary my-2 my-sm-0 mb-3"
+                                                    type="submit">Next</button>
+                                            </form>
+                                        @endif
 
 
                                     </div>
@@ -113,7 +125,7 @@
                             @elseif($currentStatus == 'loading-pending')
                                 @include('partials.container.table-2', ['cars' => $groups])
                             @else
-                                @include('partials.car.table-default')
+                                @include('partials.container.table-3', ['cars' => $groups])
                             @endif
 
                         </div>
@@ -160,6 +172,7 @@
     @include('partials.footer')
 
     @push('js')
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const carCheckboxes = document.querySelectorAll('.car_ids');
@@ -175,6 +188,26 @@
                         // Update the hidden input value with selected IDs (comma-separated)
                         hiddenInput.value = selectedCars.join(',');
                     });
+                });
+            });
+
+            $('.title').on('change', function(e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var title = $(this).val(); // Get the user ID from the hidden input
+                var carid = $(this).data('car-id'); // Get the user ID from the hidden input
+
+                $.ajax({
+                    url: '{{ route('container.listupdate') }}',
+                    type: 'POST', // HTTP method for deletion
+                    data: {
+                        carid: carid,
+                        title: title
+                    }, // Send the serialized form data (including the CSRF token)
+                    success: function(response) {},
+                    error: function(xhr) {
+                        alert('Something went wrong.'); // Handle errors
+                    }
                 });
             });
         </script>

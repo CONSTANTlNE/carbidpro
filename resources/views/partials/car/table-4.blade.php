@@ -27,12 +27,7 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
-                                ${{ $car->internal_shipping }}</div>
-                            <div class="d-flex" style="gap: 5px"><strong>Storage: </strong> ${{ $car->storage_cost }}
-                            </div>
-                            <div class="d-flex" style="gap: 5px"><strong>Sum: </strong>
-                                ${{ $car->internal_shipping + $car->storage_cost }}</div>
+                            @include('partials.car.table_content-parts.car-price')
                         </td>
                         <td>
                             <label for="company_name">Company name:</label><br>

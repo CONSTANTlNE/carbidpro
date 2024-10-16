@@ -57,12 +57,7 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
-                                ${{ $car->internal_shipping }}</div>
-                            <div class="d-flex" style="gap: 5px"><strong>Storage: </strong> ${{ $car->storage_cost }}
-                            </div>
-                            <div class="d-flex" style="gap: 5px"><strong>Sum: </strong>
-                                ${{ $car->internal_shipping + $car->storage_cost }}</div>
+                            @include('partials.car.table_content-parts.car-price')
                         </td>
                         <td>
                             <label for="company_name">Company name:</label><br>
@@ -71,7 +66,7 @@
                             <label for="contact_info">Contact info:</label><br>
                             {{ $car->contact_info }}
                         </td>
-                      
+
                         <td>
                             {{ $car->pickup_dates }}
                         </td>
@@ -82,7 +77,7 @@
 
                             <label class="mt-2" for="title_delivery">Title delivery</label>
                             <select name="title_delivery"
-                                class="form-control {{ $car->title == 'yes' && $car->title_delivery ? 'error' : '' }}"
+                                class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES

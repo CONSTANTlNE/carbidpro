@@ -1,5 +1,8 @@
+
+
+
 @foreach ($cars as $key => $cargroup)
-    <h4 style="m-0"> GROUP: {{ $key + 1 }}</h2>
+    <h4 class="mt-2"> GROUP: {{ $key + 1 }}</h2>
 
         <div class="table-responsive">
             <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
@@ -19,10 +22,10 @@
                         </th>
                         <th style="width: 10%;"> Photo of BOL
                         </th>
-                        <th>Action</th>
+                        <th style="width: 50%;">Action</th>
                     </tr>
                 </thead>
-                <thead class="back_table_color">
+                <thead class="back_table_color" style="background-color: #576cff21">
                     <form action="{{ route('container.updateGroup') }}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="group_id" value="{{ $cargroup->id }}">
                         @csrf
@@ -36,19 +39,18 @@
                             <th></th>
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
-                                    class="form-control" name="booking_id" id="booking_id">
+                                    class="form-control" name="booking_id" id="booking_id" required>
                             </th>
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
-                                    class="form-control" name="container" id="container">
+                                    class="form-control" name="container" id="container" required>
                             </th>
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
-                                    class="form-control" name="container_cost" id="container_cost">
+                                    class="form-control" name="container_cost" id="container_cost" required>
                             </th>
                             <th style="width: 10%;">
-                                <input type="file" name="bol_photo" id="bol_photo"
-                                    onchange="previewImage(event, 'preview_{{ $cargroup->id }}')" required>
+                                <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;" required>
 
                                 @if (!empty($cargroup->photo))
                                     <a href="{{ Storage::url($cargroup->photo) }}" target="_blank">
@@ -61,15 +63,23 @@
                                 <img id="preview_{{ $cargroup->id }}" src="" alt="Image preview"
                                     style="display:none; max-width: 100px; margin-top:10px;">
                             </th>
-                            <th>
+                            <th style="width: 50%;">
                                 <div class="d-flex" style="gap:10px">
                                     <button type="button" id="sendEmail" data-container-id="{{ $cargroup->id }}"
-                                        class="sendEmail btn btn-primary btn-sm">
+                                        class="sendEmail btn {{ $cargroup->is_email_sent == 1 ? 'btn-warning' : 'btn-primary' }} btn-sm">
                                         Send email
                                     </button>
 
                                     <button type="submit" class="btn btn-success btn-sm">
                                         NEXT
+                                    </button>
+
+
+
+                                    <button data-container-id="{{ $cargroup->id }}"
+                                        data-to_port_id='{{ $cargroup->to_port_id }}' data-toggle="modal"
+                                        class="btn btn-dark open-car-modal" data-target="#addCarModal" type="button">
+                                        Add Car
                                     </button>
                                 </div>
 
@@ -98,10 +108,10 @@
                                 <td>{{ $car->type_of_fuel }}</td>
 
                                 <td>
-                                    {{ $car->warehouse }}<br>
+                                    {{ !empty($car->port) ? $car->port->name : '' }} <br>
                                     <label for="">Destination Port:</label>
                                     <br>
-                                    {{ $car->port->name }}<br>
+                                    POTI<br>
                                 </td>
 
                                 <td>
@@ -128,11 +138,14 @@
 
                                 <td>
                                     <!-- Button to trigger the modal -->
-
                                     <button data-car-id="{{ $car->id }}" data-container-id="{{ $cargroup->id }}"
                                         data-toggle="modal" class="btn btn-dark open-modal"
                                         data-target="#replaceCarModal" type="button">
                                         Replace
+                                    </button>
+                                    <button data-car-id="{{ $car->id }}" data-container-id="{{ $cargroup->id }}"
+                                        class="btn btn-danger removefromlist" type="button">
+                                        Remove
                                     </button>
                                 </td>
                             </form>
@@ -147,7 +160,7 @@
             </table>
         </div>
 
-        <!-- Modal -->
+        <!-- Modal Replace -->
         <div class="modal fade" id="replaceCarModal" tabindex="-1" aria-labelledby="replaceCarModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -177,11 +190,82 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Add car -->
+        <div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCarModalLabel">Add car</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('container.addCarToGroup') }}" method="POST" id="addCarForm">
+                        <div class="modal-body">
+                            @csrf
+                            <input type="hidden" name="container_id" id="container_id">
+
+                            <div class="form-group">
+                                <label for="car-list">
+                                    Select a new car:
+                                    <br>
+                                    <br>
+
+                                    <select name="car_id" class="js-example-responsive js-states form-control"
+                                        id="car-list"></select>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
 @endforeach
 
 @push('js')
     <script>
         $(document).ready(function() {
+
+            $('#car-list').select2({
+                placeholder: 'Select Car',
+                dropdownParent: $('#addCarModal'),
+                matcher: function(params, data) {
+                    // If there are no search terms, return all of the data
+                    if ($.trim(params.term) === '') {
+                        return data;
+                    }
+
+                    // Do not display the item if there is no 'text' property
+                    if (typeof data.text === 'undefined') {
+                        return null;
+                    }
+
+                    // `params.term` is the user's search term
+                    // `data.id` should be checked against
+                    // `data.text` should be checked against
+                    var q = params.term.toLowerCase();
+                    if (data.text.toLowerCase().indexOf(q) > -1 || data.id.toLowerCase().indexOf(q) > -
+                        1) {
+                        return $.extend({}, data, true);
+                    }
+
+                    // Return `null` if the term should not be displayed
+                    return null;
+                }
+
+            });
+
+            $('#new_car_id').select2({
+                placeholder: 'Select Car',
+                dropdownParent: $('#replaceCarModal'),
+            });
+
             // Handle opening the modal and fetching available cars
             $('.open-modal').on('click', function() {
                 var carId = $(this).data('car-id');
@@ -215,7 +299,9 @@
                             $('#new_car_id').append(
                                 $('<option>', {
                                     value: car.id,
-                                    text: car.make_model_year + '- ' + car.vin
+                                    text: car.make_model_year + ' - ' + car
+                                        .vin + ' | ' + car.load_type.name +
+                                        ' | ' + car.type_of_fuel
                                 })
                             );
                         });
@@ -225,6 +311,75 @@
                     },
                     error: function(xhr) {
                         alert('Failed to load available cars.');
+                    }
+                });
+            });
+
+            // Handle opening the modal and fetching available cars
+            $('.open-car-modal').on('click', function() {
+                var carId = $(this).data('car-id');
+                var container_id = $(this).data('container-id');
+                var to_port_id = $(this).data('to_port_id');
+
+                $('#container_id').val(container_id);
+
+
+                // Fetch available cars via AJAX
+                $.ajax({
+                    url: '{{ route('container.availableCars') }}', // Your endpoint to fetch available cars
+                    method: 'POST',
+                    data: {
+                        carId: carId,
+                        container_id: container_id,
+                        to_port_id: to_port_id
+                    },
+                    success: function(response) {
+                        // Loop through the response and populate the select dropdown
+                        $('#car-list').append(
+                            $('<option>', {
+                                value: '',
+                                text: ''
+                            })
+                        );
+                        response.cars.forEach(function(car) {
+                            $('#car-list').append(
+                                $('<option>', {
+                                    value: car.id,
+                                    text: car.make_model_year + ' - ' + car
+                                        .vin + ' | ' + car.load_type.name +
+                                        ' | ' + car.type_of_fuel
+                                })
+                            );
+                        });
+                    },
+                    error: function(xhr) {
+                        alert('Failed to load available cars.');
+                    }
+                });
+            });
+
+
+
+
+            $('.removefromlist').on('click', function() {
+                var carId = $(this).data('car-id');
+                var container_id = $(this).data('container-id');
+
+                // Send an AJAX request to replace the car
+                $.ajax({
+                    url: '{{ route('container.removeFromList') }}', // Laravel route for replacing cars
+                    method: 'POST',
+                    data: {
+                        carId: carId,
+                        container_id: container_id,
+                        _token: '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    success: function(response) {
+                        alert('Car Removed From List!');
+                        location.reload(); // Optionally, reload the page to reflect changes
+                    },
+                    error: function(xhr) {
+                        alert('Failed to Remove car.');
                     }
                 });
             });
