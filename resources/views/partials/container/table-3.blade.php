@@ -11,19 +11,16 @@
                         <th>Fuel type</th>
                         <th>Warehouse</th>
                         <th>Owner</th>
-                        <th style="width: 10%;">Arrival Time</th>
-                        <th style="width: 10%;">Booking #</th>
-                        <th style="width: 10%;">Container #
-                        </th>
+                        <th style="width: 10%;">Container Info</th>
+
                         <th style="width: 10%;">Container Cost
                         </th>
                         <th style="width: 10%;"> Photo of BOL
                         </th>
                         <th style="width: 10%;"> THC agent
                         </th>
-                        <th style="width: 10%;"> THC Cost
-                        </th>
-                        <th style="width: 50%;">Action</th>
+                       
+                        <th style="width: 10%;">Action</th>
                     </tr>
                 </thead>
                 <thead class="back_table_color" style="background-color: #576cff21">
@@ -38,19 +35,19 @@
                             <th></th>
                             <th></th>
                             <th style="width: 10%;">
+                                <label for="booking_id">Booking #</label>
+                                <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
+                                    class="form-control" name="booking_id" id="booking_id" required>
+                                <label for="container">Container #</label>
+                                <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
+                                    class="form-control" name="container" id="container" required>
+                                <label for="arrival_time">Arrival Date</label>
                                 <input type="date"
                                     value="{{ \Carbon\Carbon::parse($cargroup->arrival_time)->format('Y-m-d') }}"
                                     placeholder="Arrival Time" class="form-control" name="arrival_time"
                                     id="arrival_time" {{ $cargroup->arrival_time ? '' : 'required' }}>
                             </th>
-                            <th style="width: 10%;">
-                                <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
-                                    class="form-control" name="booking_id" id="booking_id" required>
-                            </th>
-                            <th style="width: 10%;">
-                                <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
-                                    class="form-control" name="container" id="container" required>
-                            </th>
+
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                     class="form-control" name="container_cost" id="container_cost" required>
@@ -83,8 +80,9 @@
                             <th>
                                 <input type="text" placeholder="THC agent" value="{{ $cargroup->thc_agent }}"
                                     name="thc_agent" class="thc_agent" id="thc_agent">
-                            </th>
-                            <th>
+
+                                <label for="thc_cost">THC Cost</label>
+
                                 <input type="text" placeholder="THC Cost" value="{{ $cargroup->thc_cost }}"
                                     name="thc_cost" class="thc_cost" id="thc_cost">
                                 <label for="thc_invoice">Invoice</label>
@@ -99,10 +97,11 @@
                                     </a>
                                 @endif
                             </th>
-                            <th style="width: 50%;">
+
+                            <th style="width: 10%;">
                                 <div class="d-flex" style="gap:10px">
 
-                                    <button type="submit" class="btn btn-success btn-sm">
+                                    <button type="submit" class="btn btn-success">
                                         SAVE
                                     </button>
 
@@ -145,17 +144,18 @@
                                     {{ $car->owner_phone_number }}<br>
                                 </td>
 
-                                <td>{{ \Carbon\Carbon::parse($car->arrival_time)->format('m-d-Y') }} </td>
-                                <td>{{ $cargroup->booking_id }}</td>
-                                <td>{{ $car->container_number }}</td>
+                                <td>
+                                    {{ $cargroup->booking_id }}
+                                    <br>
+                                    {{ $car->container_number }}
+                                    <br>
+                                    {{ \Carbon\Carbon::parse($car->arrival_time)->format('m-d-Y') }}
+
+                                </td>
                                 <td>{{ $cargroup->cost }}</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-
-                                <td>
-
-                                </td>
                             </form>
 
                         </tr>

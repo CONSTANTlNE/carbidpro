@@ -31,11 +31,11 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="header-icon">
-                <i class="fa fa-ship"></i>
+                <i class="fa fa-anchor"></i>
             </div>
             <div class="header-title">
-                <h1>Load process</h1>
-                <small>List of Car</small>
+                <h1>Arrived</h1>
+                <small>List of Containers</small>
             </div>
         </section>
         <div class="container">
@@ -99,9 +99,8 @@
                                                 <th>Container #</th>
                                                 <th>Line + Agent THC</th>
                                                 <th>Arrival</th>
-                                                <th>TRT Payed</th>
-                                                <th>THC Payed</th>
-                                                <th>Ask to make Green</th>
+                                                <th>TRT/THC Payed</th>
+                                                <th>Ask Green</th>
                                                 <th>Terminal</th>
                                                 <th>CONT Status</th>
                                                 <th>Estimated Open Date</th>
@@ -195,8 +194,7 @@
                                                                                                             class="upload__btn-box">
                                                                                                             <label
                                                                                                                 class="upload__btn">
-                                                                                                                <p>Upload
-                                                                                                                    images
+                                                                                                                <p>Cars
                                                                                                                 </p>
                                                                                                                 <input
                                                                                                                     type="file"
@@ -303,6 +301,8 @@
                                                             {{ $cargroup->arrival_time ? '' : 'required' }}>
                                                     </td>
                                                     <td>
+                                                        <label for="trt_payed">TRT Payed</label>
+
                                                         <select class="form-control" name="trt_payed" id="trt_payed">
                                                             <option value=""></option>
                                                             <option value="yes"
@@ -312,8 +312,9 @@
                                                                 {{ $cargroup->trt_payed == 'no' ? 'selected' : '' }}>NO
                                                             </option>
                                                         </select>
-                                                    </td>
-                                                    <td>
+
+                                                        <label for="thc_payed">THC Payed</label>
+
                                                         <select class="form-control" name="thc_payed" id="thc_payed">
                                                             <option value=""></option>
                                                             <option value="yes"
@@ -324,6 +325,7 @@
                                                             </option>
                                                         </select>
                                                     </td>
+
                                                     <td>
                                                         <select class="form-control" name="is_green" id="is_green">
                                                             <option value=""></option>
