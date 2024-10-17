@@ -61,6 +61,15 @@
                 </li>
             @endif
 
+            @if (auth()->user()->hasRole('Admin'))
+                <li class="">
+                    <a href="{{ route('portemail.index') }}">
+                        <i class="fa fa-envelope"></i><span>Port  Emails</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @endif
+
         </ul>
     </div>
     <!-- /.sidebar -->

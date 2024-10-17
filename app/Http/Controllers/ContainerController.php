@@ -9,6 +9,7 @@ use App\Models\ContainerStatus;
 use App\Models\LoadType;
 use App\Models\Port;
 use App\Models\PortCity;
+use App\Models\PortEmail;
 use DB;
 use Illuminate\Http\Request;
 use App\Models\Car;
@@ -327,7 +328,7 @@ class ContainerController extends Controller
             $container->thc_agent = $request->thc_agent;
         }
 
-        
+
 
 
         $container->save();
@@ -358,11 +359,19 @@ class ContainerController extends Controller
 
         $cars = Car::whereIn('id', $car_ids)->get();
 
-        Mail::to('kvachakhiadimitri@gmail.com')->send(new CarGroupEmail($cars));
+
+
 
         $container = ContainerGroup::findOrFail($request->container_id);
         $container->is_email_sent = 1;
         $container->save();
+
+
+        $con = ContainerGroup::where($request->container_id)->first();
+
+        $getEmail = PortEmail::where('', $con->to_port_id)->first();
+
+        Mail::to($getEmail->email)->send(new CarGroupEmail($cars));
 
         // Return a response for AJAX
         return response()->json(['message' => 'Email sent successfully!']);

@@ -4,6 +4,7 @@ use App\Http\Controllers\ArrivedController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\PortEmailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -49,7 +50,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/fetch-locations', [CarController::class, 'fetchLocations'])->name('fetch.locations');
     Route::post('/fetch-ports', [CarController::class, 'fetchPorts'])->name('fetch.ports');
     Route::post('/fetch-from-states', [CarController::class, 'fetchFromStates'])->name('fetch.from.states');
-
     Route::post('/upload-images', [ImageUploadController::class, 'store'])->name('upload.images.spatie');
 
 
@@ -73,6 +73,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/arrived/container/{id}/save', [ArrivedController::class, 'update'])->name(name: 'arrived.update');
     Route::post('/dashboard/arrived/car/{id}/update', [ArrivedController::class, 'updateCar'])->name(name: 'arrived.car-update');
     Route::get('/dashboard/arrived/car/{id}/show-image/', [ArrivedController::class, 'showImages'])->name(name: 'arrived.showImages');
+
+    // Port Emails
+    Route::get('/dashboard/portemails', [PortEmailController::class, 'index'])->name('portemail.index');
+    Route::post('/dashboard/portemails', [PortEmailController::class, 'store'])->name('portemail.store');
+    Route::post('/dashboard/portemails/{user}', [PortEmailController::class, 'update'])->name('portemail.update');
+    Route::delete('/dashboard/portemails/{user}', [PortEmailController::class, 'destroy'])->name('portemail.destroy');
+
 
 
 });
