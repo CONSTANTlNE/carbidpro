@@ -17,6 +17,7 @@ class ContainerGroup extends Model
         'booking_id',
         'to_port_id',
         'is_email_sent',
+        'email_sent_date',
         'arrival_time',
         'invoice_file',
         'thc_invoice',

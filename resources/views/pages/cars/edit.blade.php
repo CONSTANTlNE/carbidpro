@@ -68,13 +68,6 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Make/Model/Year</label>
-                                            <input type="text" value="{{ $car->make_model_year }}"
-                                                name="make_model_year" class="form-control">
-                                        </div>
-
-
-                                        <div class="form-group">
                                             <label>Broker</label>
                                             <select name="dispatch_id" class="form-control" id="dispatch_id">
                                                 <option value=""></option>
@@ -87,27 +80,9 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Lot</label>
-                                            <input value="{{ $car->lot }}" type="text" name="lot"
-                                                class="form-control">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label>Vin</label>
-                                            <input type="text" value="{{ $car->vin }}" name="vin"
-                                                class="form-control">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label>Percent</label>
-                                            <input type="text" value="{{ $car->percent }}" name="percent"
-                                                class="form-control">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label>Gate or Member</label>
-                                            <input type="text" value="{{ $car->gate_or_member }}"
-                                                name="gate_or_member" class="form-control">
+                                            <label>Make/Model/Year</label>
+                                            <input type="text" value="{{ $car->make_model_year }}"
+                                                name="make_model_year" class="form-control">
                                         </div>
 
                                         <div class="form-group">
@@ -124,6 +99,59 @@
                                                     {{ $car->title == 'pending' ? 'selected' : '' }}>PENDING</option>
                                             </select>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label>Vin</label>
+                                            <input type="text" value="{{ $car->vin }}" name="vin"
+                                                class="form-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Percent</label>
+                                            <input type="text" value="{{ $car->percent }}" name="percent"
+                                                class="form-control">
+                                        </div>
+
+
+                                        <div class="container mb-3">
+                                            <div class="row">
+
+
+                                                <div class="col-md-4">
+                                                    <label>Lot</label>
+                                                    <input value="{{ $car->lot }}" type="text" name="lot"
+                                                        class="form-control">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label>Gate or Member</label>
+                                                    <input type="text" value="{{ $car->gate_or_member }}"
+                                                        name="gate_or_member" class="form-control">
+                                                </div>
+
+
+                                                <div class="col-md-4 d-flex" style="align-items: center;">
+                                                    <label>Type of Fuel</label><br>
+
+                                                    <label class="radio-inline">
+                                                        <input name="type_of_fuel" value="Petrol" type="radio"
+                                                            required
+                                                            {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Petrol' ? 'checked' : '' }}>
+                                                        Petrol
+                                                    </label>
+
+                                                    <label class="radio-inline">
+                                                        <input name="type_of_fuel" value="Hybrid" type="radio"
+                                                            required
+                                                            {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Hybrid' ? 'checked' : '' }}>
+                                                        Hybrid
+                                                    </label>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
 
 
                                         <div class="container mb-3">
@@ -194,30 +222,11 @@
 
 
 
-                                        <div class="form-group">
-                                            <label>Type of Fuel</label><br>
-
-                                            <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Petrol" type="radio" required
-                                                    {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Petrol' ? 'checked' : '' }}>
-                                                Petrol
-                                            </label>
-
-                                            <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Hybrid" type="radio" required
-                                                    {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Hybrid' ? 'checked' : '' }}>
-                                                Hybrid
-                                            </label>
-                                        </div>
-
                                     </div>
 
                                 </div>
 
                                 <div class="container">
-
-
-
                                     <div x-data="$store.balanceAccountingStore" class="mt-4">
                                         <p x-text="'Number of items: ' + balance_accounting.length"></p>
 
@@ -239,7 +248,7 @@
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="removeField(index)">Remove</button>
+                                                        @click="confirmRemoveField(index)">Remove</button>
                                                 </div>
                                             </div>
                                         </template>
@@ -247,13 +256,44 @@
                                         <!-- Add Button -->
                                         <button type="button" class="btn btn-primary mt-3" @click="addField">Add
                                             Another Item</button>
+
+                                        <div x-data="{
+                                            payed: {{ $car->payed }},
+                                            get amountDue() {
+                                                return calculateTotal() - parseFloat(this.payed || 0);
+                                            },
+                                            validateNumber() {
+                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point
+                                            }
+                                        }">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label for="allcost">All Cost</label>
+                                                    <input type="text" name="debit" id="allcost"
+                                                        class="form-control" x-bind:value="calculateTotal()" readonly>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="payed">Payed</label>
+                                                    <input type="text" value="{{ $car->payed }}" name="payed"
+                                                        id="payed" class="form-control" x-model="payed"
+                                                        x-on:input="validateNumber">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="amountDue">Amount Due</label>
+                                                    <input type="text" name="balance" id="amountDue"
+                                                        class="form-control" x-bind:value="amountDue" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-
-
-
-
                                 </div>
+
+
+
+
 
                                 <div class="container mb-3">
                                     <div class="row">
@@ -320,7 +360,27 @@
                                     @endif
                                 </div>
 
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="note">Note</label>
+                                            <textarea name="comment" class="form-control" id="note" cols="30" rows="2">{{ $car->comment }}</textarea>
+                                        </div>
 
+                                        <div class="col-md-4">
+                                            <label>CAR Status</label>
+                                            <select name="customer_id" class="form-control" id="customer_id">
+                                                <option value=""></option>
+                                                @foreach ($car_status as $status)
+                                                    <option value="{{ $status->id }}"
+                                                        {{ $status->id == $car->status ? 'selected' : '' }}>
+                                                        {{ $status->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
 
                                 <div class="reset-button">
                                     <button type="submit" class="btn btn-success"> Save</button>
@@ -411,7 +471,12 @@
                             value: 0
                         });
                     },
-
+                    // New method with confirmation
+                    confirmRemoveField(index) {
+                        if (confirm("Are you sure you want to remove this item?")) {
+                            this.removeField(index);
+                        }
+                    },
                     removeField(index) {
                         this.balance_accounting.splice(index, 1);
                     },
@@ -442,6 +507,26 @@
                         }
                     }
                 });
+            });
+
+            $(function() {
+                var availableWarehouse = [
+                    'TRT - New Jersey',
+                    'TRT - TX Texas',
+                    'TRT - CA California',
+                    'TRT - GA Georgia',
+                ];
+
+                $("#warehouse").autocomplete({
+                    source: availableWarehouse,
+                    minLength: 0 // Set to 0 to show suggestions immediately
+                });
+
+                // Trigger the autocomplete suggestions on input focus (click)
+                $("#warehouse").on('focus', function() {
+                    $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus
+                });
+
             });
 
             // Example words for autocomplete
@@ -681,8 +766,23 @@
                             // Ensure the Alpine store is accessed correctly
                             try {
                                 // Access the store and update the shipping cost
-                                Alpine.store('balanceAccountingStore').updateShippingCost(response
-                                    .shipping_cost);
+                                // Alpine.store('balanceAccountingStore').updateShippingCost(response
+                                //     .shipping_cost);
+
+                                let store = Alpine.store('balanceAccountingStore');
+
+                                // Check if the first row exists, if not, create it
+                                if (store.balance_accounting.length > 0) {
+                                    // Update the first row with the shipping cost
+                                    store.balance_accounting[0].name = 'Shipping cost';
+                                    store.balance_accounting[0].value = response.shipping_cost;
+                                } else {
+                                    // If there's no row, push the shipping cost as the first row
+                                    store.balance_accounting.push({
+                                        name: 'Shipping cost',
+                                        value: response.shipping_cost
+                                    });
+                                }
                             } catch (error) {
                                 console.log("Error updating Alpine store:", error);
                             }

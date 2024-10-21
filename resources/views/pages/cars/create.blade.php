@@ -88,12 +88,6 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label>Make/Model/Year</label>
-                                            <input type="text" name="make_model_year" class="form-control"
-                                                value="{{ old('make_model_year') }}">
-                                        </div>
-
 
                                         <div class="form-group">
                                             <label>Broker</label>
@@ -107,11 +101,30 @@
                                             </select>
                                         </div>
 
+
                                         <div class="form-group">
-                                            <label>Lot</label>
-                                            <input type="text" name="lot" class="form-control"
-                                                value="{{ old('lot') }}">
+                                            <label>Make/Model/Year</label>
+                                            <input type="text" name="make_model_year" class="form-control"
+                                                value="{{ old('make_model_year') }}" required>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label>Title</label>
+                                            <select name="title" class="form-control" id="title" required>
+                                                <option value=""></option>
+                                                <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
+                                                </option>
+                                                <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
+                                                    YES</option>
+                                                <option value="bypost"
+                                                    {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST</option>
+                                                <option value="pending"
+                                                    {{ old('title') == 'pending' ? 'selected' : '' }}>PENDING</option>
+                                            </select>
+
+                                        </div>
+
+
 
                                         <div class="form-group">
                                             <label>Vin</label>
@@ -125,26 +138,44 @@
                                                 value="{{ old('percent') }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label>Gate or Member</label>
-                                            <input type="text" name="gate_or_member" class="form-control"
-                                                value="{{ old('gate_or_member') }}">
-                                        </div>
 
-                                        <div class="form-group">
-                                            <label>Title</label>
-                                            <select name="title" class="form-control" id="title">
-                                                <option value=""></option>
-                                                <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
-                                                </option>
-                                                <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
-                                                    YES</option>
-                                                <option value="bypost"
-                                                    {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST</option>
-                                                <option value="pending"
-                                                    {{ old('title') == 'pending' ? 'selected' : '' }}>PENDING</option>
-                                            </select>
+                                        <div class="container mb-3">
+                                            <div class="row">
 
+
+                                                <div class="col-md-4">
+                                                    <label>Lot</label>
+                                                    <input type="text" name="lot" class="form-control"
+                                                        value="{{ old('lot') }}">
+                                                </div>
+
+
+                                                <div class="col-md-4">
+                                                    <label>Gate or Member</label>
+                                                    <input type="text" name="gate_or_member" class="form-control"
+                                                        value="{{ old('gate_or_member') }}">
+                                                </div>
+
+                                                <div class="col-md-4 d-flex" style="align-items: center;">
+                                                    <label>Type of Fuel</label><br>
+
+                                                    <label class="radio-inline">
+                                                        <input name="type_of_fuel" value="Petrol" type="radio"
+                                                            {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}
+                                                            required>
+                                                        Petrol
+                                                    </label>
+
+                                                    <label class="radio-inline">
+                                                        <input name="type_of_fuel" value="Hybrid" type="radio"
+                                                            {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}
+                                                            required>
+                                                        Hybrid
+                                                    </label>
+                                                </div>
+
+
+                                            </div>
                                         </div>
 
 
@@ -212,21 +243,6 @@
                                         </div>
 
 
-                                        <div class="form-group">
-                                            <label>Type of Fuel</label><br>
-
-                                            <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Petrol" type="radio"
-                                                    {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}>
-                                                Petrol
-                                            </label>
-
-                                            <label class="radio-inline">
-                                                <input name="type_of_fuel" value="Hybrid" type="radio"
-                                                    {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}>
-                                                Hybrid
-                                            </label>
-                                        </div>
 
 
                                     </div>
@@ -238,10 +254,12 @@
 
 
                                     <div x-data="$store.balanceAccountingStore" class="mt-4">
-                                        <p x-text="'Number of items: ' + balance_accounting.length"></p>
+                                        <div class="d-flex" style="gap:10px">
+                                            <p x-text="'Number of items: ' + balance_accounting.length"></p>
 
-                                        <!-- Display the total of values -->
-                                        <p>Total Value: <span x-text="calculateTotal()"></span></p>
+                                            <!-- Display the total of values -->
+                                            <p>Total Value: <span x-text="calculateTotal()"></span></p>
+                                        </div>
 
                                         <!-- Repeater Fields in One Row -->
                                         <template x-for="(item, index) in balance_accounting" :key="index">
@@ -258,7 +276,8 @@
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="removeField(index)">Remove</button>
+                                                        @click="confirmRemoveField(index)">Remove</button>
+
                                                 </div>
                                             </div>
                                         </template>
@@ -266,6 +285,37 @@
                                         <!-- Add Button -->
                                         <button type="button" class="btn btn-primary mt-3" @click="addField">Add
                                             Another Item</button>
+
+                                        <div x-data="{
+                                            payed: '',
+                                            get amountDue() {
+                                                return calculateTotal() - parseFloat(this.payed || 0);
+                                            },
+                                            validateNumber() {
+                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point
+                                            }
+                                        }">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label for="allcost">All Cost</label>
+                                                    <input type="text" name="debit" id="allcost"
+                                                        class="form-control" x-bind:value="calculateTotal()" readonly>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="payed">Payed</label>
+                                                    <input type="text"  name="payed"
+                                                        id="payed" class="form-control" x-model="payed"
+                                                        x-on:input="validateNumber">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="amountDue">Amount Due</label>
+                                                    <input type="text" name="balance" id="amountDue"
+                                                        class="form-control" x-bind:value="amountDue" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
 
@@ -319,6 +369,11 @@
                                         }
                                     </style>
 
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="note">Note</label>
+                                    <textarea name="comment" class="form-control" id="note" cols="30" rows="2"></textarea>
                                 </div>
 
 
@@ -416,6 +471,13 @@
                         });
                     },
 
+                    // New method with confirmation
+                    confirmRemoveField(index) {
+                        if (confirm("Are you sure you want to remove this item?")) {
+                            this.removeField(index);
+                        }
+                    },
+
                     removeField(index) {
                         this.balance_accounting.splice(index, 1);
                     },
@@ -450,8 +512,8 @@
 
             // Example words for autocomplete
             const suggestedWords = [
-                'Vehicle cost',
                 'Shipping cost',
+                'Vehicle cost',
                 'Fee amount',
                 'Insurance cost',
                 'Hybrid',
@@ -460,6 +522,26 @@
                 'Sublot',
                 'Credit',
             ];
+
+            $(function() {
+                var availableWarehouse = [
+                    'TRT - New Jersey',
+                    'TRT - TX Texas',
+                    'TRT - CA California',
+                    'TRT - GA Georgia',
+                ];
+
+                $("#warehouse").autocomplete({
+                    source: availableWarehouse,
+                    minLength: 0 // Set to 0 to show suggestions immediately
+                });
+
+                // Trigger the autocomplete suggestions on input focus (click)
+                $("#warehouse").on('focus', function() {
+                    $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus
+                });
+
+            });
 
             // Initialize jQuery UI autocomplete
             function initializeAutocomplete() {
@@ -683,8 +765,24 @@
                             // Ensure the Alpine store is accessed correctly
                             try {
                                 // Access the store and update the shipping cost
-                                Alpine.store('balanceAccountingStore').updateShippingCost(response
-                                    .shipping_cost);
+                                // Alpine.store('balanceAccountingStore').updateShippingCost(response
+                                //     .shipping_cost);
+
+                                let store = Alpine.store('balanceAccountingStore');
+
+                                // Check if the first row exists, if not, create it
+                                if (store.balance_accounting.length > 0) {
+                                    // Update the first row with the shipping cost
+                                    store.balance_accounting[0].name = 'Shipping cost';
+                                    store.balance_accounting[0].value = response.shipping_cost;
+                                } else {
+                                    // If there's no row, push the shipping cost as the first row
+                                    store.balance_accounting.push({
+                                        name: 'Shipping cost',
+                                        value: response.shipping_cost
+                                    });
+                                }
+
                             } catch (error) {
                                 console.log("Error updating Alpine store:", error);
                             }
@@ -749,8 +847,8 @@
             $(document).ready(function() {
                 // Predefined suggestions for the name field
                 const predefinedNames = [
-                    'Vehicle cost',
                     'Shipping cost',
+                    'Vehicle cost',
                     'Fee amount',
                     'Insurance cost',
                     'Hybrid',

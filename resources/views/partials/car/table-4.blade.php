@@ -3,8 +3,8 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                <th>CAR</th>
-                <th>From</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
 
                 <th>Price</th>
                 <th>Carrier</th>
@@ -54,10 +54,8 @@
                             </button>
                             <br>
                             <br>
-                            @if (isset($car->updated_at))
-                                <span class="btn btn-dark">
-                                    {{ $car->updated_at->format('d.m') }}</span>
-                            @endif
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
+<strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>

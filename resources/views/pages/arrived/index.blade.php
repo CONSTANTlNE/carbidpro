@@ -95,13 +95,12 @@
                                         <thead class="back_table_color">
                                             <tr class="info">
                                                 <th>ID</th>
-                                                <th>Title in office</th>
                                                 <th>Container #</th>
                                                 <th>Line + Agent THC</th>
-                                                <th>Arrival</th>
+                                                <th>Estimated Arrival</th>
+                                                <th>Terminal</th>
                                                 <th>TRT/THC Payed</th>
                                                 <th>Ask Green</th>
-                                                <th>Terminal</th>
                                                 <th>CONT Status</th>
                                                 <th>Estimated Open Date</th>
                                                 <th>Opend</th>
@@ -117,22 +116,11 @@
 
 
                                             <form action="{{ route('arrived.update', $cargroup->id) }}" method="POST"
-                                                enctype="multipart/form-data">
+                                                enctype="multipart/form-data" novalidate>
                                                 @csrf
                                                 <tr class="info">
                                                     <td>{{ $key + 1 }}</td>
-                                                    <td>
-                                                        <select class="form-control" name="title_in_office"
-                                                            id="title_in_office">
-                                                            <option value=""></option>
-                                                            <option value="yes"
-                                                                {{ $cargroup->title_in_office == 'yes' ? 'selected' : '' }}>
-                                                                YES</option>
-                                                            <option value="no"
-                                                                {{ $cargroup->title_in_office == 'no' ? 'selected' : '' }}>
-                                                                NO</option>
-                                                        </select>
-                                                    </td>
+
                                                     <td>
                                                         <a href="javascript:void()" data-toggle="modal"
                                                             data-target="#containerGroup-{{ $cargroup->id }}"
@@ -146,7 +134,7 @@
                                                                 role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title">Upload Images</h5>
+                                                                        <h5 class="modal-title">Car List</h5>
                                                                         <button type="button" class="close"
                                                                             data-dismiss="modal" aria-label="Close">
                                                                             <span aria-hidden="true">&times;</span>
@@ -161,12 +149,11 @@
                                                                                 <thead class="back_table_color">
                                                                                     <tr class="info">
                                                                                         <th>ID</th>
-                                                                                        <th>CAR</th>
+                                                                                        <th>CAR INFO</th>
                                                                                         <th>Owner</th>
-                                                                                        <th>Container Photos</th>
+                                                                                        <th>Car Photo</th>
                                                                                         <th>Bll OF Loading</th>
                                                                                         <th>Remark</th>
-                                                                                        <th>Title</th>
                                                                                         <th>Action</th>
                                                                                     </tr>
                                                                                 </thead>
@@ -185,7 +172,6 @@
                                                                                                 <td>
                                                                                                     {{ $car->vehicle_owner_name }}<br>
                                                                                                     {{ $car->owner_id_number }}<br>
-                                                                                                    {{ $car->owner_phone_number }}<br>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                     <div
@@ -237,32 +223,11 @@
                                                                                                     @endif
                                                                                                 </td>
                                                                                                 <td>
-                                                                                                    <input
-                                                                                                        class="form-control"
-                                                                                                        type="text"
-                                                                                                        value="{{ $car->remark ?? '' }}"
-                                                                                                        name="remark"
-                                                                                                        id="remark_{{ $car->id }}">
+
+                                                                                                    <textarea class="form-control" name="remark" id="remark_{{ $car->id }}" cols="30" rows="2">{{ $car->remark ?? '' }}</textarea>
+
                                                                                                 </td>
-                                                                                                <td>
-                                                                                                    <select
-                                                                                                        name="title_take"
-                                                                                                        class="form-control"
-                                                                                                        id="title_take_{{ $car->id }}"
-                                                                                                        required>
-                                                                                                        <option
-                                                                                                            value="">
-                                                                                                        </option>
-                                                                                                        <option
-                                                                                                            value="yes"
-                                                                                                            {{ $car->title_take == 'yes' ? 'selected' : '' }}>
-                                                                                                            YES</option>
-                                                                                                        <option
-                                                                                                            value="no"
-                                                                                                            {{ $car->title_take == 'no' ? 'selected' : '' }}>
-                                                                                                            NO</option>
-                                                                                                    </select>
-                                                                                                </td>
+                                                                                                
                                                                                                 <td>
                                                                                                     <div class="d-flex"
                                                                                                         style="gap:10px">
@@ -301,6 +266,20 @@
                                                             {{ $cargroup->arrival_time ? '' : 'required' }}>
                                                     </td>
                                                     <td>
+                                                        <select class="form-control" name="terminal" id="terminal">
+                                                            <option value=""></option>
+                                                            <option value="AMP"
+                                                                {{ $cargroup->terminal == 'AMP' ? 'selected' : '' }}>
+                                                                AMP</option>
+                                                            <option value="Espe"
+                                                                {{ $cargroup->terminal == 'Espe' ? 'selected' : '' }}>
+                                                                Espe</option>
+                                                            <option value="GTI"
+                                                                {{ $cargroup->terminal == 'GTI' ? 'selected' : '' }}>
+                                                                GTI</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
                                                         <label for="trt_payed">TRT Payed</label>
 
                                                         <select class="form-control" name="trt_payed" id="trt_payed">
@@ -337,24 +316,14 @@
                                                             </option>
                                                         </select>
                                                     </td>
-                                                    <td>
-                                                        <select class="form-control" name="terminal" id="terminal">
-                                                            <option value=""></option>
-                                                            <option value="AMP"
-                                                                {{ $cargroup->terminal == 'AMP' ? 'selected' : '' }}>
-                                                                AMP</option>
-                                                            <option value="Espe"
-                                                                {{ $cargroup->terminal == 'Espe' ? 'selected' : '' }}>
-                                                                Espe</option>
-                                                            <option value="GTI"
-                                                                {{ $cargroup->terminal == 'GTI' ? 'selected' : '' }}>
-                                                                GTI</option>
-                                                        </select>
-                                                    </td>
+
                                                     <td>
                                                         <select class="form-control" name="cont_status"
-                                                            id="cont_status">
+                                                            id="cont_status"
+                                                            style="{{ $cargroup->cont_status == 'Green' ? 'color:green' : '' }} {{ $cargroup->cont_status == 'Red' ? 'color:red' : '' }}">
                                                             <option value=""></option>
+
+
                                                             <option value="Green"
                                                                 {{ $cargroup->cont_status == 'Green' ? 'selected' : '' }}>
                                                                 Green</option>
@@ -394,9 +363,7 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <input class="form-control" type="text"
-                                                            value="{{ $cargroup->remark ?? '' }}" name="remark"
-                                                            id="remark">
+                                                        <textarea class="form-control" name="remark" id="remark" cols="30" rows="2">{{ $cargroup->remark ?? '' }}</textarea>
                                                     </td>
                                                     <td>
                                                         <div class="d-flex" style="gap:10px">

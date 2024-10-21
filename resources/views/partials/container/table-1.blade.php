@@ -5,7 +5,7 @@
             <label for="to_port_id">To Port</label>
             <select name="to_port_id" id="to_port_id" class="form-control">
                 <option value="">Select Port</option>
-                @foreach($ports as $port)
+                @foreach ($ports as $port)
                     <option value="{{ $port->id }}" {{ request('to_port_id') == $port->id ? 'selected' : '' }}>
                         {{ $port->name }}
                     </option>
@@ -18,7 +18,7 @@
             <label for="load_type">Load Type</label>
             <select name="load_type" id="load_type" class="form-control">
                 <option value="">Select Load Type</option>
-                @foreach($loadtypes as $load_type)
+                @foreach ($loadtypes as $load_type)
                     <option value="{{ $load_type->id }}" {{ request('load_type') == $load_type->id ? 'selected' : '' }}>
                         {{ $load_type->name }}
                     </option>
@@ -60,7 +60,7 @@
             <tr class="info">
                 <th></th>
                 <th>ID</th>
-                <th>CAR</th>
+                <th>CAR INFO</th>
                 <th>Car type</th>
                 <th>Fuel type</th>
                 <th>Warehouse</th>
@@ -83,7 +83,7 @@
 
                     <input type="hidden" name="status"
                         value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                    <td>{{ $car->loadType->name }}</td>
+                    <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
                     <td>{{ $car->type_of_fuel }}</td>
 
                     <td>
@@ -94,7 +94,7 @@
                     </td>
                     <td>
                         <label class="mt-2" for="title">Title</label>
-                        <select name="title" class="form-control title" data-car-id="{{ $car->id}}"
+                        <select name="title" class="form-control title" data-car-id="{{ $car->id }}"
                             id="title" required>
                             <option value=""></option>
                             <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
@@ -118,10 +118,9 @@
 
                         {{ $daysGone }} Day
                         <br>
-                        @if (isset($car->updated_at))
-                            <span class="btn btn-dark">
-                                {{ $car->updated_at->format('d.m') }}</span>
-                        @endif
+                        <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
+                        <br>
+                        <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                     </td>
 

@@ -216,6 +216,9 @@ class CarController extends Controller
         $car->owner_phone_number = $request->input('owner_phone_number');
         $car->container_number = $request->input('container_number');
         $car->warehouse = $request->input('warehouse');
+        $car->comment = $request->input('comment');
+        $car->balance = $request->input('balance');
+        $car->payed = $request->input('payed');
 
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
@@ -350,6 +353,8 @@ class CarController extends Controller
     public function edit(Request $request)
     {
         $car = Car::findOrFail($request->id);
+        $car_status = CarStatus::get();
+        
         $auctions = Auction::all();
         $load_types = LoadType::all();
         $ports = Port::all();
@@ -366,6 +371,7 @@ class CarController extends Controller
                 'balanceAccounting',
                 'auctions',
                 'dispatchers',
+                'car_status',
                 'load_types',
                 'ports',
                 'locations',
@@ -430,7 +436,7 @@ class CarController extends Controller
 
             // Encode the array back into JSON
             $updatedJsonString = json_encode($array);
-
+            
 
             // Output the updated JSON
             $car->balance_accounting = $updatedJsonString;
@@ -449,6 +455,12 @@ class CarController extends Controller
             $car->payment_address = $request->payment_address;
         }
 
+        if ($request->has(key: 'payment_company_name')) {
+            $car->payment_company_name = $request->payment_company_name;
+        }
+
+
+
         if ($request->hasFile('payment_photo')) {
             // Get the uploaded file (single file)
             $photo = $request->file('payment_photo');
@@ -463,6 +475,11 @@ class CarController extends Controller
             $car->save();
         }
 
+
+        if ($request->onlytitl_delivery) {
+            $car->save();
+            return true;
+        }
 
 
         $car->status = $car->status + 1;

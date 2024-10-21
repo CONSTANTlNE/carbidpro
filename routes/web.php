@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/car/edit/{id}', [CarController::class, 'edit'])->name(name: 'car.edit');
     Route::post('/dashboard/car/edit/{id}', [CarController::class, 'update'])->name(name: 'car.update');
     Route::post('/dashboard/car/list-update/{id}', [CarController::class, 'listUpdate'])->name(name: 'car.listupdate');
+    Route::post('/dashboard/car/update', [CarController::class, 'listUpdate'])->name(name: 'car.updateByid');
     Route::get('/dashboard/cars/status/{slug}', [CarController::class, 'showStatus'])->name(name: 'car.showStatus');
     Route::delete('/dashboard/car/{user}', [CarController::class, 'destroy'])->name('car.destroy');
 

@@ -63,6 +63,9 @@ class Car extends Model implements HasMedia, Sortable
         'remark',
         'bill_of_loading',
         'container_images',
+        'payment_company',
+        'debit',
+        'balance'
     ];
 
     public function statusRelation()

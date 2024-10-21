@@ -3,8 +3,8 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                <th>CAR</th>
-                <th>From</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
                 <th>
                     <a
                         href="{{ request()->fullUrlWithQuery(['sort' => 'dispatcher.name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
@@ -14,14 +14,15 @@
                 <th>
                     <a
                         href="{{ request()->fullUrlWithQuery(['sort' => 'customers.contact_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
-                        Customer
+                        Dealer
                     </a>
                 </th>
                 <th><a
                         href="{{ request()->fullUrlWithQuery(['sort' => 'car_statuses.name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}">
                         Status
                     </a></th>
-                <th>Date</th>
+                <th>Balance</th>
+                 
                 <th>Action</th>
             </tr>
         </thead>
@@ -57,7 +58,11 @@
 
                         </td>
                         <td>
-                            <div class="datetime">{{ $car->created_at }}</div>
+                            <strong>All Cost:</strong><br>
+                            {{ $car->debit }}
+                            <strong>Amount due:</strong><br>
+                            {{ $car->debit - $car->payed }}
+
                         </td>
 
                         <td>
@@ -73,10 +78,9 @@
                             </button>
                             <br>
                             <br>
-                            @if (isset($car->updated_at))
-                                <span class="btn btn-dark">
-                                    {{ $car->updated_at->format('d.m') }}</span>
-                            @endif
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
+                            <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>

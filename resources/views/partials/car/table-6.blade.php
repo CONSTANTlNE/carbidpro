@@ -18,8 +18,8 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                <th>CAR</th>
-                <th>From</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
 
                 <th>Price</th>
                 <th>Carrier</th>
@@ -27,7 +27,7 @@
                 <th>Pickup & Delivery Dates</th>
                 <th>Title</th>
                 <th>Photos</th>
-                <th>Payment Information</th>
+                <th>Payment Info </th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -155,7 +155,11 @@
                                     transfer</option>
                             </select>
 
-                            <label for="payment_address">Payment info</label>
+                            <label for="payment_company_name">Company Name</label>
+                            <input type="text" value="{{ $car->payment_company_name }}" placeholder="Company Name"
+                                name="payment_company_name" id="payment_company_name" class="mt-1 form-control" required>
+
+                            <label for="payment_address">Payment Address</label>
                             <input type="text" value="{{ $car->payment_address }}" name="payment_address"
                                 id="payment_address" class="form-control" required>
 
@@ -196,10 +200,8 @@
                             </button>
                             <br>
                             <br>
-                            @if (isset($car->updated_at))
-                                <span class="btn btn-dark">
-                                    {{ $car->updated_at->format('d.m') }}</span>
-                            @endif
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>
@@ -314,12 +316,12 @@
 
         $(function() {
 
-            console.log(isEmpty);
-            if (isEmpty) {
-                $('.buttonexport .btn.btn-primary').addClass('btn-danger');
-            } else {
-                $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
-            }
+            // console.log(isEmpty);
+            // if (isEmpty) {
+            //     $('.buttonexport .btn.btn-primary').addClass('btn-danger');
+            // } else {
+            //     $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
+            // }
 
             // Example words for autocomplete
             const suggestedWords = [

@@ -10,6 +10,7 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\PortEmail;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use App\Models\Car;
@@ -141,16 +142,22 @@ class ContainerController extends Controller
         ]);
 
 
-        $cars = Car::whereIn('id', $car_ids_array)->pluck('to_port_id');
+        $cars = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title']); // Fetch both to_port_id and title
 
-        // Check if all from_state_id are the same
-        if ($cars->unique()->count() === 1) {
-            // All records have the same from_state_id
-            $sameState = true;
-            $group->update(['to_port_id' => $cars[0]]);
-        } else {
+        // Check if all `to_port_id` are the same
+        if ($cars->pluck('to_port_id')->unique()->count() !== 1) {
+            // Return error if `to_port_id` values are not the same
             return redirect()->back()->with(['message' => 'Cars Port need same', 'alert-type' => 'error']);
         }
+
+        // Check if all `title` values are 'YES'
+        if ($cars->pluck('title')->contains('YES') === false) {
+            // Return error if any title is not 'YES'
+            return redirect()->back()->with(['message' => 'All car titles must be YES', 'alert-type' => 'error']);
+        }
+
+        $group->update(['to_port_id' => $cars[0]->to_port_id]);
+
 
 
         Car::whereIn('id', $car_ids_array)->increment('container_status', 1);
@@ -165,8 +172,6 @@ class ContainerController extends Controller
     public function availableCars(Request $request)
     {
 
-
-
         $car_ids = DB::table('container_group_container')
             ->where('container_group_id', $request->container_id)
             ->pluck('car_id')
@@ -177,7 +182,6 @@ class ContainerController extends Controller
             $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->where('to_port_id', $request->to_port_id)->get(); // Or apply filtering logic if necessary
         } else {
             $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->get(); // Or apply filtering logic if necessary
-
         }
 
 
@@ -364,6 +368,7 @@ class ContainerController extends Controller
 
         $container = ContainerGroup::findOrFail($request->container_id);
         $container->is_email_sent = 1;
+        $container->email_sent_date = Carbon::now();
         $container->save();
 
 

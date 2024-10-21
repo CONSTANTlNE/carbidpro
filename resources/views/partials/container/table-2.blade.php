@@ -1,6 +1,3 @@
-
-
-
 @foreach ($cars as $key => $cargroup)
     <h4 class="mt-2"> GROUP: {{ $key + 1 }}</h2>
 
@@ -10,14 +7,12 @@
                     <tr class="info">
                         <th>ID</th>
                         <th style="width: 20%;">CAR</th>
-                        <th>Car type</th>
-                        <th>Fuel type</th>
+                        <th style="width: 10%;">Car type</th>
+                        <th style="width: 10%;">Fuel type</th>
                         <th>Warehouse</th>
                         <th>Owner</th>
                         <th style="width: 10%;">Dispatch day count</th>
-                        <th style="width: 10%;">Booking #</th>
-                        <th style="width: 10%;">Container #
-                        </th>
+                        <th style="width: 10%;">Container Info</th>
                         <th style="width: 10%;">Container Cost
                         </th>
                         <th style="width: 10%;"> Photo of BOL
@@ -38,12 +33,17 @@
                             <th></th>
                             <th></th>
                             <th style="width: 10%;">
+                                <label for="booking_id">Booking #</label>
                                 <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
                                     class="form-control" name="booking_id" id="booking_id" required>
-                            </th>
-                            <th style="width: 10%;">
+                                <label for="container">Container #</label>
                                 <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
                                     class="form-control" name="container" id="container" required>
+                                <label for="arrival_time">Arrival Date</label>
+                                <input type="date"
+                                    value="{{ \Carbon\Carbon::parse($cargroup->arrival_time)->format('Y-m-d') }}"
+                                    placeholder="Arrival Time" class="form-control" name="arrival_time"
+                                    id="arrival_time" {{ $cargroup->arrival_time ? '' : 'required' }}>
                             </th>
                             <th style="width: 10%;">
                                 <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
@@ -64,23 +64,24 @@
                                     style="display:none; max-width: 100px; margin-top:10px;">
                             </th>
                             <th style="width: 50%;">
-                                <div class="d-flex" style="gap:10px">
-                                    <button type="button" id="sendEmail" data-container-id="{{ $cargroup->id }}"
-                                        class="sendEmail btn {{ $cargroup->is_email_sent == 1 ? 'btn-warning' : 'btn-primary' }} btn-sm">
-                                        Send email
-                                    </button>
-
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        NEXT
-                                    </button>
-
-
+                                <div class="d-flex" style="gap:10px;    flex-direction: column;">
 
                                     <button data-container-id="{{ $cargroup->id }}"
                                         data-to_port_id='{{ $cargroup->to_port_id }}' data-toggle="modal"
                                         class="btn btn-dark open-car-modal" data-target="#addCarModal" type="button">
                                         Add Car
                                     </button>
+                                    
+                                    <button type="button" id="sendEmail" data-container-id="{{ $cargroup->id }}"
+                                        class="sendEmail btn {{ $cargroup->is_email_sent == 1 ? 'btn-warning' : 'btn-primary' }} btn-sm">
+                                        {{ $cargroup->is_email_sent == 1 ? 'Email sent ' . $cargroup->email_sent_date : 'Send email' }}
+                                    </button>
+
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        NEXT
+                                    </button>
+
+                                    
                                 </div>
 
 
@@ -104,7 +105,7 @@
                                 @csrf
                                 <input type="hidden" name="status"
                                     value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                                <td>{{ $car->loadType->name }}</td>
+                                <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
                                 <td>{{ $car->type_of_fuel }}</td>
 
                                 <td>
@@ -131,8 +132,9 @@
                                     {{ $daysGone }} Day
 
                                 </td>
-                                <td>{{ $cargroup->booking_id }}</td>
-                                <td>{{ $car->container_number }}</td>
+                                <td>
+
+                                </td>
                                 <td>{{ $cargroup->cost }}</td>
                                 <td></td>
 

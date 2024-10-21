@@ -19,7 +19,7 @@
                         </th>
                         <th style="width: 10%;"> THC agent
                         </th>
-                       
+
                         <th style="width: 10%;">Action</th>
                     </tr>
                 </thead>
@@ -128,7 +128,7 @@
                                 @csrf
                                 <input type="hidden" name="status"
                                     value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                                <td>{{ $car->loadType->name }}</td>
+                                <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
                                 <td>{{ $car->type_of_fuel }}</td>
 
                                 <td>
@@ -145,14 +145,17 @@
                                 </td>
 
                                 <td>
+                                    <strong>Booking #</strong><br>
                                     {{ $cargroup->booking_id }}
                                     <br>
+                                    <strong>Container #</strong><br>
                                     {{ $car->container_number }}
                                     <br>
+                                    <strong>Arrival Date</strong><br>
                                     {{ \Carbon\Carbon::parse($car->arrival_time)->format('m-d-Y') }}
 
                                 </td>
-                                <td>{{ $cargroup->cost }}</td>
+                                <td>${{ $cargroup->cost }}</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>

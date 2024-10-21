@@ -18,15 +18,15 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                <th>CAR</th>
-                <th>From</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
 
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Title</th>
                 <th>Photos</th>
-                <th>Payment Information</th>
+                <th>Payment Info </th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -127,9 +127,10 @@
                         </td>
 
                         <td>
-                            <label for="payment_method">Payment method</label>
-                            <select name="payment_method" id="payment_method" class="form-control" required>
-                                <option value=""></option>
+                            <select aria-placeholder="" name="payment_method" id="payment_method" class="form-control"
+                                required>
+                                <option selected="true" disabled="disabled">Payment method</option>
+
                                 <option value="zelle" {{ $car->payment_method == 'zelle' ? 'selected' : '' }}>Zelle
                                 </option>
                                 <option value="check" {{ $car->payment_method == 'check' ? 'selected' : '' }}>Check
@@ -137,10 +138,10 @@
                                 <option value="bank" {{ $car->payment_method == 'bank' ? 'selected' : '' }}>Bank
                                     transfer</option>
                             </select>
-
-                            <label for="payment_address">Payment Address</label>
-                            <input type="text" value="{{ $car->payment_address }}" name="payment_address"
-                                id="payment_address" class="form-control" required>
+                            <input type="text" value="{{ $car->payment_company_name }}" placeholder="Company Name"
+                                name="payment_company_name" id="payment_company_name" class="mt-1 form-control" required>
+                            <input type="text" value="{{ $car->payment_address }}" placeholder="Payment Address"
+                                name="payment_address" id="payment_address" class="form-control mt-1" required>
 
                         </td>
 
@@ -154,10 +155,8 @@
                             </button>
                             <br>
                             <br>
-                            @if (isset($car->updated_at))
-                                <span class="btn btn-dark">
-                                    {{ $car->updated_at->format('d.m') }}</span>
-                            @endif
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>

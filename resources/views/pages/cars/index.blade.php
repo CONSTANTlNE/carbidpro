@@ -40,7 +40,7 @@
         <div class="container">
             @if (session('success'))
                 <div class="alert alert-success"
-                    style="text-align: center;font-size: 20px;text-transform: uppercase;font-weight: bold;max-width: 600px;margin: 1rem  auto 0;">
+                    style="text-align: center;font-size: 15px;text-transform: uppercase;font-weight: bold;max-width: 400px;margin: 1rem  auto 0;">
                     {{ session('success') }}
                 </div>
             @endif

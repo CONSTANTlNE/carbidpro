@@ -18,15 +18,15 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                <th>CAR</th>
-                <th>From</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
 
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Title</th>
                 <th>Photos</th>
-                <th>Payment Information</th>
+                <th>Payment Info </th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -76,8 +76,8 @@
                             <span> {{ $car->title }}</span>
 
                             <label class="mt-2" for="title_delivery">Title delivery</label>
-                            <select name="title_delivery"
-                                class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
+                            <select name="title_delivery" data-car-id="{{ $car->id }}"
+                                class="form-control title_delivery {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
@@ -155,7 +155,12 @@
                                     transfer</option>
                             </select>
 
-                            <label for="payment_address">Payment info</label>
+                            <label for="payment_company_name">Company Name</label>
+                            <input type="text" value="{{ $car->payment_company_name }}" placeholder="Company Name"
+                                name="payment_company_name" id="payment_company_name" class="mt-1 form-control"
+                                required>
+
+                            <label for="payment_address">Payment Address</label>
                             <input type="text" value="{{ $car->payment_address }}" name="payment_address"
                                 id="payment_address" class="form-control" required>
 
@@ -190,10 +195,8 @@
                             </button>
                             <br>
                             <br>
-                            @if (isset($car->updated_at))
-                                <span class="btn btn-dark">
-                                    {{ $car->updated_at->format('d.m') }}</span>
-                            @endif
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>
@@ -227,6 +230,30 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script type="text/javascript">
+        $('.title_delivery').on('change', function(e) {
+
+            var title = $(this).val(); // Get the user ID from the hidden input
+            var carid = $(this).data('car-id'); // Get the user ID from the hidden input
+            console.log($(this).data('car-id'));
+            $.ajax({
+                url: '{{ route('car.updateByid') }}',
+                type: 'POST', // HTTP method for deletion
+                data: {
+                    id: carid,
+                    title_delivery: title,
+                    onlytitl_delivery: true
+                }, // Send the serialized form data (including the CSRF token)
+                success: function(response) {
+                    location.reload();
+
+                },
+                error: function(xhr) {
+                    location.reload();
+                }
+            });
+        });
+
+
         document.addEventListener("DOMContentLoaded", function() {
 
 
