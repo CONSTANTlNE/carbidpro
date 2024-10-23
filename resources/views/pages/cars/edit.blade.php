@@ -300,21 +300,22 @@
                                         <div class="col-md-4">
                                             <label for="vehicle_owner_name">Vehicle Owner name
                                             </label>
-                                            <input type="text" name="vehicle_owner_name" id="vehicle_owner_name"
+                                            <input type="text" value="{{ $car->vehicle_owner_name }}"
+                                                name="vehicle_owner_name" id="vehicle_owner_name"
                                                 class="form-control">
                                         </div>
 
                                         <div class="col-md-4">
                                             <label for="owner_id_number">Owner ID Number
                                             </label>
-                                            <input type="text" name="owner_id_number" id="owner_id_number"
+                                            <input type="text" value="{{ $car->owner_id_number }}" name="owner_id_number" id="owner_id_number"
                                                 class="form-control">
                                         </div>
 
                                         <div class="col-md-4">
                                             <label for="owner_phone_number">Owner Phone number
                                             </label>
-                                            <input type="text" name="owner_phone_number" id="owner_phone_number"
+                                            <input type="text" value="{{ $car->owner_phone_number }}" name="owner_phone_number" id="owner_phone_number"
                                                 class="form-control">
                                         </div>
 

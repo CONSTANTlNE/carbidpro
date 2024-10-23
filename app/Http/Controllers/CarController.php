@@ -219,6 +219,7 @@ class CarController extends Controller
         $car->comment = $request->input('comment');
         $car->balance = $request->input('balance');
         $car->payed = $request->input('payed');
+        $car->debit = $request->input('debit');
 
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {

@@ -146,14 +146,14 @@
                                                 <div class="col-md-4">
                                                     <label>Lot</label>
                                                     <input type="text" name="lot" class="form-control"
-                                                        value="{{ old('lot') }}">
+                                                        value="{{ old('lot') }}" required>
                                                 </div>
 
 
                                                 <div class="col-md-4">
                                                     <label>Gate or Member</label>
                                                     <input type="text" name="gate_or_member" class="form-control"
-                                                        value="{{ old('gate_or_member') }}">
+                                                        value="{{ old('gate_or_member') }}" required>
                                                 </div>
 
                                                 <div class="col-md-4 d-flex" style="align-items: center;">
@@ -229,7 +229,7 @@
                                                 <div class="col-md-2">
                                                     <label for="zip_code">Exact location-zip</label>
                                                     <input type="text" class="form-control" name="zip_code"
-                                                        id="zip_code" value="{{ old('zip_code') }}">
+                                                        id="zip_code" value="{{ old('zip_code') }}" required>
                                                 </div>
 
                                                 <div class="col-md-2">

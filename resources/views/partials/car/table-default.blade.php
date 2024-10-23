@@ -59,7 +59,7 @@
                         </td>
                         <td>
                             <strong>All Cost:</strong><br>
-                            {{ $car->debit }}
+                            {{ $car->debit }}<br>
                             <strong>Amount due:</strong><br>
                             {{ $car->debit - $car->payed }}
 

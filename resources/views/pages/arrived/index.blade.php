@@ -167,7 +167,31 @@
                                                                                             <tr class="info">
                                                                                                 <td>{{ $car->id }}
                                                                                                 </td>
-                                                                                                <td>@include('partials.car.table_content-parts.car-info')
+                                                                                                <td>
+                                                                                                    <div>
+                                                                                                        <strong>LOT:<span>{{ $car->lot }}</span></strong>
+                                                                                                        <img src="/assets/dist/img/copy.svg"
+                                                                                                            alt="copy"
+                                                                                                            class="copy">
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <strong>{{ !empty($car->Auction) ? $car->Auction->name : 'Gate/Iaai' }}:<span>{{ $car->gate_or_member }}</span></strong>
+                                                                                                        <img src="/assets/dist/img/copy.svg"
+                                                                                                            alt="copy"
+                                                                                                            class="copy">
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <strong>Model:<span>{{ $car->make_model_year }}</span></strong>
+                                                                                                        <img src="/assets/dist/img/copy.svg"
+                                                                                                            alt="copy"
+                                                                                                            class="copy">
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <strong>VIN:<span>{{ $car->vin }}</span></strong>
+                                                                                                        <img src="/assets/dist/img/copy.svg"
+                                                                                                            alt="copy"
+                                                                                                            class="copy">
+                                                                                                    </div>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                     {{ $car->vehicle_owner_name }}<br>
@@ -227,7 +251,7 @@
                                                                                                     <textarea class="form-control" name="remark" id="remark_{{ $car->id }}" cols="30" rows="2">{{ $car->remark ?? '' }}</textarea>
 
                                                                                                 </td>
-                                                                                                
+
                                                                                                 <td>
                                                                                                     <div class="d-flex"
                                                                                                         style="gap:10px">
@@ -268,9 +292,9 @@
                                                     <td>
                                                         <select class="form-control" name="terminal" id="terminal">
                                                             <option value=""></option>
-                                                            <option value="AMP"
-                                                                {{ $cargroup->terminal == 'AMP' ? 'selected' : '' }}>
-                                                                AMP</option>
+                                                            <option value="APM"
+                                                                {{ $cargroup->terminal == 'APM' ? 'selected' : '' }}>
+                                                                APM</option>
                                                             <option value="Espe"
                                                                 {{ $cargroup->terminal == 'Espe' ? 'selected' : '' }}>
                                                                 Espe</option>
@@ -320,7 +344,7 @@
                                                     <td>
                                                         <select class="form-control" name="cont_status"
                                                             id="cont_status"
-                                                            style="{{ $cargroup->cont_status == 'Green' ? 'color:green' : '' }} {{ $cargroup->cont_status == 'Red' ? 'color:red' : '' }}">
+                                                            style="{{ $cargroup->cont_status == 'Green' ? 'background:#28a745;color:#fff;' : '' }} {{ $cargroup->cont_status == 'Red' ? 'background:#dc3545;color:#fff;' : '' }}">
                                                             <option value=""></option>
 
 
