@@ -77,7 +77,7 @@
                                     <div class="row">
                                         <div class="form-group">
                                             <label>Dealer</label>
-                                            <select name="customer_id" class="form-control" id="customer_id">
+                                            <select name="customer_id" class="form-control" id="customer_id" required>
                                                 <option value=""></option>
                                                 @foreach ($customers as $customer)
                                                     <option value="{{ $customer->id }}"
@@ -91,7 +91,7 @@
 
                                         <div class="form-group">
                                             <label>Broker</label>
-                                            <select name="dispatch_id" class="form-control" id="dispatch_id">
+                                            <select name="dispatch_id" class="form-control" id="dispatch_id" required>
                                                 <option value=""></option>
                                                 @foreach ($dispatchers as $dispatch)
                                                     <option value="{{ $dispatch->id }}"

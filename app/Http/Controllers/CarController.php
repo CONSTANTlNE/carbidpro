@@ -456,8 +456,8 @@ class CarController extends Controller
             $car->payment_address = $request->payment_address;
         }
 
-        if ($request->has(key: 'payment_company_name')) {
-            $car->payment_company_name = $request->payment_company_name;
+        if ($request->has(key: 'payment_company')) {
+            $car->payment_company = $request->payment_company;
         }
 
 

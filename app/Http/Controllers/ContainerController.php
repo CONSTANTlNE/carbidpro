@@ -151,7 +151,8 @@ class ContainerController extends Controller
         }
 
         // Check if all `title` values are 'YES'
-        if ($cars->pluck('title')->contains('YES') === false) {
+
+        if ($cars->pluck('title')->contains('yes') === false) {
             // Return error if any title is not 'YES'
             return redirect()->back()->with(['message' => 'All car titles must be YES', 'alert-type' => 'error']);
         }
@@ -166,7 +167,7 @@ class ContainerController extends Controller
         $group->cars()->attach($car_ids_array); // Laravel will create separate rows for each car ID
 
 
-        return redirect()->route('container.showStatus', 'loading-pending')->with(['message' => 'Cars grouped successfully', 'group' => $group]);
+        return redirect()->route('container.showStatus', 'for-load')->with(['message' => 'Cars grouped successfully', 'group' => $group]);
     }
 
     public function availableCars(Request $request)

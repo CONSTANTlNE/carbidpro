@@ -1,7 +1,22 @@
-
 <div class="d-flex" style="gap: 5px"><strong>Price: </strong>
     ${{ $car->internal_shipping }}</div>
-<div class="d-flex" style="flex-wrap: wrap;"><strong>Storage-{{ $car->storage }}: </strong><span>${{ $car->storage_cost }}</span>
+@php
+    // Calculate the sum for "Storage" keys
+    $data = json_decode($car->balance_accounting, true);
+    $storageSum = array_reduce(
+        $data,
+        function ($sum, $item) {
+            if (strtolower($item['name']) === 'storage') {
+                $sum += $item['value'];
+            }
+            return $sum;
+        },
+        0,
+    );
+
+@endphp
+<div class="d-flex" style="flex-wrap: wrap;"><strong>Storage-{{ $car->storage }}: 
+    </strong><span> ${{ $storageSum }}</span>
 </div>
 @if ($car->storage != 'Owner')
     <div class="d-flex" style="gap: 5px"><strong>Sum: </strong>
