@@ -287,7 +287,7 @@
                                             Another Item</button>
 
                                         <div x-data="{
-                                            payed: '',
+                                            payed: '0',
                                             get amountDue() {
                                                 return calculateTotal() - parseFloat(this.payed || 0);
                                             },
@@ -306,7 +306,7 @@
                                                     <label for="payed">Payed</label>
                                                     <input type="text"  name="payed"
                                                         id="payed" class="form-control" x-model="payed"
-                                                        x-on:input="validateNumber">
+                                                        x-on:input="validateNumber" required>
                                                 </div>
 
                                                 <div class="col-md-4">

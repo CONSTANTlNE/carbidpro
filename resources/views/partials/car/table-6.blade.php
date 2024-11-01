@@ -155,9 +155,9 @@
                                     transfer</option>
                             </select>
 
-                            <label for="payment_company_name">Company Name</label>
-                            <input type="text" value="{{ $car->payment_company_name }}" placeholder="Company Name"
-                                name="payment_company_name" id="payment_company_name" class="mt-1 form-control" required>
+                            <label for="payment_company">Company Name</label>
+                            <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
+                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
 
                             <label for="payment_address">Payment Address</label>
                             <input type="text" value="{{ $car->payment_address }}" name="payment_address"

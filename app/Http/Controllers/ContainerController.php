@@ -26,6 +26,7 @@ class ContainerController extends Controller
         $cars = Car::with(relations: ['dispatch', 'customer', 'state', 'CarStatus', 'auction', 'loadType'])->paginate(50); // Keep eager loading for relationships
         $container_status = ContainerStatus::withCount('cars')->get();
 
+
         return view('pages.containers.index', compact('cars', 'container_status'));
     }
 
@@ -43,6 +44,8 @@ class ContainerController extends Controller
                 }
             ])->get();
         }
+
+
 
         $groups = '';
         $cars = '';

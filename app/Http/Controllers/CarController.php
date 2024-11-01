@@ -495,7 +495,8 @@ class CarController extends Controller
         $carstatus = CarStatus::where('id', $car->status)->first();
 
 
-        return redirect()->route('car.showStatus', $carstatus->slug)->with('success', 'Car updated successfully.');
+        return redirect()->back()->with('success', 'Car updated successfully.');
+        // return redirect()->route('car.showStatus', $carstatus->slug)->with('success', 'Car updated successfully.');
     }
 
     /**

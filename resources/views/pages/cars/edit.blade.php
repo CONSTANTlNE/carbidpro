@@ -277,7 +277,7 @@
                                                     <label for="payed">Payed</label>
                                                     <input type="text" value="{{ $car->payed }}" name="payed"
                                                         id="payed" class="form-control" x-model="payed"
-                                                        x-on:input="validateNumber">
+                                                        x-on:input="validateNumber" required>
                                                 </div>
 
                                                 <div class="col-md-4">

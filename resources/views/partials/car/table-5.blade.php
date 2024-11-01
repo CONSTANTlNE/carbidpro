@@ -138,8 +138,8 @@
                                 <option value="bank" {{ $car->payment_method == 'bank' ? 'selected' : '' }}>Bank
                                     transfer</option>
                             </select>
-                            <input type="text" value="{{ $car->payment_company_name }}" placeholder="Company Name"
-                                name="payment_company_name" id="payment_company_name" class="mt-1 form-control" required>
+                            <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
+                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
                             <input type="text" value="{{ $car->payment_address }}" placeholder="Payment Address"
                                 name="payment_address" id="payment_address" class="form-control mt-1" required>
 
