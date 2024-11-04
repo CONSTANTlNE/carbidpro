@@ -371,9 +371,35 @@
 
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="note">Note</label>
-                                    <textarea name="comment" class="form-control" id="note" cols="30" rows="2"></textarea>
+                             
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="note">Note</label>
+                                            <textarea name="comment" class="form-control" id="note" cols="30" rows="2"></textarea>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>CAR Status</label>
+                                            <select name="status" class="form-control" id="customer_id">
+                                                <option value=""></option>
+                                                @foreach ($car_status as $status)
+                                                    <option value="{{ $status->id }}">
+                                                        {{ $status->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Satart dispatch?</label>
+                                            <select name="is_dispatch" class="form-control" id="is_dispatch">
+                                                <option value="yes" selected>YES</option>
+                                                <option value="no">NO</option>
+                                               
+                                            </select>
+                                        </div>
+                                    </div>
+
                                 </div>
 
 

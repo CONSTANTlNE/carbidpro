@@ -65,7 +65,8 @@ class Car extends Model implements HasMedia, Sortable
         'container_images',
         'payment_company',
         'debit',
-        'balance'
+        'balance',
+        'is_dispatch'
     ];
 
     public function statusRelation()

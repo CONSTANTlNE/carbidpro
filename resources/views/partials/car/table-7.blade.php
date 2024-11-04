@@ -90,14 +90,14 @@
                             <!-- Button to open the modal -->
                             <button type="button"
                                 class="btn {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
-                                data-toggle="modal" data-target="#imageUploadModal"
+                                data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
                                 data-record-id="{{ $car->id }}">
                                 Images
                             </button>
 
                             <!-- Modal for FilePond upload -->
-                            <div class="modal fade" id="imageUploadModal" tabindex="-1" role="dialog"
-                                aria-labelledby="imageUploadModalLabel" aria-hidden="true">
+                            <div class="modal fade" id="imageUploadModal-{{ $car->id }}" tabindex="-1"
+                                role="dialog" aria-labelledby="imageUploadModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -114,8 +114,8 @@
 
                                             <!-- FilePond input for multiple image uploads -->
                                             <input type="file" style="display: none"
-                                                data-car_id="{{ $car->id }}" id="filepond" name="images[]"
-                                                multiple>
+                                                data-car_id="{{ $car->id }}" class="filepond" id="filepond"
+                                                name="images[]" multiple>
 
 
 
@@ -157,8 +157,7 @@
 
                             <label for="payment_company">Company Name</label>
                             <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
-                                name="payment_company" id="payment_company" class="mt-1 form-control"
-                                required>
+                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
 
                             <label for="payment_address">Payment Address</label>
                             <input type="text" value="{{ $car->payment_address }}" name="payment_address"
@@ -188,11 +187,6 @@
                         </td>
 
                         <td>
-
-                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
-                                <i class="fa fa-trash-o"></i>
-                            </button>
                             <br>
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
@@ -257,9 +251,6 @@
         document.addEventListener("DOMContentLoaded", function() {
 
 
-
-
-
             // Register FilePond plugins
             FilePond.registerPlugin(
                 FilePondPluginImagePreview, // for showing image preview
@@ -269,35 +260,40 @@
 
             // Turn input element into a pond
             // Get the car_id from the input element
-            const inputElement = document.querySelector('input[type="file"]');
-            const carId = inputElement.getAttribute('data-car_id');
+            const inputElements = document.querySelectorAll('.filepond');
+            // const carId = inputElement.getAttribute('data-car_id');
 
-            // Initialize FilePond with car_id passed in the process data
-            const pond = FilePond.create(inputElement, {
-                allowMultiple: true, // Allow multiple file uploads
-                maxFiles: 15, // Limit to 10 files
-                acceptedFileTypes: ['image/*'], // Only accept image files
-                maxFileSize: '10MB', // Maximum file size of 2MB
+            inputElements.forEach((inputElement) => {
+                // Get the car_id from the current input element
+                const carId = inputElement.getAttribute('data-car_id');
+                // Initialize FilePond with car_id passed in the process data
+                FilePond.create(inputElement, {
+                    allowMultiple: true, // Allow multiple file uploads
+                    maxFiles: 15, // Limit to 15 files
+                    acceptedFileTypes: ['image/*'], // Only accept image files
+                    maxFileSize: '10MB', // Maximum file size of 10MB
 
-                // FilePond server configuration
-                server: {
-                    process: {
-                        url: '{{ route('upload.images.spatie') }}',
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    // FilePond server configuration
+                    server: {
+                        process: {
+                            url: '{{ route('upload.images.spatie') }}',
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            // Add extra data (car_id) to the request
+                            ondata: (formData) => {
+                                formData.append('car_id', carId);
+                                return formData;
+                            },
+                            onload: (response) => console.log('Upload successful!', response),
+                            onerror: (response) => console.error('Upload error:', response)
                         },
-                        // Add extra data (car_id) to the request
-                        ondata: (formData) => {
-                            formData.append('car_id', carId);
-                            return formData;
-                        },
-                        onload: (response) => console.log('Upload successful!', response),
-                        onerror: (response) => console.error('Upload error:', response)
-                    },
-                    revert: null, // Revert uploaded image if necessary
-                }
+                        revert: null // Revert uploaded image if necessary
+                    }
+                });
             });
+
 
         });
 

@@ -78,7 +78,7 @@
 
                             <label class="mt-2" for="title_delivery">Title delivery</label>
                             <select name="title_delivery"
-                                class="form-control {{ $car->title == 'yes' && $car->title_delivery ? 'error' : '' }}"
+                                class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES

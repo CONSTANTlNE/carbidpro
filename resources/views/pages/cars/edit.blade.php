@@ -308,14 +308,15 @@
                                         <div class="col-md-4">
                                             <label for="owner_id_number">Owner ID Number
                                             </label>
-                                            <input type="text" value="{{ $car->owner_id_number }}" name="owner_id_number" id="owner_id_number"
-                                                class="form-control">
+                                            <input type="text" value="{{ $car->owner_id_number }}"
+                                                name="owner_id_number" id="owner_id_number" class="form-control">
                                         </div>
 
                                         <div class="col-md-4">
                                             <label for="owner_phone_number">Owner Phone number
                                             </label>
-                                            <input type="text" value="{{ $car->owner_phone_number }}" name="owner_phone_number" id="owner_phone_number"
+                                            <input type="text" value="{{ $car->owner_phone_number }}"
+                                                name="owner_phone_number" id="owner_phone_number"
                                                 class="form-control">
                                         </div>
 
@@ -370,13 +371,22 @@
 
                                         <div class="col-md-4">
                                             <label>CAR Status</label>
-                                            <select name="customer_id" class="form-control" id="customer_id">
+                                            <select name="status" class="form-control" id="customer_id">
                                                 <option value=""></option>
                                                 @foreach ($car_status as $status)
                                                     <option value="{{ $status->id }}"
                                                         {{ $status->id == $car->status ? 'selected' : '' }}>
                                                         {{ $status->name }}</option>
                                                 @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Satart dispatch?</label>
+                                            <select name="is_dispatch" class="form-control" id="is_dispatch">
+                                                <option value="yes"
+                                                    {{ $car->is_dispatch == 'yes' ? 'selected' : '' }}>YES</option>
+                                                <option value="no" {{ $car->is_dispatch == 'no' ? 'selected' : '' }}>NO</option>
                                             </select>
                                         </div>
                                     </div>

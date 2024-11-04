@@ -399,7 +399,7 @@
                                         formData.append('_token', '{{ csrf_token() }}'); // Laravel CSRF token
                                         formData.append('bill_of_loading', document.querySelector('#bill_of_loading_' + carId).files[0]);
                                         formData.append('remark', document.querySelector('#remark_' + carId).value);
-                                        formData.append('title_take', document.querySelector('#title_take_' + carId).value);
+                                        // formData.append('title_take', document.querySelector('#title_take_' + carId).value);
                                         formData.append('car_id', carId);
 
                                         // Add any additional form fields, such as the uploaded files

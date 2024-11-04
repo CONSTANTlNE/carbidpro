@@ -153,9 +153,11 @@ class ContainerController extends Controller
             return redirect()->back()->with(['message' => 'Cars Port need same', 'alert-type' => 'error']);
         }
 
-        // Check if all `title` values are 'YES'
-
-        if ($cars->pluck('title')->contains('yes') === false) {
+        if (
+            $cars->pluck('title')->every(function ($title) {
+                return strtolower($title) === 'yes';
+            }) === false
+        ) {
             // Return error if any title is not 'YES'
             return redirect()->back()->with(['message' => 'All car titles must be YES', 'alert-type' => 'error']);
         }

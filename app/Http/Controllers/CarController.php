@@ -167,6 +167,7 @@ class CarController extends Controller
         $shipping_prices = ShippingPrice::all();
         $customers = Customer::get();
         $dispatchers = User::where('role', 'Dispatch')->get();
+        $car_status = CarStatus::get();
 
         return view(
             'pages.cars.create',
@@ -174,6 +175,7 @@ class CarController extends Controller
                 'auctions',
                 'dispatchers',
                 'load_types',
+                'car_status',
                 'ports',
                 'locations',
                 'customers',
@@ -205,6 +207,7 @@ class CarController extends Controller
         $car->percent = $request->input('percent');
         $car->gate_or_member = $request->input('gate_or_member');
         $car->title = $request->input('title');
+        $car->is_dispatch = $request->input('is_dispatch');
         $car->auction = $request->input('auction');
         $car->load_type = $request->input('load_type');
         $car->from_state = $request->input('from_state');
@@ -226,6 +229,15 @@ class CarController extends Controller
             // Assuming balance_accounting is a JSON field in the database
             $car->balance_accounting = json_encode($request->input('balance_accounting'));
         }
+
+
+        if (!empty($request->status)) {
+            // Assuming balance_accounting is a JSON field in the database
+            $car->status = $request->status;
+        } else {
+            $car->status = 1;
+        }
+
 
         // Handle images array
         if ($request->has('images')) {
@@ -355,7 +367,7 @@ class CarController extends Controller
     {
         $car = Car::findOrFail($request->id);
         $car_status = CarStatus::get();
-        
+
         $auctions = Auction::all();
         $load_types = LoadType::all();
         $ports = Port::all();
@@ -437,7 +449,7 @@ class CarController extends Controller
 
             // Encode the array back into JSON
             $updatedJsonString = json_encode($array);
-            
+
 
             // Output the updated JSON
             $car->balance_accounting = $updatedJsonString;

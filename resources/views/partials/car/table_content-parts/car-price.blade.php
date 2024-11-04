@@ -16,7 +16,7 @@
 
 @endphp
 <div class="d-flex" style="flex-wrap: wrap;"><strong>Storage-{{ $car->storage }}: 
-    </strong><span> ${{ $storageSum }}</span>
+    </strong><span> ${{ $car->storage_cost }}</span>
 </div>
 @if ($car->storage != 'Owner')
     <div class="d-flex" style="gap: 5px"><strong>Sum: </strong>

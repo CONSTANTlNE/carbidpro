@@ -6,7 +6,7 @@
                 <th>CAR INFO</th>
                 <th>FROM-TO</th>
                 <th style="width:10%">Price</th>
-                
+
                 <th>Title Status</th>
                 <th>Created at</th>
                 <th>Action</th>
@@ -26,17 +26,20 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"  required>
+                            <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
+                                required>
 
                         </td>
-                       
+
                         <td>{{ $car->title }}</td>
                         <td>
-                             
+
                         </td>
 
                         <td>
-                            <button type="submit" class="btn btn-success btn-sm">
+
+                            <button type="submit" class="btn btn-success btn-sm"
+                                {{ $car->is_dispatch == 'no' ? 'disabled' : '' }}>
                                 Next
                             </button>
                             @if (auth()->user()->hasRole('Admin'))
@@ -49,7 +52,7 @@
                             <br>
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
-<strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>

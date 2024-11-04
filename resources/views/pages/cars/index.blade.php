@@ -71,18 +71,52 @@
                                         @foreach ($car_status as $status)
                                             @php
                                                 $hasError = '';
+                                                $errorCount = 0; // Counter to count how many cars have errors
+
                                                 if ($status->id == 7) {
                                                     // Check if any car related to this status has title_delivery set to 'no'
                                                     $hasError = $status->cars->contains(function ($car) {
                                                         return $car->title_delivery == 'no' ||
                                                             !$car->getMedia('images')->isNotEmpty();
                                                     });
+
+                                                    // Check for errors and count them
+                                                    $errorCount = $status->cars
+                                                        ->filter(function ($car) {
+                                                            return $car->title_delivery == 'no' ||
+                                                                !$car->getMedia('images')->isNotEmpty();
+                                                        })
+                                                        ->count();
+
+                                                    // Set $hasError to true if there are any errors
+                                                    $hasError = $errorCount > 0;
+                                                }
+
+                                                if ($status->id == 4 || $status->id == 5) {
+                                                    $hasError = $status->cars->contains(function ($car) {
+                                                        $pickupDates = $car->pickup_dates;
+                                                        $pickupDateExpired = false;
+
+                                                        if ($pickupDates) {
+                                                            $dates = explode(' - ', $pickupDates);
+                                                            if (count($dates) == 2) {
+                                                                $secondDate = \Carbon\Carbon::createFromFormat(
+                                                                    'd.m.Y',
+                                                                    trim($dates[1]),
+                                                                );
+                                                                if ($secondDate && now()->greaterThan($secondDate)) {
+                                                                    $pickupDateExpired = true;
+                                                                }
+                                                            }
+                                                        }
+                                                        return $pickupDateExpired;
+                                                    });
                                                 }
 
                                             @endphp
                                             <a href="{{ route('car.showStatus', $status->slug) }}"
                                                 class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-                                                {{ $status->name }} {{ $status->cars_count }}
+                                                {{ $status->name }} {{ $status->id == 7 ?  $errorCount :  $status->cars_count }}
                                             </a>
                                         @endforeach
 
@@ -139,7 +173,7 @@
                             <p>Are you sure you want to delete this Car?</p>
                             <form id="deleteCarForm">
                                 @csrf <!-- CSRF token for security -->
-                                <input type="hidden" id="deleteCarId"  name="car_id">
+                                <input type="hidden" id="deleteCarId" name="car_id">
                                 <!-- Hidden field to hold the user ID -->
                                 <div class="form-group user-form-group">
                                     <div class="float-right">
