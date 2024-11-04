@@ -36,6 +36,7 @@ class ContainerController extends Controller
 
         if (auth()->user()->hasRole('Admin')) {
             $container_status = ContainerStatus::withCount('cars', 'containerStatus')->get();
+
         } else {
             $container_status = ContainerStatus::withCount([
                 'containerStatus',
@@ -84,19 +85,39 @@ class ContainerController extends Controller
 
         } elseif ($slug == 'loading-pending') {
 
-            $groups = ContainerGroup::with('cars')
+            $groupsQuery = ContainerGroup::with('cars')
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 2);  // Filter cars where container_status is 2
-                })
-                ->get();
+                    $query->where('container_status', 2); // Filter cars where container_status is 2
+                });
+
+            // Apply search filter if $request->search is provided
+            if ($request->has('search') && !empty($request->search)) {
+                $searchValue = $request->search;
+                $groupsQuery->where(function ($query) use ($searchValue) {
+                    $query->where('booking_id', $searchValue)
+                        ->orWhere('container_number', $searchValue);
+                });
+            }
+
+            $groups = $groupsQuery->get();
 
         } else {
 
-            $groups = ContainerGroup::with('cars')
+            $groupsQuery = ContainerGroup::with('cars')
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 3);  // Filter cars where container_status is 2
-                })
-                ->get();
+                    $query->where('container_status', 3); // Filter cars where container_status is 3
+                });
+
+            // Apply search filter if $request->search is provided
+            if ($request->has('search') && !empty($request->search)) {
+                $searchValue = $request->search;
+                $groupsQuery->where(function ($query) use ($searchValue) {
+                    $query->where('booking_id', $searchValue)
+                        ->orWhere('container_id', $searchValue);
+                });
+            }
+
+            $groups = $groupsQuery->get();
         }
 
 

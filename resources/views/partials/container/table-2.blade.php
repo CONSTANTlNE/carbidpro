@@ -46,6 +46,12 @@
                                     id="arrival_time" {{ $cargroup->arrival_time ? '' : 'required' }}>
                             </th>
                             <th style="width: 10%;">
+                                <input type="text" placeholder="THC agent" value="{{ $cargroup->thc_agent }}"
+                                    name="thc_agent" class="form-control thc_agent" id="thc_agent">
+
+                                <br>
+                                <br>
+
                                 <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                     class="form-control" name="container_cost" id="container_cost" required>
                             </th>
@@ -71,7 +77,7 @@
                                         class="btn btn-dark open-car-modal" data-target="#addCarModal" type="button">
                                         Add Car
                                     </button>
-                                    
+
                                     <button type="button" id="sendEmail" data-container-id="{{ $cargroup->id }}"
                                         class="sendEmail btn {{ $cargroup->is_email_sent == 1 ? 'btn-warning' : 'btn-primary' }} btn-sm">
                                         {{ $cargroup->is_email_sent == 1 ? 'Email sent ' . $cargroup->email_sent_date : 'Send email' }}
@@ -81,7 +87,7 @@
                                         NEXT
                                     </button>
 
-                                    
+
                                 </div>
 
 
@@ -145,8 +151,9 @@
                                         data-target="#replaceCarModal" type="button">
                                         Replace
                                     </button>
-                                    <button data-car-id="{{ $car->id }}" data-container-id="{{ $cargroup->id }}"
-                                        class="btn btn-danger removefromlist" type="button">
+                                    <button data-car-id="{{ $car->id }}"
+                                        data-container-id="{{ $cargroup->id }}" class="btn btn-danger removefromlist"
+                                        type="button">
                                         Remove
                                     </button>
                                 </td>
@@ -233,6 +240,31 @@
 @push('js')
     <script>
         $(document).ready(function() {
+
+            const suggestedWords = [
+                'MAERSK',
+                'Hapag-Eisa',
+                'Turkon-DTS',
+                'One net-Wilhelmsen',
+            ];
+
+            // Initialize jQuery UI autocomplete
+            function initializeAutocomplete() {
+                $(".thc_agent").autocomplete({
+                    source: suggestedWords,
+                    minLength: 0,
+                    select: function(event, ui) {
+                        let selectedWord = ui.item.value; // Get the selected word
+                        $(this).closest('td').find('input[name="cost"]').val('');
+                    }
+                }).focus(function() {
+                    // Force the dropdown to show when the input gains focus
+                    $(this).autocomplete("search", "");
+                });
+            }
+
+            initializeAutocomplete();
+
 
             $('#car-list').select2({
                 placeholder: 'Select Car',
