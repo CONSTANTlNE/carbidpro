@@ -13,13 +13,25 @@ class ArrivedController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $groups = ContainerGroup::with('cars')
-            ->whereHas('cars', function ($query) {
-                $query->where('container_status', 3);  // Filter cars where container_status is 2
-            })
-            ->get();
+
+
+
+        if (!empty($request->input('search')) && $request->has('search')) {
+
+            $groups = ContainerGroup::with('cars')->where('container_id', $request->input('search'))
+                ->whereHas('cars', function ($query) {
+                    $query->where('container_status', 3);  // Filter cars where container_status is 2
+                })
+                ->get();
+        } else {
+            $groups = ContainerGroup::with('cars')
+                ->whereHas('cars', function ($query) {
+                    $query->where('container_status', 3);  // Filter cars where container_status is 2
+                })
+                ->get();
+        }
 
         $cars = '';
         $ports = Port::all();

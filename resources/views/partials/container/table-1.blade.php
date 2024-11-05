@@ -54,6 +54,23 @@
     </div>
 </form>
 
+
+<div style="margin-top:30px;display: flex;flex-direction: column;gap: 30px;align-items: flex-end;">
+
+    @if ($currentStatus == 'for-load')
+        <form action="{{ route('container.selected') }}"
+            class="form-inline my-2 my-lg-0 mt-5 mb-3" method="post">
+            @csrf
+            <input type="hidden" class="carids" id="carids" name="car_ids[]"
+                value="">
+            <button class="btn btn-primary my-2 my-sm-0 mb-3"
+                type="submit">Next</button>
+        </form>
+    @endif
+
+
+</div>
+
 <div class="table-responsive mt-3">
     <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
         <thead class="back_table_color">

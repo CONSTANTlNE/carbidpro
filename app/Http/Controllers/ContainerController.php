@@ -95,7 +95,12 @@ class ContainerController extends Controller
                 $searchValue = $request->search;
                 $groupsQuery->where(function ($query) use ($searchValue) {
                     $query->where('booking_id', $searchValue)
-                        ->orWhere('container_number', $searchValue);
+                        ->orWhere('container_id', $searchValue)
+                        ->orWhereHas('cars', function ($carQuery) use ($searchValue) {
+                            $carQuery->where('lot', 'LIKE', '%' . $searchValue . '%')
+                                ->orWhere('vin', 'LIKE', '%' . $searchValue . '%')
+                                ->orWhere('make_model_year', 'LIKE', '%' . $searchValue . '%');
+                        });
                 });
             }
 
@@ -113,7 +118,12 @@ class ContainerController extends Controller
                 $searchValue = $request->search;
                 $groupsQuery->where(function ($query) use ($searchValue) {
                     $query->where('booking_id', $searchValue)
-                        ->orWhere('container_id', $searchValue);
+                        ->orWhere('container_id', $searchValue)
+                        ->orWhereHas('cars', function ($carQuery) use ($searchValue) {
+                            $carQuery->where('lot', 'LIKE', '%' . $searchValue . '%')
+                                ->orWhere('vin', 'LIKE', '%' . $searchValue . '%')
+                                ->orWhere('make_model_year', 'LIKE', '%' . $searchValue . '%');
+                        });
                 });
             }
 
@@ -206,9 +216,9 @@ class ContainerController extends Controller
 
 
         if ($request->has('to_port_id')) {
-            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->where('to_port_id', $request->to_port_id)->get(); // Or apply filtering logic if necessary
+            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->where('title', 'yes')->where('to_port_id', $request->to_port_id)->get(); // Or apply filtering logic if necessary
         } else {
-            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->get(); // Or apply filtering logic if necessary
+            $availableCars = Car::with('loadType')->whereNotIn('id', $car_ids)->where('title', 'yes')->where('to_port_id', $request->to_port_id)->get(); // Or apply filtering logic if necessary
         }
 
 
@@ -340,6 +350,29 @@ class ContainerController extends Controller
             $container->invoice_file = $path;
         }
 
+        if ($request->hasFile('payment_file_1')) {
+            // Get the uploaded file (single file)
+            $payment_file_1 = $request->file('payment_file_1');
+
+            // Store the file in 'public/payment_invoice_files' directory
+            $path = $payment_file_1->store('payment_file_1', 'public');
+            // Save the path in the database
+            $container->payment_file_1 = $path;
+        }
+
+        if ($request->hasFile('payment_file_2')) {
+            // Get the uploaded file (single file)
+            $payment_file_2 = $request->file('payment_file_2');
+
+            // Store the file in 'public/payment_invoice_files' directory
+            $path = $payment_file_2->store('payment_file_2', 'public');
+            // Save the path in the database
+            $container->payment_file_2 = $path;
+        }
+
+
+        
+
         if ($request->hasFile('thc_invoice')) {
             // Get the uploaded file (single file)
             $thc_invoice = $request->file('thc_invoice');
@@ -357,6 +390,10 @@ class ContainerController extends Controller
 
         if ($request->has('thc_agent')) {
             $container->thc_agent = $request->thc_agent;
+        }
+
+        if ($request->has('is_green')) {
+            $container->is_green = $request->is_green;
         }
 
 

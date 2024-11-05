@@ -47,7 +47,7 @@
                             </th>
                             <th style="width: 10%;">
                                 <input type="text" placeholder="THC agent" value="{{ $cargroup->thc_agent }}"
-                                    name="thc_agent" class="form-control thc_agent" id="thc_agent">
+                                    name="thc_agent" class="form-control thc_agent" id="thc_agent" required>
 
                                 <br>
                                 <br>
@@ -146,7 +146,7 @@
 
                                 <td>
                                     <!-- Button to trigger the modal -->
-                                    <button data-car-id="{{ $car->id }}" data-container-id="{{ $cargroup->id }}"
+                                    <button data-car-id="{{ $car->id }}" to_port_id="{{$car->to_port_id}}" data-container-id="{{ $cargroup->id }}"
                                         data-toggle="modal" class="btn btn-dark open-modal"
                                         data-target="#replaceCarModal" type="button">
                                         Replace
@@ -322,6 +322,7 @@
                         container_id: container_id,
                     },
                     success: function(response) {
+                       
                         // Loop through the response and populate the select dropdown
                         $('#new_car_id').append(
                             $('<option>', {
@@ -341,6 +342,7 @@
                         });
                         // Show the modal after cars are loaded
                         $('#replaceCarModal').modal('show');
+                        $('.select2-results__options').empty()
 
                     },
                     error: function(xhr) {
@@ -368,6 +370,7 @@
                         to_port_id: to_port_id
                     },
                     success: function(response) {
+                        $('#car-list').empty()
                         // Loop through the response and populate the select dropdown
                         $('#car-list').append(
                             $('<option>', {

@@ -93,7 +93,7 @@
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"
                                                     class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
                                                     {{ $status->name }}
-                                                    {{ $status->slug != 'for-load' ? $groupCount : $status->container_status_count }}
+                                                    {{ $status->slug != 'for-load' ? '' : $status->container_status_count }}
                                                 </a>
                                             @endif
                                         @endforeach
@@ -103,21 +103,6 @@
 
                                     </div>
 
-                                    <div style="display: flex;flex-direction: column;gap: 30px;align-items: flex-end;">
-
-                                        @if ($currentStatus == 'for-load')
-                                            <form action="{{ route('container.selected') }}"
-                                                class="form-inline my-2 my-lg-0 mt-5 mb-3" method="post">
-                                                @csrf
-                                                <input type="hidden" class="carids" id="carids" name="car_ids[]"
-                                                    value="">
-                                                <button class="btn btn-primary my-2 my-sm-0 mb-3"
-                                                    type="submit">Next</button>
-                                            </form>
-                                        @endif
-
-
-                                    </div>
 
                                     <div>
                                         <form class="form-inline my-2 my-lg-0" method="GET">
@@ -134,6 +119,7 @@
                             </div>
 
 
+                            
                             @if ($currentStatus == 'for-load')
                                 @include('partials.container.table-1', $cars)
                             @elseif($currentStatus == 'loading-pending')

@@ -63,8 +63,29 @@
                                     </a>
                                 @endif
 
+                                <label for="payment_file_1">Payment Doc</label>
+                                <input type="file" name="payment_file_1" id="payment_file_1" style="width: 200px;"
+                                    {{ !empty($cargroup->payment_file_1) ? '' : 'required' }}>
+                                @if (!empty($cargroup->payment_file_1))
+                                    <a href="{{ Storage::url($cargroup->payment_file_1) }}" target="_blank">
+
+                                        <img src="https://cdn-icons-png.freepik.com/256/10106/10106255.png?semt=ais_hybrid"
+                                            style="max-width: 25px; margin-top:10px" alt="Recipte">
+                                    </a>
+                                @endif
+
                             </th>
                             <th style="width: 10%;">
+                                <label for="is_green">Ask to Green</label>
+                                <select class="form-control" name="is_green" id="is_green" required>
+                                    <option value=""></option>
+                                    <option value="yes" {{ $cargroup->is_green == 'yes' ? 'selected' : '' }}>
+                                        YES</option>
+                                    <option value="no" {{ $cargroup->is_green == 'no' ? 'selected' : '' }}>NO
+                                    </option>
+                                </select>
+                                <br>
+
                                 <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;"
                                     {{ !empty($cargroup->photo) ? '' : 'required' }}>
 
@@ -91,6 +112,18 @@
 
                                 @if (!empty($cargroup->thc_invoice))
                                     <a href="{{ Storage::url($cargroup->thc_invoice) }}" target="_blank">
+
+                                        <img src="https://cdn-icons-png.freepik.com/256/10106/10106255.png?semt=ais_hybrid"
+                                            style="max-width: 25px; margin-top:10px" alt="Recipte">
+                                    </a>
+                                @endif
+
+
+                                <label for="payment_file_2">Payment Doc</label>
+                                <input type="file" name="payment_file_2" id="payment_file_2"
+                                    style="width: 200px;" {{ !empty($cargroup->payment_file_2) ? '' : 'required' }}>
+                                @if (!empty($cargroup->payment_file_2))
+                                    <a href="{{ Storage::url($cargroup->payment_file_2) }}" target="_blank">
 
                                         <img src="https://cdn-icons-png.freepik.com/256/10106/10106255.png?semt=ais_hybrid"
                                             style="max-width: 25px; margin-top:10px" alt="Recipte">

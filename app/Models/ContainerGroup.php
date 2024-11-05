@@ -33,6 +33,8 @@ class ContainerGroup extends Model
         'opened',
         'open_payed',
         'remark',
+        'payment_file_1',
+        'payment_file_2'
     ];
 
     public function cars()

@@ -38,6 +38,7 @@
                 <small>List of Containers</small>
             </div>
         </section>
+
         <div class="container">
             @if (session('message'))
                 <style>
@@ -68,6 +69,18 @@
                     <div class="card lobicard" id="lobicard-custom-control" data-sortable="true">
 
                         <div class="card-body">
+
+                            <div style="display: flex;justify-content: flex-end;">
+                                <form class="form-inline my-2 my-lg-0" method="GET">
+
+                                    <input class="form-control mr-sm-2"
+                                        value="{{ isset($_GET['search']) ? $_GET['search'] : '' }}" name="search"
+                                        type="search" placeholder="Search" aria-label="Search">
+                                    <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
+                                </form>
+                            </div>
+
+
                             <!-- Plugin content:powerpoint,txt,pdf,png,word,xl -->
                             <div class="btn-group d-flex" role="group">
                                 <div class="row" style="justify-content: space-between;width: 100%;">
@@ -168,7 +181,7 @@
                                                                                                 <td>{{ $car->id }}
                                                                                                 </td>
                                                                                                 <td>
-                                                                                                    
+
                                                                                                     <div>
                                                                                                         <strong>Model:<span>{{ $car->make_model_year }}</span></strong>
                                                                                                         <img src="/assets/dist/img/copy.svg"
@@ -193,7 +206,8 @@
                                                                                                             class="upload__btn-box">
                                                                                                             <label
                                                                                                                 class="upload__btn">
-                                                                                                                <p>Car Photo 
+                                                                                                                <p>Car
+                                                                                                                    Photo
                                                                                                                 </p>
                                                                                                                 <input
                                                                                                                     type="file"
@@ -333,12 +347,11 @@
                                                     <td>
                                                         <select class="form-control" name="cont_status"
                                                             id="cont_status"
-                                                            style="{{ $cargroup->cont_status == 'Green' ? 'background:#28a745;color:#fff;' : '' }} {{ $cargroup->cont_status == 'Red' ? 'background:#dc3545;color:#fff;' : '' }}">
+                                                            style="{{ $cargroup->cont_status == 'Green' || ($cargroup->payment_file_1 && !empty($cargroup->payment_file_2)) ? 'background:#28a745;color:#fff;' : '' }} {{ $cargroup->cont_status == 'Red' ? 'background:#dc3545;color:#fff;' : '' }}">
                                                             <option value=""></option>
 
-
                                                             <option value="Green"
-                                                                {{ $cargroup->cont_status == 'Green' ? 'selected' : '' }}>
+                                                                {{ $cargroup->cont_status == 'Green' || ($cargroup->payment_file_1 && !empty($cargroup->payment_file_2)) ? 'selected' : '' }}>
                                                                 Green</option>
                                                             <option value="Red"
                                                                 {{ $cargroup->cont_status == 'Red' ? 'selected' : '' }}>

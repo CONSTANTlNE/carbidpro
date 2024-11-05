@@ -54,8 +54,19 @@
                             {{ $car->contact_info }}
                         </td>
                         <td>
+                            @php
+                                $pickupDates = $car->pickup_dates;
+                                $dateParts = explode(' - ', $pickupDates);
+                                $endDate = isset($dateParts[1])
+                                    ? \Carbon\Carbon::createFromFormat('d.m.Y', trim($dateParts[1]))
+                                    : null;
+                                $isExpired = $endDate && $endDate->isPast();
+                            @endphp
+
                             <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
-                                name="pickup_dates" class="form-control daterange" />
+                                name="pickup_dates" class="form-control daterange"
+                                style="background-color: {{ $isExpired ? 'red' : 'white' }};" />
+
                         </td>
                         <td>
                             <label style="margin: 0;padding:0">Title Status</label>

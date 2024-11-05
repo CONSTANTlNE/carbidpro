@@ -38,8 +38,19 @@
                         </td>
                         <td>{{ $car->title }}</td>
                         <td>
-                            <input type="text" data-record-id="{{ $car->id }}"
-                                value="{{ $car->pickup_dates }}" name="pickup_dates" class="form-control daterange" />
+                            @php
+                                $pickupDates = $car->pickup_dates;
+                                $dateParts = explode(' - ', $pickupDates);
+                                $endDate = isset($dateParts[1])
+                                    ? \Carbon\Carbon::createFromFormat('d.m.Y', trim($dateParts[1]))
+                                    : null;
+                                $isExpired = $endDate && $endDate->isPast();
+                            @endphp
+
+                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange"
+                                style="background-color: {{ $isExpired ? 'red' : 'white' }};" />
+
                         </td>
 
                         <td>
@@ -55,7 +66,7 @@
                             <br>
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
-<strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
                         </td>
                     </form>
