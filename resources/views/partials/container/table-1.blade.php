@@ -81,9 +81,9 @@
                 <th>Car type</th>
                 <th>Fuel type</th>
                 <th>Warehouse</th>
-                <th>Title Status</th>
+                <th>T/status</th>
                 <th>Owner</th>
-                <th style="width: 6%;">Dispatch day count</th>
+                <th style="width: 6%;">Dispatch days</th>
             </tr>
         </thead>
         <tbody>
@@ -101,11 +101,14 @@
                     <input type="hidden" name="status"
                         value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                     <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
-                    <td>{{ $car->type_of_fuel }}</td>
+                    
+                    <td>
+                        @include('partials.container.table_content-parts.fuel-type')
+                    </td>
 
                     <td>
                         {{ !empty($car->port) ? $car->port->name : '' }} <br>
-                        <label for="">Destination Port:</label>
+                        <label for="">Dest Port:</label>
                         <br>
                         POTI<br>
                     </td>

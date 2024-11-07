@@ -8,7 +8,7 @@
 
                 <th>Price</th>
                 <th>Carrier</th>
-                <th>Title Status</th>
+                <th>T/status</th>
                 <th>Pickup & Delivery Dates</th>
                 <th>Action</th>
             </tr>
@@ -57,11 +57,6 @@
                             <button type="submit" id="submit-btn-{{ $car->id }}" disabled
                                 class="btn btn-success btn-sm">
                                 Next
-                            </button>
-
-                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
-                                <i class="fa fa-trash-o"></i>
                             </button>
                             <br>
                             <br>

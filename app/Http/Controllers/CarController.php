@@ -454,6 +454,10 @@ class CarController extends Controller
             // Output the updated JSON
             $car->balance_accounting = $updatedJsonString;
             $car->storage_cost = $request->cost;
+
+            $car->debit = $car->debit + $request->cost;
+
+
         }
 
         if ($request->has('title_delivery')) {

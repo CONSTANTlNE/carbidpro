@@ -72,11 +72,11 @@
                                 name="pickup_dates" class="form-control daterange" />
                         </td>
                         <td>
-                            <label style="margin: 0;padding:0">Title Status</label>
+                            <label style="margin: 0;padding:0">T/status</label>
                             <br>
                             <span> {{ $car->title }}</span>
 
-                            <label class="mt-2" for="title_delivery">Title delivery</label>
+                            <label class="mt-2" for="title_delivery">T/delivery</label>
                             <select name="title_delivery"
                                 class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
@@ -194,10 +194,6 @@
                                 Next
                             </button>
 
-                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
-                                <i class="fa fa-trash-o"></i>
-                            </button>
                             <br>
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>

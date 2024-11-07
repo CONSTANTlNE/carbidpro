@@ -11,7 +11,7 @@
                         <th style="width: 10%;">Fuel type</th>
                         <th>Warehouse</th>
                         <th>Owner</th>
-                        <th style="width: 10%;">Dispatch day count</th>
+                        <th style="width: 10%;">Dispatch days</th>
                         <th style="width: 10%;">Container Info</th>
                         <th style="width: 10%;">Container Cost
                         </th>
@@ -46,7 +46,7 @@
                                     id="arrival_time" {{ $cargroup->arrival_time ? '' : 'required' }}>
                             </th>
                             <th style="width: 10%;">
-                                <input type="text" placeholder="THC agent" value="{{ $cargroup->thc_agent }}"
+                                <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
                                     name="thc_agent" class="form-control thc_agent" id="thc_agent" required>
 
                                 <br>
@@ -112,11 +112,12 @@
                                 <input type="hidden" name="status"
                                     value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                                 <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
-                                <td>{{ $car->type_of_fuel }}</td>
+                                <td> @include('partials.container.table_content-parts.fuel-type')
+                                </td>
 
                                 <td>
                                     {{ !empty($car->port) ? $car->port->name : '' }} <br>
-                                    <label for="">Destination Port:</label>
+                                    <label for="">Dest Port:</label>
                                     <br>
                                     POTI<br>
                                 </td>
@@ -146,9 +147,9 @@
 
                                 <td>
                                     <!-- Button to trigger the modal -->
-                                    <button data-car-id="{{ $car->id }}" to_port_id="{{$car->to_port_id}}" data-container-id="{{ $cargroup->id }}"
-                                        data-toggle="modal" class="btn btn-dark open-modal"
-                                        data-target="#replaceCarModal" type="button">
+                                    <button data-car-id="{{ $car->id }}" to_port_id="{{ $car->to_port_id }}"
+                                        data-container-id="{{ $cargroup->id }}" data-toggle="modal"
+                                        class="btn btn-dark open-modal" data-target="#replaceCarModal" type="button">
                                         Replace
                                     </button>
                                     <button data-car-id="{{ $car->id }}"
@@ -322,7 +323,7 @@
                         container_id: container_id,
                     },
                     success: function(response) {
-                       
+
                         // Loop through the response and populate the select dropdown
                         $('#new_car_id').append(
                             $('<option>', {

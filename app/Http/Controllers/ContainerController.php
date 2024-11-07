@@ -75,6 +75,16 @@ class ContainerController extends Controller
                     $query->where('title', $request->title); // Assuming 1 = Yes, 0 = No
                 }
 
+                // Text search filter
+                if ($request->has('search') && !empty($request->search)) {
+                    $search = $request->search;
+                    $query->where(function ($q) use ($search) {
+                        $q->where('vin', 'like', "%{$search}%")
+                            ->orWhere('make_model_year', 'like', "%{$search}%") // Add more fields as needed
+                            ->orWhere('lot', 'like', "%{$search}%"); // Example field
+                    });
+                }
+
                 $cars = $query->paginate(50);
 
 
@@ -371,7 +381,7 @@ class ContainerController extends Controller
         }
 
 
-        
+
 
         if ($request->hasFile('thc_invoice')) {
             // Get the uploaded file (single file)

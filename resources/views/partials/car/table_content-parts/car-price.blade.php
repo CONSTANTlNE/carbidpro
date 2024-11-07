@@ -15,7 +15,7 @@
     );
 
 @endphp
-<div class="d-flex" style="flex-wrap: wrap;"><strong>Storage-{{ $car->storage }}: 
+<div class="d-flex" style="flex-wrap: wrap;"><strong>Strg-{{ $car->storage }}: 
     </strong><span> ${{ $car->storage_cost }}</span>
 </div>
 @if ($car->storage != 'Owner')

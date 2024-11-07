@@ -7,7 +7,7 @@
                 <th>FROM-TO</th>
                 <th style="width:10%">Price</th>
 
-                <th>Title Status</th>
+                <th>T/status</th>
                 <th>Created at</th>
                 <th>Action</th>
             </tr>
@@ -37,17 +37,12 @@
                         </td>
 
                         <td>
-
+                            
                             <button type="submit" class="btn btn-success btn-sm"
                                 {{ $car->is_dispatch == 'no' ? 'disabled' : '' }}>
                                 Next
                             </button>
-                            @if (auth()->user()->hasRole('Admin'))
-                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                    data-target="#deleteUserModal" data-user-id="{{ $car->id }}">
-                                    <i class="fa fa-trash-o"></i>
-                                </button>
-                            @endif
+                           
 
                             <br>
                             <br>

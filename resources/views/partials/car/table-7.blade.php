@@ -71,11 +71,11 @@
                             {{ $car->pickup_dates }}
                         </td>
                         <td>
-                            <label style="margin: 0;padding:0">Title Status</label>
+                            <label style="margin: 0;padding:0">T/status</label>
                             <br>
                             <span> {{ $car->title }}</span>
 
-                            <label class="mt-2" for="title_delivery">Title delivery</label>
+                            <label class="mt-2" for="title_delivery">T/delivery</label>
                             <select name="title_delivery" data-car-id="{{ $car->id }}"
                                 class="form-control title_delivery {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>

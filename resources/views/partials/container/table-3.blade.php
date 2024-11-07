@@ -99,7 +99,7 @@
 
                             </th>
                             <th>
-                                <input type="text" placeholder="THC agent" value="{{ $cargroup->thc_agent }}"
+                                <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
                                     name="thc_agent" class="thc_agent" id="thc_agent">
 
                                 <label for="thc_cost">THC Cost</label>
@@ -162,11 +162,14 @@
                                 <input type="hidden" name="status"
                                     value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                                 <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
-                                <td>{{ $car->type_of_fuel }}</td>
+                                <td>
+                                    @include('partials.container.table_content-parts.fuel-type')
+
+                                </td>
 
                                 <td>
                                     {{ !empty($car->port) ? $car->port->name : '' }} <br>
-                                    <label for="">Destination Port:</label>
+                                    <label for="">Dest Port:</label>
                                     <br>
                                     POTI<br>
                                 </td>
