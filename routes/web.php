@@ -4,6 +4,7 @@ use App\Http\Controllers\ArrivedController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\PaymentReportController;
 use App\Http\Controllers\PortEmailController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -29,6 +30,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+
     // Users
     Route::get('/dashboard/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/dashboard/users', [UserController::class, 'store'])->name('users.store');
@@ -81,7 +83,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/portemails/{user}', [PortEmailController::class, 'update'])->name('portemail.update');
     Route::delete('/dashboard/portemails/{user}', [PortEmailController::class, 'destroy'])->name('portemail.destroy');
 
-
+    // Payment Reports
+    Route::get('/dashboard/payment-reports', [PaymentReportController::class, 'index'])->name('paymentreports.index');
+    Route::post('/dashboard/payment-reports', [PaymentReportController::class, 'store'])->name('paymentreports.store');
+    Route::post('/dashboard/payment-reports/{id}', [PaymentReportController::class, 'update'])->name('paymentreports.update');
+    Route::delete('/dashboard/payment-reports/{id}', [PaymentReportController::class, 'destroy'])->name('paymentreports.destroy');
 
 });
 

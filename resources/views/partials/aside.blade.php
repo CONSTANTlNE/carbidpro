@@ -9,6 +9,17 @@
                     <span class="pull-right-container"></span>
                 </a>
             </li>
+
+            @if (auth()->user()->hasRole('Admin'))
+                <li class="{{ Route::is('paymentreports.index') ? 'active' : '' }}">
+                    <a href="{{ route('paymentreports.index') }}">
+                        <i class="fa fa-money"></i><span>Payment Reports</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @endif
+
+
             @if (auth()->user()->hasRole('Admin'))
                 <li class="{{ Route::is('users.index') ? 'active' : '' }}">
                     <a href="{{ route('users.index') }}">
@@ -64,7 +75,7 @@
             @if (auth()->user()->hasRole('Admin'))
                 <li class="">
                     <a href="{{ route('portemail.index') }}">
-                        <i class="fa fa-envelope"></i><span>Port  Emails</span>
+                        <i class="fa fa-envelope"></i><span>Port Emails</span>
                         <span class="pull-right-container"></span>
                     </a>
                 </li>
