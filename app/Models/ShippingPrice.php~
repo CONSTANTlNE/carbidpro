@@ -16,6 +16,7 @@ class ShippingPrice extends Model
     protected $fillable = ['from_location_id', 'to_port_id', 'auction_id', 'price'];
 
 
+
     public function location()
     {
         return $this->belongsTo(Location::class, 'from_location_id');

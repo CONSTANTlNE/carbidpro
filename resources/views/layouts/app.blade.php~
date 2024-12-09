@@ -63,7 +63,6 @@
 @yield('load-types')
 @yield('shipping-prices')
 @yield('ports')
-@yield('customers')
 
 <!-- jQuery -->
 <script src="/assets/plugins/jQuery/jquery-1.12.4.min.js"></script>

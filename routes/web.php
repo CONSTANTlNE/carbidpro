@@ -1,12 +1,18 @@
 <?php
 
 use App\Http\Controllers\ArrivedController;
+use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContainerController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\LoadTypesController;
+use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\PaymentReportController;
 use App\Http\Controllers\PortEmailController;
+use App\Http\Controllers\PortsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +94,55 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/payment-reports', [PaymentReportController::class, 'store'])->name('paymentreports.store');
     Route::post('/dashboard/payment-reports/{id}', [PaymentReportController::class, 'update'])->name('paymentreports.update');
     Route::delete('/dashboard/payment-reports/{id}', [PaymentReportController::class, 'destroy'])->name('paymentreports.destroy');
+
+    // Auctions
+    Route::controller(AuctionsController::class)->group(function() {
+        Route::get('/dashboard/auctions',  'index')->name('auctions.index');
+        Route::post('/dashboard/auctions/store', 'store')->name('auctions.store');
+        Route::post('/dashboard/auctions/destroy',  'destroy')->name('auctions.destroy');
+        Route::post('/dashboard/auctions/update',  'update')->name('auctions.update');
+    });
+
+    // Load Types
+    Route::controller(LocationsController::class)->group(function () {
+        Route::get('/dashboard/locations',  'index')->name('locations.index');
+        Route::post('/dashboard/locations/store', 'store')->name('locations.store');
+        Route::post('/dashboard/locations/destroy',  'destroy')->name('locations.destroy');
+        Route::post('/dashboard/locations/update',  'update')->name('locations.update');
+    });
+
+    // Shipping Prices
+    Route::controller(ShippingPricesController::class)->group(function () {
+        Route::get('/dashboard/shipping-prices',  'index')->name('shipping-prices.index');
+        Route::post('/dashboard/shipping-prices/store', 'store')->name('shipping-prices.store');
+        Route::post('/dashboard/shipping-prices/destroy',  'destroy')->name('shipping-prices.destroy');
+        Route::get('/dashboard/shipping-prices/locations/htmx','htmxLocations')->name('htmx.locations');
+        Route::post('/dashboard/shipping-prices/update',  'update')->name('shipping-prices.update');
+    });
+
+    // Load Types
+    Route::controller(LoadTypesController::class)->group(function () {
+        Route::get('/dashboard/load-types',  'index')->name('load-types.index');
+        Route::post('/dashboard/load-types/store', 'store')->name('load-types.store');
+        Route::post('/dashboard/load-types/destroy',  'destroy')->name('load-types.destroy');
+        Route::post('/dashboard/load-types/update',  'update')->name('load-types.update');
+    });
+
+    // Ports
+    Route::controller(PortsController::class)->group(function () {
+        Route::get('/dashboard/ports',  'index')->name('ports.index');
+        Route::post('/dashboard/ports/store', 'store')->name('ports.store');
+        Route::post('/dashboard/ports/destroy',  'destroy')->name('ports.destroy');
+        Route::post('/dashboard/ports/update',  'update')->name('ports.update');
+    });
+
+    // Customers
+    Route::controller(CustomersController::class)->group(function () {
+        Route::get('/dashboard/customers',  'index')->name('customers.index');
+        Route::post('/dashboard/customers/store', 'store')->name('customers.store');
+        Route::post('/dashboard/customers/destroy',  'destroy')->name('customers.destroy');
+        Route::post('/dashboard/customers/update',  'update')->name('customers.update');
+    });
 
 });
 

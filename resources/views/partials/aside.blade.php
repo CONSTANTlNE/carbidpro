@@ -27,6 +27,13 @@
                         <span class="pull-right-container"></span>
                     </a>
                 </li>
+                <li class="{{ Route::is('customers.index') ? 'active' : '' }}">
+                    <a href="{{ route('customers.index') }}">
+                        <i class="fa fa-user-circle"></i><span>Customers</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+
             @endif
 
 
@@ -80,7 +87,50 @@
                     </a>
                 </li>
             @endif
+            <hr>
+            @if (auth()->user()->hasRole('Admin'))
+                <li class="treeview active">
+                    <a href="#">
+                        <i class="fa fa-gear"></i><span>Data</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left float-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="">
+                            <a href="{{ route('auctions.index') }}">
+                                <span>Auctions</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('locations.index') }}">
+                                <span>Locations</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('shipping-prices.index') }}">
+                                <span>Shipping Prices</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('load-types.index') }}">
+                                <span>Load Types</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('ports.index') }}">
+                                <span>Ports</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
 
+                    </ul>
+                </li>
+            @endif
         </ul>
     </div>
     <!-- /.sidebar -->

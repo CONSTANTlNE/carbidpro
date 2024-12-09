@@ -71,9 +71,9 @@ class CarController extends Controller
 
 
         // Select cars columns only to avoid ambiguity
-        $cars = $cars->paginate(50);
+        $cars = $cars->with('Auction')->paginate(50);
 
-        $car_status = CarStatus::withCount('cars')->get();
+        $car_status = CarStatus::with('cars')->withCount('cars')->get();
 
         return view('pages.cars.index', compact('cars', 'car_status'));
     }
@@ -167,7 +167,8 @@ class CarController extends Controller
         $shipping_prices = ShippingPrice::all();
         $customers = Customer::get();
         $dispatchers = User::where('role', 'Dispatch')->get();
-        $car_status = CarStatus::get();
+        $car_status = CarStatus::with('cars')->get();
+
 
         return view(
             'pages.cars.create',
@@ -259,9 +260,9 @@ class CarController extends Controller
 
         // $car_status = CarStatus::withCount('cars')->get();
         if (auth()->user()->hasRole('Admin')) {
-            $car_status = CarStatus::withCount('cars')->get();
+            $car_status = CarStatus::with('cars')->withCount('cars')->get();
         } else {
-            $car_status = CarStatus::withCount([
+            $car_status = CarStatus::with('cars')->withCount([
                 'cars' => function ($query) {
                     $query->where('dispatch_id', auth()->id());
                 }
