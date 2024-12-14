@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->string('load_type')->nullable();
             $table->string('from_state')->nullable();
             $table->unsignedBigInteger('to_port_id')->nullable(); // Assuming this refers to a foreign key
+            $table->string('zip_code')->nullable();
             $table->decimal('sub_total', 10, 2);
             $table->decimal('payed', 10, 2);
             $table->decimal('amount_due', 10, 2);
@@ -39,6 +40,32 @@ return new class extends Migration {
             $table->text('comment')->nullable();
             $table->boolean('is_deleted')->default(0); // 0 for not deleted, 1 for deleted
             $table->json('balance_accounting')->nullable(); // Store balance accounting as JSON
+
+            $table->string('warehouse')->nullable();
+            $table->string('internal_shipping')->nullable();
+            $table->string('company_name')->nullable();
+            $table->string('contact_info')->nullable();
+            $table->string('pickup_dates')->nullable();
+            $table->string('storage')->nullable();
+            $table->string('storage_cost')->nullable();
+            $table->string('title_delivery')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_address')->nullable();
+            $table->string('payment_photo')->nullable();
+            $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
+            $table->bigInteger('dispatch_id')->nullable();
+            $table->integer('order_column')->index()->nullable();
+            $table->foreignId('container_status_id')->constrained()->cascadeOnDelete();
+            $table->timestamp('arrival_time')->nullable();
+            $table->string('title_take')->nullable();
+            $table->string('remark')->nullable();
+            $table->string('bill_of_loading')->nullable();
+            $table->tinyText('container_images')->nullable();
+            $table->string('balance')->nullable();
+            $table->string('left_balance')->nullable();
+            $table->string('payment_company')->nullable();
+            $table->string('debit')->nullable();
+            $table->enum('is_dispatch', ['no', 'yes'])->nullable();
             $table->timestamps();
         });
     }

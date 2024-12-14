@@ -1,20 +1,28 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AnnouncmentController;
 use App\Http\Controllers\ArrivedController;
 use App\Http\Controllers\AuctionsController;
+use App\Http\Controllers\calculatorController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContainerController;
-use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\LoadTypesController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\PaymentReportController;
 use App\Http\Controllers\PortEmailController;
 use App\Http\Controllers\PortsController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\UserController;
+use App\Models\Setting;
+use App\Services\SettingsService;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,13 +35,103 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+//Route::get('/', function () {
+//    return view('welcome');
+//});
+//
+
+Route::get('/lang/{locale}', function ($locale) {
+    Session::put('locale', $locale);
+    return redirect()->back();
+})->name('set-locale');
+
+
+
+// FRONTEND ROUTES No Auth
+
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/announcements', [AnnouncmentController::class, 'index']);
+Route::get('/contact', [ContactController::class, 'index']);
+Route::get('/about', function (SettingsService $settings) {
+    if (Session::has('locale')) {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget(Session::get('locale')); // Translate to Georgian
+    } else {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        Session::put('locale', 'en');
+    }
+    return view('frontend.pages.about', compact('tr', 'settings'));
+})->name('about');
+Route::get('/terms-and-conditions', function (SettingsService $settings) {
+    if (Session::has('locale')) {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget(Session::get('locale')); // Translate to Georgian
+    } else {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        Session::put('locale', 'en');
+    }
+    return view('frontend.pages.terms', compact('tr', 'settings'));
+})->name('terms');
+Route::get('/privacy-and-policy', function (SettingsService $settings) {
+    if (Session::has('locale')) {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget(Session::get('locale')); // Translate to Georgian
+    } else {
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        Session::put('locale', 'en');
+    }
+    return view('frontend.pages.privacy', compact('tr', 'settings'));
+})->name('privacy');
+Route::get('/create-setting', function () {
+    Setting::create([
+        'key' => 'privacy',
+        'label' => 'Privacy',
+        'value' => null,
+        'type' => 'textarea',
+    ]);
+
+
+})->name('st');
+Route::get('/calculator', [calculatorController::class, 'index']);
+Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
+Route::post('/send-email', [CustomerController::class, 'sendEmail'])->name('sendEmail');
+
+Route::prefix('customer')->group(function () {
+    Route::get('/login', [CustomerController::class, 'showLoginForm'])->name('customer.login.get');
+    Route::post('/login', [CustomerController::class, 'login'])->name('customer.login.post');
+    Route::get('/register', [CustomerController::class, 'showRegistrationForm'])->name('customer.register.get');
+    Route::post('/register', [CustomerController::class, 'register'])->name('customer.register.post');
+    Route::get('/logout', [CustomerController::class, 'logout'])->name('customer.logout');
 });
+
+Route::get('/search', [CustomerController::class, 'searchResult'])
+    ->name('customer.searchResult');
+
+Route::get('/download-images/{vin}', [CustomerController::class, 'download'])
+    ->name('customer.download_images');
+
+
+
+
+
+
+
+
+// ====  ADMIN ROUTES  ====
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
 
@@ -137,13 +235,74 @@ Route::middleware('auth')->group(function () {
     });
 
     // Customers
-    Route::controller(CustomersController::class)->group(function () {
-        Route::get('/dashboard/customers',  'index')->name('customers.index');
+    Route::controller(AdminController::class)->group(function () {
+        Route::get('/dashboard/customers',  'customerIndex')->name('customers.index');
         Route::post('/dashboard/customers/store', 'store')->name('customers.store');
+        Route::post('/dashboard/customers/activate', 'customerActivate')->name('customer.activate');
         Route::post('/dashboard/customers/destroy',  'destroy')->name('customers.destroy');
         Route::post('/dashboard/customers/update',  'update')->name('customers.update');
     });
+});
 
+
+
+
+
+// ====  Dealer  ROUTES  ====
+
+Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
+
+    Route::get('/record/{id}/table', [CustomerController::class, 'getTableData'])->name('record.table');
+
+    Route::get('/main', [CustomerController::class, 'showDashboard'])
+        ->name('customer.dashboard');
+
+    Route::get('/archived-cars', [CustomerController::class, 'showDashboard'])
+        ->name('customer.archivedcars');
+
+    Route::get('/car-info/{vin}', [CustomerController::class, 'showCar'])
+        ->name('customer.car-info');
+
+
+
+    Route::post('/save-release', [CustomerController::class, 'saveRelease'])->name('saveRelease');
+
+    Route::get('/payment-registration', [CustomerController::class, 'showPaymentRequest'])
+        ->name('customer.payment_registration');
+
+    Route::post('/payment-registration', [CustomerController::class, 'registrPaymentRequest'])
+        ->name('customer.payment_registration_submit');
+
+    Route::get('/payment-history', [CustomerController::class, 'paymentHistory'])
+        ->name('customer.payment_history');
+
+    Route::post('/generate-invoice', [CustomerController::class, 'generateInvoice'])
+        ->name('customer.generate_invoice');
+
+    Route::post('/set-car-amount', [CustomerController::class, 'setCarAmount'])
+        ->name('customer.set_amount');
+
+
+    Route::get('/team-list', [CustomerController::class, 'teamList'])
+        ->name('customer.teamList');
+
+    Route::get('/add-team', [CustomerController::class, 'addTeam'])
+        ->name('customer.addTeam');
+
+    Route::get('/team-edit/{id}', [CustomerController::class, 'teamEdit'])
+        ->name('customer.teamEdit');
+
+    Route::post('/team-update/{id}', [CustomerController::class, 'teamUpdate'])
+        ->name('customer.teamUpdate');
+
+    Route::post('/team-remove/{id}', [CustomerController::class, 'removeTeam'])
+        ->name('customer.removeTeam');
+
+    Route::post('/car-assing-team', [CustomerController::class, 'addTeamToCar'])
+        ->name('customer.addTeamToCar');
+
+    Route::post('/add-invoice-price', [CustomerController::class, 'addInvoicePrice'])
+        ->name('customer.addInvoicePrice');
 });
 
 require __DIR__ . '/auth.php';

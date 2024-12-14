@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('shipping_prices', function (Blueprint $table) {
             $table->id();
             $table->string('price');
-            $table->boolean('is_active')->default(true);
-            $table->foreignId('auction_id')->default(["1","2","3"])->constrained();
+            $table->json('auction_ids')->default(json_encode([1, 2, 3]));
+            $table->foreignId('from_location_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('to_port_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -107,7 +107,7 @@ class Car extends Model implements HasMedia, Sortable
 
     public function customer()
     {
-        return $this->hasOne(Customer::class, 'id', 'customer_id');
+        return $this->belongsTo(Customer::class, 'id', 'customer_id');
     }
 
     public function CarStatus()

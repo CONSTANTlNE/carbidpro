@@ -35,7 +35,7 @@
                     <div class="card lobicard" id="lobicard-custom-controls" data-sortable="true">
                         <div class="card-header">
                             <div class="card-title custom_title">
-                                <h1>Customers  {{$count}}</h1>
+                                <h1>Customers {{$count}}</h1>
                             </div>
                         </div>
                         <div class="card-body">
@@ -61,31 +61,36 @@
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Company Name</label>
-                                                            <input name="company_name" required type="text" placeholder="" class="form-control">
+                                                            <input name="company_name" required type="text"
+                                                                   placeholder="" class="form-control">
                                                         </div>
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Company/Personal ID</label>
-                                                            <input name="company_id" required type="text" placeholder="" class="form-control">
+                                                            <input name="company_id" required type="text" placeholder=""
+                                                                   class="form-control">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Contact Person</label>
-                                                            <input name="contact_person" required type="text" placeholder="" class="form-control">
+                                                            <input name="contact_person" required type="text"
+                                                                   placeholder="" class="form-control">
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Phone</label>
-                                                            <input name="phone" required type="text" placeholder="" class="form-control">
+                                                            <input name="phone" required type="text" placeholder=""
+                                                                   class="form-control">
                                                         </div>
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Email</label>
-                                                            <input name="email" required type="text" placeholder="" class="form-control">
+                                                            <input name="email" required type="text" placeholder=""
+                                                                   class="form-control">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Car purchase per Month</label>
-                                                            <select  name="car_number" id="" class="form-control">
+                                                            <select name="car_number" id="" class="form-control">
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
                                                                 <option value="50">50</option>
@@ -96,16 +101,18 @@
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Extra For Calculator</label>
-                                                            <input name="extra" required type="text" placeholder="" class="form-control">
+                                                            <input name="extra" required type="text" placeholder=""
+                                                                   class="form-control">
                                                         </div>
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group text-center">
                                                             <label class="control-label">Status Active</label>
-                                                            <input name="status" required type="checkbox" checked  class="form-control">
+                                                            <input name="status" required type="checkbox" checked
+                                                                   class="form-control">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Role</label>
-                                                            <select  name="role" id="" class="form-control">
+                                                            <select name="role" id="" class="form-control">
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
                                                                 <option value="50">50</option>
@@ -116,7 +123,8 @@
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">password</label>
-                                                            <input name="password" required type="text" placeholder="" class="form-control">
+                                                            <input name="password" required type="text" placeholder=""
+                                                                   class="form-control">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -165,9 +173,9 @@
                                     <select style="width: 120px" class="ml-3 form-control" name="auction" id=""
                                             onchange="this.form.submit()">
                                         <option value="all">All Auctions</option>
-{{--                                        @foreach($auctions as $auction)--}}
-{{--                                            <option @selected(request()->query('auction') == $auction->id) value="{{$auction->id}}" >{{$auction->name}}</option>--}}
-{{--                                        @endforeach--}}
+                                        {{--                                        @foreach($auctions as $auction)--}}
+                                        {{--                                            <option @selected(request()->query('auction') == $auction->id) value="{{$auction->id}}" >{{$auction->name}}</option>--}}
+                                        {{--                                        @endforeach--}}
                                     </select>
                                 </form>
                             </div>
@@ -195,7 +203,17 @@
                                             <td>{{$customer->email}}</td>
                                             <td>dealer</td>
                                             <td>login</td>
-                                            <td>{{$customer->is_active}}</td>
+                                            <td>
+                                                <form action="{{route('customer.activate')}}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{$customer->id}}">
+                                                    @if($customer->is_active==1)
+                                                        <button class="btn btn-success btn-rounded w-md m-b-5">Active</button>
+                                                    @else
+                                                        <button  class="btn btn-danger btn-rounded w-md m-b-5">Inactive</button
+                                                    @endif
+                                                </form>
+                                            </td>
                                             <td>{{$customer->created_at->format('d-m-Y')}}</td>
                                             <td>
                                                 {{--Edit Modal--}}
@@ -282,7 +300,8 @@
                                                                             <fieldset>
                                                                                 <div class="col-md-12 form-group user-form-group">
                                                                                     <label class="control-label">Delete
-                                                                                        Customer : {{$customer->contact_name}}
+                                                                                        Customer
+                                                                                        : {{$customer->contact_name}}
                                                                                         ?</label>
                                                                                     <div class="flex justify-content-center mt-3">
                                                                                         <button type="button"
