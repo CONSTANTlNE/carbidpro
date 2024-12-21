@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PaymentRequest extends Model
+class CustomerBalance extends Model
 {
-    use HasFactory;
-    protected $fillable = [
-        'amount',
-        'full_name',
-        'date',
-        'customer_id',
-        'is_approved',
-    ];
+
+    protected  $guarded = [];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+
+    public function car()
+    {
+        return $this->belongsTo(Car::class, 'car_id');
+    }
+
 }

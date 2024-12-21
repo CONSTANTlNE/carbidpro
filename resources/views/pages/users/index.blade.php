@@ -199,21 +199,21 @@
                                     <div class="col-md-6 form-group">
                                         <label class="control-label">Name</label>
                                         <input type="text" id="add_name" name="name" placeholder="User Name"
-                                            class="form-control" required>
+                                            class="form-control" required autocomplete="off">
                                     </div>
 
                                     <!-- Email -->
                                     <div class="col-md-6 form-group">
                                         <label class="control-label">Email</label>
                                         <input type="email" id="add_email" name="email" placeholder="Email"
-                                            class="form-control" required>
+                                            class="form-control" required value="">
                                     </div>
 
                                     <!-- Password -->
                                     <div class="col-md-6 form-group">
                                         <label class="control-label">Password</label>
                                         <input type="password" id="add_password" name="password"
-                                            placeholder="Password" class="form-control" required>
+                                            placeholder="Password" class="form-control" required value="">
                                     </div>
 
                                     <!-- Confirm Password -->
@@ -231,6 +231,9 @@
                                             <option value="Admin">Admin</option>
                                             <option value="Editor">Editor</option>
                                             <option value="Dispatch">Dispatch</option>
+                                            <option value="Loader">Loader</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Terminal_Agent">Terminal Agent</option>
                                         </select>
                                     </div>
 

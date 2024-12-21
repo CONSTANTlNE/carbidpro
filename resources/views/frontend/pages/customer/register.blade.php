@@ -86,7 +86,7 @@
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="remember_me" name="remember" required>
                                 <label class="form-check-label" for="remember_me">{!! $tr->translate('I Agree to the') !!} <a
-                                        href="https://phplaravel-1240578-4751501.cloudwaysapps.com/terms-and-conditions" target="_blank"><span
+                                        href="{{route('terms')}}" target="_blank"><span
                                             style="color: blue;text-decoration:underline">Terms and Conditions</span>
                                     </a></label>
                             </div>

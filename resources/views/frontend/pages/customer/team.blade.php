@@ -1,5 +1,6 @@
-@extends('layout.app')
+@extends('frontend.layout.app')
 
+{{--@dd($teams , auth()->user()->id)--}}
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
         data-background="/assets/images/cargo.jpeg" style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">

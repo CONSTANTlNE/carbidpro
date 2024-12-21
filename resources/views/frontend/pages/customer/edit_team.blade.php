@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('frontend.layout.app')
 
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"

@@ -17,12 +17,13 @@ class LocationsController extends Controller
             return to_route('locations.index');
         }
 
-
         if ($request->has('search')) {
             $search = $request->input('search');
             $locations = Location::with('auction')
                 ->where('name', 'like', '%' . $search . '%')
-                ->paginate($perpage)->withQueryString();
+                ->paginate($perpage)
+                ->withQueryString();
+
             $count=$locations->total();
             return view('pages.locations', compact('locations','auctions','count'));
         }
@@ -32,7 +33,8 @@ class LocationsController extends Controller
             $locations = Location::with('auction')
             ->where('auction_id', $auctionId)
             ->paginate($perpage)
-                ->withQueryString();
+            ->withQueryString();
+
             $count=$locations->total();
             return view('pages.locations', compact('locations', 'auctions','count'));
         }

@@ -77,7 +77,7 @@
                                     <div class="row">
                                         <div class="form-group">
                                             <label>Dealer</label>
-                                            <select name="customer_id" class="form-control" id="customer_id" required>
+                                            <select autocomplete="nope" name="customer_id" class="form-control" id="customer_id" required>
                                                 <option value=""></option>
                                                 @foreach ($customers as $customer)
                                                     <option value="{{ $customer->id }}"
@@ -91,7 +91,7 @@
 
                                         <div class="form-group">
                                             <label>Broker</label>
-                                            <select name="dispatch_id" class="form-control" id="dispatch_id" required>
+                                            <select autocomplete="nope" name="dispatch_id" class="form-control" id="dispatch_id" required>
                                                 <option value=""></option>
                                                 @foreach ($dispatchers as $dispatch)
                                                     <option value="{{ $dispatch->id }}"
@@ -104,13 +104,13 @@
 
                                         <div class="form-group">
                                             <label>Make/Model/Year</label>
-                                            <input type="text" name="make_model_year" class="form-control"
+                                            <input autocomplete="nope" type="text" name="make_model_year" class="form-control"
                                                 value="{{ old('make_model_year') }}" required>
                                         </div>
 
                                         <div class="form-group">
                                             <label>Title</label>
-                                            <select name="title" class="form-control" id="title" required>
+                                            <select autocomplete="nope" name="title" class="form-control" id="title" required>
                                                 <option value=""></option>
                                                 <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
                                                 </option>
@@ -128,13 +128,13 @@
 
                                         <div class="form-group">
                                             <label>Vin</label>
-                                            <input type="text" name="vin" class="form-control"
+                                            <input autocomplete="nope" type="text" name="vin" class="form-control"
                                                 value="{{ old('vin') }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Percent</label>
-                                            <input type="text" name="percent" class="form-control"
+                                            <input autocomplete="nope" type="text" name="percent" class="form-control"
                                                 value="{{ old('percent') }}">
                                         </div>
 
@@ -145,14 +145,14 @@
 
                                                 <div class="col-md-4">
                                                     <label>Lot</label>
-                                                    <input type="text" name="lot" class="form-control"
+                                                    <input autocomplete="nope" type="text" name="lot" class="form-control"
                                                         value="{{ old('lot') }}" required>
                                                 </div>
 
 
                                                 <div class="col-md-4">
                                                     <label>Gate or Member</label>
-                                                    <input type="text" name="gate_or_member" class="form-control"
+                                                    <input autocomplete="nope" type="text" name="gate_or_member" class="form-control"
                                                         value="{{ old('gate_or_member') }}" required>
                                                 </div>
 
@@ -160,14 +160,14 @@
                                                     <label>Type of Fuel</label><br>
 
                                                     <label class="radio-inline">
-                                                        <input name="type_of_fuel" value="Petrol" type="radio"
+                                                        <input autocomplete="nope" name="type_of_fuel" value="Petrol" type="radio"
                                                             {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}
                                                             required>
                                                         Petrol
                                                     </label>
 
                                                     <label class="radio-inline">
-                                                        <input name="type_of_fuel" value="Hybrid" type="radio"
+                                                        <input autocomplete="nope" name="type_of_fuel" value="Hybrid" type="radio"
                                                             {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}
                                                             required>
                                                         Hybrid
@@ -183,7 +183,7 @@
                                             <div class="row">
                                                 <div class="col-md-2">
                                                     <label for="auction">Auction</label>
-                                                    <select id="auction" name="auction" class="form-control select2">
+                                                    <select autocomplete="nope" id="auction" name="auction" class="form-control select2">
                                                         <option value="">Select an option</option>
                                                         @foreach ($auctions as $auction)
                                                             <option value="{{ $auction->id }}"
@@ -196,7 +196,7 @@
 
                                                 <div class="col-md-2">
                                                     <label for="loadType">Load Type</label>
-                                                    <select name="load_type" id="loadType"
+                                                    <select autocomplete="nope" name="load_type" id="loadType"
                                                         class="form-control select2">
                                                         <option value="">Select an option</option>
                                                         @foreach ($load_types as $load_type)
@@ -209,7 +209,7 @@
 
                                                 <div class="col-md-2">
                                                     <label for="fromState">From State</label>
-                                                    <select name="from_state" id="fromState"
+                                                    <select autocomplete="nope" name="from_state" id="fromState"
                                                         class="form-control select2">
                                                         <option value="">Select an option</option>
                                                         <!-- This will be populated dynamically based on the auction selection -->
@@ -219,7 +219,7 @@
                                                 <!-- Add this for To Port and Load Type, etc. -->
                                                 <div class="col-md-2">
                                                     <label for="to_port_id">To Port Id</label>
-                                                    <select name="to_port_id" id="to_port_id"
+                                                    <select autocomplete="nope" name="to_port_id" id="to_port_id"
                                                         class="form-control select2">
                                                         <option value="">Select an option</option>
                                                         <!-- This will be populated dynamically -->
@@ -228,15 +228,15 @@
 
                                                 <div class="col-md-2">
                                                     <label for="zip_code">Exact location-zip</label>
-                                                    <input type="text" class="form-control" name="zip_code"
+                                                    <input autocomplete="nope" type="text" class="form-control" name="zip_code"
                                                         id="zip_code" value="{{ old('zip_code') }}" required>
                                                 </div>
 
                                                 <div class="col-md-2">
                                                     <label for="warehouse">Warehouse</label>
-                                                    <input type="text" value="TRT - New Jersey"
-                                                        class="form-control" name="warehouse" id="warehouse"
-                                                        value="{{ old('warehouse') }}" required>
+                                                    <input autocomplete="nope" type="text"   value="{{ old('warehouse') }}"
+                                                           class="form-control" name="warehouse" id="warehouse"
+                                                       required>
                                                 </div>
 
                                             </div>
@@ -298,7 +298,7 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <label for="allcost">All Cost</label>
-                                                    <input type="text" name="debit" id="allcost"
+                                                    <input type="text" name="total_cost" id="allcost"
                                                         class="form-control" x-bind:value="calculateTotal()" readonly>
                                                 </div>
 
@@ -382,10 +382,10 @@
                                         <div class="col-md-4">
                                             <label>CAR Status</label>
                                             <select name="status" class="form-control" id="customer_id">
-                                                <option value=""></option>
                                                 @foreach ($car_status as $status)
-                                                    <option value="{{ $status->id }}">
-                                                        {{ $status->name }}</option>
+                                                    <option @selected($status->name=='For Dispatch') value="{{ $status->id }}">
+                                                        {{ $status->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -401,8 +401,6 @@
                                     </div>
 
                                 </div>
-
-
                                 <div class="reset-button">
                                     <button type="submit" class="btn btn-success"> Save</button>
                                 </div>

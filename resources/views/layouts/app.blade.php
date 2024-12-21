@@ -51,11 +51,15 @@
 
       =====================================================================-->
     <link href="{{asset('assets/plugins/modals/component.css')}}" rel="stylesheet"/>
-
+    <script src="https://unpkg.com/htmx.org@2.0.3"
+            integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+            crossorigin="anonymous"></script>
     @stack('css')
 </head>
 
-<body class="@yield('body-class', '')">
+{{--<body class="@yield('body-class', '')">--}}
+<body class="hold-transition sidebar-mini sidebar-collapse">
+
 <div id="htmxerrors"></div>
 @yield('content')
 @yield('auctions')
@@ -64,6 +68,12 @@
 @yield('shipping-prices')
 @yield('ports')
 @yield('customers')
+@yield('payment_request')
+{{--Site Settings--}}
+@yield('sliders')
+@yield('announces')
+@yield('settings')
+@yield('services')
 
 <!-- jQuery -->
 <script src="/assets/plugins/jQuery/jquery-1.12.4.min.js"></script>

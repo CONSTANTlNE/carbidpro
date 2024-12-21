@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 
 use App\Models\car;
 use App\Models\PaymentReport;
-use App\Models\PaymentRequest;
+use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -99,41 +99,39 @@ class CustomerController extends Controller
         return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::guard('customer')->logout();
 
-        Session::forget('auth');
+        $request->session()->invalidate();
 
-        return redirect()->back();
+        $request->session()->regenerateToken();
+
+        return to_route('home');
     }
 
     public function saveRelease(Request $request)
     {
+
+//        dd($request->all());
         // Validate the incoming request data before proceeding
-        $validatedData = $request->validate([
+        $request->validate([
             'car_id' => 'required', // Ensure the car_id exists in the database
         ]);
 
-
         // Find the car by its ID
-        $car = Car::findOrFail($validatedData['car_id']);
+        $car = Car::findOrFail($request->car_id);
 
-        if (empty($car['release_car_create_date'])) {
-            if (!empty($request['fname']) && !empty($request['idnumber']) && !empty($request['phone'])) {
-                // Update the car attributes
-                $car->release_car_name        = $request['fname'];
-                $car->release_car_idnumber    = $request['idnumber'];
-                $car->release_car_phone       = $request['phone'];
-                $car->release_car_create_date = Carbon::now(); // You can use Carbon directly without the backslash
+        // Update the car attributes
+        $car->vehicle_owner_name = $request->vehicle_owner_name;
+        $car->owner_id_number    = $request->owner_id_number;
+        $car->owner_phone_number = $request->owner_phone_number;
 
-                // Save the changes to the database
-                $car->save();
+        // Save the changes to the database
+        $car->save();
 
-                // Optionally, you can return a response or redirect the user after updating the car
-                return response()->json(['message' => 'Car updated successfully'], 200);
-            }
-        }
+        // Optionally, you can return a response or redirect the user after updating the car
+        return back()->with('success', 'Car details updated successfully.');
     }
 
     public function showCar($vin)
@@ -158,7 +156,7 @@ class CustomerController extends Controller
             Session::put('locale', 'en');
         }
 
-        return view('pages.customer.car-info', compact('tr', 'car'));
+        return view('frontend.pages.customer.car-info', compact('tr', 'car'));
     }
 
     public function download($vin)
@@ -247,11 +245,10 @@ class CustomerController extends Controller
             Session::put('locale', 'en');
         }
 
-
         // Data preparation for dashboard view
-        $teams = Customer::where('parent_of', auth()->user()->id)->get();
+        $teams = Customer::where('child_of', auth()->user()->id)->get();
 
-        return view('pages.customer.team', compact('tr', 'teams'));
+        return view('frontend.pages.customer.team', compact('tr', 'teams'));
     }
 
     public function addTeam(Request $request)
@@ -277,7 +274,7 @@ class CustomerController extends Controller
         $customer = auth()->user();
 
 
-        return view('pages.customer.add_team', compact('tr', 'customer'));
+        return view('frontend.pages.customer.add_team', compact('tr', 'customer'));
     }
 
     public function teamEdit($id)
@@ -296,7 +293,7 @@ class CustomerController extends Controller
         $team = Customer::where('id', $id)->first();
 
 
-        return view('pages.customer.edit_team', compact('tr', 'team'));
+        return view('frontend.pages.customer.edit_team', compact('tr', 'team'));
     }
 
     public function teamUpdate($id, Request $request)
@@ -339,10 +336,16 @@ class CustomerController extends Controller
     public function addTeamToCar(Request $request)
     {
         $car          = car::find($request->car_id);
-        $car->team_id = $request->team_id ? $request->team_id : 0;
+
+        if($request->team_id==='remove_team'){
+            $car->team_id =0;
+            $car->save();
+            return back();
+        }
+        $car->team_id = $request->team_id;
         $car->save();
 
-        return true;
+        return back();
     }
 
     public function showDashboard(Request $request, Builder $builder)
@@ -364,7 +367,7 @@ class CustomerController extends Controller
         }
 
         // Data preparation for dashboard view
-        if (auth()->user()->parent_of > 0) {
+        if (auth()->user()->child_of > 0) {
             $whereLabel = 'team_id';
             $customer   = auth()->user();
         } else {
@@ -372,44 +375,43 @@ class CustomerController extends Controller
             $customer   = auth()->user();
         }
 
-        $html = $builder->parameters(['scrollX' => true])->columns([
-            Column::make('id'),
-            Column::make('year')->title('Year'),
-            Column::make('make'),
-            Column::make('model'),
-            Column::make('vin')->render('`<a style="color:blue" href="/dashboard/car-info/${full.vin}">${full.vin}</a>`'),
-            Column::make('title_recived')->render('full.title_recived == 1 ? `<span class="true">YES</span>` : `<span class="false">NO</span>`'),
-            Column::make('cargo_recived')->render('full.cargo_recived == 1 ? `<span class="true">YES</span>` : `<span class="false">NO</span>`'),
-            Column::make('key')->render('full.key == 1 ? `<span class="true">YES</span>` : `<span class="false">NO</span>`'),
-            Column::make('from_state_id')
-                ->title('From')
-                ->render('full.state.name'),
-            Column::make('to_port_id')
-                ->title('To')
-                ->render('full.to_port.name'),
-            Column::make('debit'),
-            Column::make('recived'),
-            Column::make('days'),
-            Column::make('container'),
-            Column::make('balance'),
-        ]);
-
 
         if (route('customer.archivedcars') == url()->current()) {
-            $cars = car::with(['state', 'toPort'])->where('status', 1)->where('balance', 0)->where($whereLabel,
-                $customer->id)->get();
-            // $cars = car::with(['state', 'toPort'])->where('is_active', 1)->where('balance', 0)->where('color', '#82f98261')->where($whereLabel, $customer->id)->get();
+            $cars = car::with(['state', 'toPort', 'payments'])
+                ->where('is_active', 1)
+                ->where('balance', 0)
+                ->where($whereLabel,
+                    $customer->id)
+                ->paginate(50)
+                ->withQueryString();
+
         } elseif (auth()->user()->hasRole('portmanager')) {
-            $cars = car::with(['state', 'toPort'])->where('status', 1)->get();
+            $cars = car::with(['state', 'toPort', 'payments'])
+                ->where('is_active', 1)
+                ->paginate(50)
+                ->withQueryString();
         } else {
-            $cars = car::with(['state', 'toPort'])->where('status', 1)->where('balance_accounting', '!=', null)->where($whereLabel,
-                $customer->id)->get();
+            $cars = car::with(['state', 'toPort', 'payments'])
+                ->where('is_active', 1)
+                ->where('balance_accounting', '!=', null)
+                ->where($whereLabel,
+                    $customer->id)
+                ->paginate(50)
+                ->withQueryString();
         }
 
+        $balance = CustomerBalance::where('customer_id', $customer->id)
+            ->where('is_approved', 1)
+            ->sum('amount');
 
-        $teams = Customer::where('parent_of', $customer->id)->get();
+        $pending = CustomerBalance::where('customer_id', $customer->id)
+            ->where('is_approved', 0)
+            ->sum('amount');
 
-        return view('frontend.pages.customer.dashboard', compact('tr', 'customer', 'html', 'teams', 'cars'));
+        $teams = Customer::where('child_of', $customer->id)->get();
+
+        return view('frontend.pages.customer.dashboard2',
+            compact('tr', 'customer', 'teams', 'cars', 'balance', 'pending'));
     }
 
     public function showPaymentRequest(Request $request, Builder $builder)
@@ -435,9 +437,9 @@ class CustomerController extends Controller
             return redirect('/')->with('error', 'Your account is not active.');
         }
 
-        // Data preparation for dashboard view
+        // check if auth user is Sub Dealer or not and retrieve relevant data
 
-        if (auth()->user()->parent_of > 0) {
+        if (auth()->user()->child_of > 0) {
             $whereLabel = 'team_id';
             $customer   = auth()->user();
         } else {
@@ -445,30 +447,42 @@ class CustomerController extends Controller
             $customer   = auth()->user();
         }
 
-        $cars = car::with(['state', 'toPort', 'payments'])->where('is_active', 1)->where('balance', '!=',
-            0)->where('color', '!=', '#82f98261')->where($whereLabel, $customer->id)->orderBy('created_at',
-            'DESC')->get();
+//        $cars = car::with(['state', 'toPort', 'payments'])->where('is_active', 1)->where('balance', '!=',
+//        0)->where('color', '!=', '#82f98261')->where($whereLabel, $customer->id)->orderBy('created_at',
+//        'DESC')->get();
+
+        $cars = car::with(['state', 'toPort', 'payments'])->where('is_active', 1)
+            ->where('total_cost', '!=', 0)
+            ->where($whereLabel, $customer->id)
+            ->orderBy('created_at',
+                'DESC')->get();
 
 
-        $paymentRequest = PaymentRequest::where('customer_id', auth()->user()->id)
+        $paymentRequest = CustomerBalance::where('customer_id', auth()->user()->id)
             ->where('is_approved', 1)
             ->sum('amount');
 
         $carBalance = car::where('customer_id', auth()->user()->id)
-            ->where('balance', '<', 0)
-            ->sum('balance');
+            ->where('total_cost', '<', 0)
+            ->sum('total_cost');
 
 
-        $payment_report = PaymentReport::where('customer_id', auth()->user()->id)->where('is_approved',
-            1)->sum('left_amount');
+        $payment_report = CustomerBalance::where('customer_id', auth()->user()->id)
+            ->where('is_approved', 1)->sum('amount');
 
 
         $balance = $paymentRequest - $payment_report - $carBalance;
+//        dd($balance);
 
-        $total_amount_due = car::where('customer_id', auth()->user()->id)->where('balance', '!=', 0)->where('color',
-            '!=', '#82f98261')->where('is_active', 1)->sum('balance');
+//        $total_amount_due = car::where('customer_id', auth()->user()->id)->where('balance', '!=', 0)->where('color',
+//            '!=', '#82f98261')->where('is_active', 1)->sum('balance');
 
-        $pending = PaymentRequest::where('customer_id', auth()->user()->id)
+        $total_amount_due = car::where('customer_id', auth()->user()->id)
+            ->where('amount_due', '!=', 0)
+            ->where('is_active', 1)
+            ->sum('amount_due');
+
+        $pending = CustomerBalance::where('customer_id', auth()->user()->id)
             ->where('is_approved', 0)
             ->sum('amount');
 
@@ -499,57 +513,23 @@ class CustomerController extends Controller
         // Data preparation for dashboard view
         $customer = auth()->user();
 
-        $cars = car::with(['state', 'toPort'])->where('is_active', 1)->where('customer_id', $customer->id)->get();
 
-        $paymentRequest = PaymentRequest::where('customer_id', auth()->user()->id)
+        $payment_report = CustomerBalance::with('car')
+            ->where('customer_id', auth()->user()->id)
+            ->where('is_approved',
+                1)->get();
+
+        $balance = CustomerBalance::where('customer_id', $customer->id)
             ->where('is_approved', 1)
             ->sum('amount');
 
-        $charged = PaymentReport::where('customer_id', auth()->user()->id)->get();
-
-        $recieved       = PaymentRequest::where('customer_id', auth()->user()->id)->get();
-        $payment_report = PaymentReport::where('customer_id', auth()->user()->id)->where('is_approved',
-            1)->sum('left_amount');
+        $pending = CustomerBalance::where('customer_id', $customer->id)
+            ->where('is_approved', 0)
+            ->sum('amount');
 
 
         return view('frontend.pages.customer.payment_history',
-            compact('tr', 'customer', 'payment_report', 'recieved', 'cars', 'charged'));
-    }
-
-    public function registrPaymentRequest(Request $request)
-    {
-        $paymentRequest = new PaymentRequest;
-
-        $paymentRequest->amount      = $request->bank_payment;
-        $paymentRequest->full_name   = $request->full_name;
-        $paymentRequest->date        = $request->payment_date;
-        $paymentRequest->customer_id = auth()->user()->id;
-        $paymentRequest->save();
-
-
-        try {
-            $content = [
-                'name'   => $paymentRequest->full_name,
-                'date'   => $paymentRequest->date,
-                'amount' => $paymentRequest->amount,
-            ];
-
-
-            Mail::to('carbidprosystem@gmail.com')->send(new SampleMail($content));
-
-
-            // foreach (['First Coder' => 'first-recipient@gmail.com', 'Second Coder' => 'second-recipient@gmail.com'] as $name => $recipient) {
-            //     Mail::to($recipient)->send(new MyTestEmail($name));
-            // }
-
-            return redirect()->back()->with('success', 'Payment request received! We will confirm within 24 hours.');
-        } catch (\Exception $e) {
-            // Log the error for troubleshooting
-            \Log::error('Email sending error: '.$e->getMessage());
-
-
-            return redirect()->back();
-        }
+            compact('tr', 'customer', 'payment_report', 'balance', 'pending'));
     }
 
     public function sendEmail(Request $request)
@@ -563,7 +543,7 @@ class CustomerController extends Controller
         ];
 
 
-        Mail::to('carbidprosystem@gmail.com')->send(new ContactMail($content));
+        Mail::to(config('carbiddata.email'))->send(new ContactMail($content));
 
         return redirect()->back()->with('success', 'Email sent');
     }
@@ -581,7 +561,7 @@ class CustomerController extends Controller
 
         $car_name = $car->make.' '.$car->model.' '.$car->year.' '.$car->vin;
 
-        if (session()->get('auth')->parent_of <= 0 && !empty($car->balance_accounting[0]['name'])) {
+        if (session()->get('auth')->child_of <= 0 && !empty($car->balance_accounting[0]['name'])) {
             $items = [];
             // InvoiceItem::make($car_name)->pricePerUnit(session()->get('auth')->parent_of <= 0 ? $car->debit : $car->invoice_debit),
 
@@ -655,7 +635,7 @@ class CustomerController extends Controller
             }
         } else {
             $car_name = $car->make.' '.$car->model.' '.$car->year.' '.$car->vin;
-            $item     = InvoiceItem::make($car_name)->pricePerUnit(session()->get('auth')->parent_of <= 0 ? $car->debit : $car->invoice_debit);
+            $item     = InvoiceItem::make($car_name)->pricePerUnit(session()->get('auth')->child_of <= 0 ? $car->debit : $car->invoice_debit);
             $invoice  = Invoice::make()
                 ->buyer($customer)
                 ->currencySymbol('$')
@@ -666,99 +646,6 @@ class CustomerController extends Controller
 
 
         return $invoice->stream();
-    }
-
-    public function setCarAmount(Request $request)
-    {
-        $payment_reports              = new PaymentReport;
-        $payment_reports->car_id      = $request->car_id;
-        $payment_reports->customer_id = auth()->user()->id;
-        $payment_reports->left_amount = $request->amount;
-        $payment_reports->is_approved = 1;
-        $payment_reports->save();
-
-
-        $car = car::find($request->car_id);
-        // $car->balance = $car->balance - $request->amount;
-
-        // Adding Fee to table
-        $createdDate      = Carbon::parse($car->credit_date);
-        $currentDate      = Carbon::now();
-        $differenceInDays = $createdDate->diffInDays($currentDate);
-
-
-        $originalBalance = $car->amount_due_without_fee;
-
-        $percent = $car->percent; // This should be in decimal form, i.e., 5% should be 0.05.
-
-        if (isset($car->extra_price) && $car->extra_price > 0) {
-            $percentAmount =
-                (int) $car->extra_price * ($percent / 100);
-        } else {
-            $percentAmount =
-                (int) $originalBalance * ($percent / 100);
-        }
-
-
-        // Assuming 30 days for simplicity.
-        $days = 30;
-
-
-        // Calculate the daily charge.
-        $dailyCharge = number_format($percentAmount, 0, '.', '') / $days;
-
-
-        $newAmountDue = $dailyCharge * $differenceInDays;
-
-
-        $financed_fee = number_format($dailyCharge * $differenceInDays, 0);
-
-
-        $currentItems = $car->balance_accounting;
-
-
-        // Define the new item to add
-        $newItem = [
-            "name"  => "Credit %",
-            "value" => $financed_fee,
-        ];
-
-        // Add the new item to the existing array
-        $currentItems[] = $newItem;
-
-
-        $car_payment                  = new CarPayment;
-        $car_payment->car_id          = $request->car_id;
-        $car_payment->all_cost        = $car->debit;
-        $car_payment->left_days       = $differenceInDays;
-        $car_payment->financed_fee    = $financed_fee;
-        $car_payment->cost_with_extra = $car->balance;
-        $car_payment->payed           = $request->amount;
-        $car_payment->payment_date    = Carbon::now();
-
-
-        $car_payment->save();
-
-
-        $car->recived            = $car->recived + $request->amount;
-        $car->balance            = $car->balance - $request->amount;
-        $car->credit_date        = Carbon::now();
-        $car->balance_accounting = $currentItems;
-
-        $car->save();
-
-
-        $content = [
-            'dealer_name'  => auth()->user()->contact_name,
-            'dealer_email' => auth()->user()->email,
-            'car_model'    => $car->make,
-            'car_vin'      => $car->vin,
-            'payed'        => $request->amount,
-        ];
-
-        Mail::to('carbidprosystem@gmail.com')->send(new \App\Mail\paymentReport($content));
-
-        return true;
     }
 
     public function showRegistrationForm()
@@ -777,6 +664,7 @@ class CustomerController extends Controller
         return view('frontend.pages.customer.register', compact('tr'));
     }
 
+    // Dealer Registration and also Dealers can register their Sub Dealers adding their profit as 'extra_for_team'
     public function register(Request $request)
     {
         $current = session()->get('auth');
@@ -798,15 +686,16 @@ class CustomerController extends Controller
             $customer               = new Customer;
             $customer->contact_name = $request->input('contact_name');
             $customer->company_name = "";
-
-            $customer->phone          = $request->input('phone');
-            $customer->email          = $request->input('email');
-            $customer->password       = Hash::make($request->input('password'));
-            $customer->is_active      = 1; // Set account as active by default
-            $customer->parent_of      = $current->id; // Set account as active by default
-            $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0; // Set account as active by default
+            $customer->child_of     = $current->id;
+            $customer->phone        = $request->input('phone');
+            $customer->email        = $request->input('email');
+            $customer->password     = Hash::make($request->input('password'));
+            $customer->is_active    = 1; // Set account as active by default
+            $customer->child_of     = $current->id; // assign main dealer ID as parent if subdealer is registered by a main dealer
+            // Extra is a Dealer profit added for subdealer transactions or we can set manually and give either discount or different price for particular dealers
+            $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
             $customer->save();
-            $customer->parent_of = $customer->id; // Set account as active by default
+
             $customer->save();
 
             $customer->assignRole($request->role);
@@ -818,7 +707,7 @@ class CustomerController extends Controller
                 'current_email' => $current->email,
             ];
 
-            Mail::to('carbidprosystem@gmail.com')->send(new teamRegisterMail($content));
+            Mail::to(config('carbiddata.email'))->send(new teamRegisterMail($content));
         } else {
             $validator = $request->validate([
                 'number_of_cars' => 'required', // Add more validation rules as needed
@@ -830,10 +719,10 @@ class CustomerController extends Controller
             ]);
 
 
-            $customer                  = new Customer;
-            $customer->company_name    = $request->input('company_name');
-            $customer->contact_name    = $request->input('contact_name');
-            $customer->personal_number = $request->input('personal_number');
+            $customer                    = new Customer;
+            $customer->company_name      = $request->input('company_name');
+            $customer->contact_name      = $request->input('contact_name');
+            $customer->personal_number   = $request->input('personal_number');
             $customer->unhashed_password = $request->input('password');
 
             $customer->phone          = $request->input('phone');
@@ -851,8 +740,7 @@ class CustomerController extends Controller
                 'email'        => $request->input('email'),
             ];
 
-//            Mail::to('carbidprosystem@gmail.com')->send(new RegisterMail($content));
-            Mail::to('gmta.constantine@gmail.com')->send(new RegisterMail($content));
+            Mail::to(config('carbiddata.email'))->send(new RegisterMail($content));
 
             $customer->assignRole('dealer');
         }
@@ -862,7 +750,6 @@ class CustomerController extends Controller
             return redirect(route('customer.addTeam'))->with('success', 'Your Team member added.');
         }
 
-
-        return redirect(route('customer.login.get'))->with('error', 'Your account will be activated.');
+        return redirect(route('customer.login.get'))->with('success', 'Your account will be activated.');
     }
 }

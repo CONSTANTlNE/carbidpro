@@ -15,18 +15,14 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="blog-details-img-text-wrapper">
-
                     <div class="ft-blog-details-item">
                         <div class="blog-details-text headline">
                             <article>
-                                {!! $tr->translate($settings->get('about_text')) !!}
+                                {!! $tr->translate($settings->value) !!}
                             </article>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>

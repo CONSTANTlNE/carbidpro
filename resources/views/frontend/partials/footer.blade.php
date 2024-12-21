@@ -11,6 +11,19 @@
           }
       }
   </style>
+  @php
+  // Cache initialized in Header component and included in layout
+      $footerStatics=Cache::get('footerStatics'.session()->get('locale'));
+
+                if($footerStatics===null){
+                    $data=[
+                        'All Rights Reserved'=> $tr->translate('All Rights Reserved'),
+                    ];
+
+                    Cache::forever('footerStatics'.session()->get('locale'), $data);
+                }
+  @endphp
+
   <div class="carpaymentmodal modal fade" id="recordModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -37,13 +50,12 @@
   </div>
 
 
-
   <!-- Start of Footer section
                                                  ============================================= -->
   <footer id="ft-footer" class="ft-footer-section">
       <div class="container">
           <div class="ft-footer-copywrite-1 text-center">
-              <span>Copyright @ 2024 {!! $tr->translate(' All Rights Reserved') !!} | <a href="/terms-and-conditions"
+              <span>Copyright @ 2024 {{ Cache::get('footerStatics' . session()->get('locale'))['All Rights Reserved'] }} | <a href="/terms-and-conditions"
                       style="text-decoration: underline">Terms and Conditions</a> | <a href="/privacy-and-policy"
                       style="text-decoration: underline">Privacy
                       and Policy</a>

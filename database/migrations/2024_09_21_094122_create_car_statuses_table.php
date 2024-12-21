@@ -19,15 +19,15 @@ return new class extends Migration {
         });
 
         // Insert default values
-        DB::table('car_statuses')->insert([
-            ['slug' => 'for-dispatch', 'name' => 'For Dispatch'],
-            ['slug' => 'listed', 'name' => 'Listed'],
-            ['slug' => 'assign', 'name' => 'Assign'],
-            ['slug' => 'pick-up', 'name' => 'Pick UP'],
-            ['slug' => 'delivered', 'name' => 'Delivered'],
-            ['slug' => 'payment', 'name' => 'Payment'],
-            ['slug' => 'dispatched', 'name' => 'Dispatched'],
-        ]);
+//        DB::table('car_statuses')->insert([
+//            ['slug' => 'for-dispatch', 'name' => 'For Dispatch'],
+//            ['slug' => 'listed', 'name' => 'Listed'],
+//            ['slug' => 'assign', 'name' => 'Assign'],
+//            ['slug' => 'pick-up', 'name' => 'Pick UP'],
+//            ['slug' => 'delivered', 'name' => 'Delivered'],
+//            ['slug' => 'payment', 'name' => 'Payment'],
+//            ['slug' => 'dispatched', 'name' => 'Dispatched'],
+//        ]);
     }
 
     /**

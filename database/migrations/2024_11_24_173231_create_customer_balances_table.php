@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_requests', function (Blueprint $table) {
+        Schema::create('customer_balances', function (Blueprint $table) {
             $table->id();
             $table->string('amount')->nullable();
             $table->string('full_name')->nullable();
@@ -19,6 +19,9 @@ return new class extends Migration
             $table->boolean('is_approved')->default(0);
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreignId('car_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('type')->index();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

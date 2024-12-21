@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\PaymentRequest;
+use Illuminate\Http\Request;
+
+class PaymentRequestController extends Controller
+{
+
+    public function requestIndex()
+    {
+        $payment_requests = PaymentRequest::with(['customer.cars'])->orderBy('created_at',
+            'desc')->get(); // Adjust the query to suit your admin access logic
+
+        return view('pages.payment-request.index', compact('payment_requests'));
+    }
+
+    public function approveRequest(Request $request)
+    {
+
+        
+        $prequest = PaymentRequest::where('id', $request->id)->first();
+
+        if ($prequest->is_approved === 0) {
+            $prequest->is_approved = 1;
+            $prequest->save();
+
+
+        } else {
+            $prequest->is_approved = 0;
+            $prequest->save();
+        }
+
+        return back();
+    }
+}

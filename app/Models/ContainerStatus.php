@@ -11,11 +11,7 @@ class ContainerStatus extends Model
 
     public function cars()
     {
-        return $this->hasMany(Car::class, 'status', 'id');
+        return $this->hasMany(Car::class,);
     }
 
-    public function containerStatus()
-    {
-        return $this->hasMany(Car::class, 'container_status', 'id');
-    }
 }

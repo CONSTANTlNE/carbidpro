@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\Customer;
 use App\Models\PaymentReport;
+use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
 
 class PaymentReportController extends Controller
@@ -14,9 +15,11 @@ class PaymentReportController extends Controller
      */
     public function index()
     {
-        $payment_reports = PaymentReport::with(['car', 'customer'])->orderBy('created_at', 'desc')->get(); // Adjust the query to suit your admin access logic
-        $cars = Car::all();
-        $customers = Customer::all();
+        $payment_reports = C::with(['car', 'customer'])->orderBy('created_at',
+            'desc')->get(); // Adjust the query to suit your admin access logic
+        $cars            = Car::all();
+        $customers       = Customer::all();
+
         return view('pages.payment-report.index', compact('payment_reports', 'cars', 'customers'));
     }
 
@@ -33,18 +36,27 @@ class PaymentReportController extends Controller
      */
     public function store(Request $request)
     {
-
         PaymentReport::create([
-            'car_id' => $request->car_id,
+            'car_id'      => $request->car_id,
             'customer_id' => $request->customer_id,
             'left_amount' => $request->left_amount,
             'is_approved' => isset($request->is_approved) ? 1 : 0,
         ]);
 
+
+
+
+
+
+
+
+
         // Return success response
         return response()->json([
             'message' => 'Record added successfully!',
         ]);
+
+
     }
 
     /**
@@ -71,7 +83,7 @@ class PaymentReportController extends Controller
         $payment_report = PaymentReport::findOrFail($id);
 
         // Update the user's information
-        $payment_report->car_id = $request->input('car_id');
+        $payment_report->car_id      = $request->input('car_id');
         $payment_report->customer_id = $request->input('customer_id');
         $payment_report->left_amount = $request->input('left_amount');
         $payment_report->is_approved = isset($request->is_approved) ? 1 : 0;
@@ -98,4 +110,6 @@ class PaymentReportController extends Controller
             'message' => 'Record deleted successfully!',
         ]);
     }
+
+
 }

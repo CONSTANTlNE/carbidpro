@@ -9,5 +9,9 @@ class PortCity extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'price', 'country_id'];
-    
+
+
+    public function cars(){
+        $this->hasMany(Car::class);
+    }
 }

@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('frontend.layout.app')
 
 @section('content')
     @push('style')
@@ -109,8 +109,6 @@
                             {!! $tr->translate('Pending') !!}: $<span id="pending">{{ isset($pending) ? $pending : 0 }}</span>
                         </div>
                     @endif
-
-
                 </div>
             </div>
         </div>
@@ -250,17 +248,15 @@
                                             value="{{ $car->id }}">
 
                                         <input type="hidden" class="amount_due" name="amount_due"
-                                            value="{{ $car->balance }}">
+                                            value="{{ $car->amount_due }}">
 
                                         <input type="number" min="0" name="amount" class="form-control amount"
                                             aria-label="Amount"
-                                            {{ (isset($balance) && $balance <= 0) || $car->balance <= 0 ? 'disabled' : '' }}>
+                                            {{ (isset($balance) && $balance <= 0) || $car->total_cost <= 0 ? 'disabled' : '' }}>
 
                                         <button type="button" class="btn btn-success submit_amount">Submit</button>
                                     </div>
-
                                 </td>
-
                             </tr>
                         @endforeach
 
@@ -269,10 +265,7 @@
                 <div style="text-align:right;color:red;margin-right:20px;font-size:18px">{!! $tr->translate('Total Amount due') !!}: $<span
                         id="total_balance">{{ isset($total_amount_due) ? $total_amount_due : 0 }}</span>
                 </div>
-
-
                 <br>
-
             </div>
         </div>
     </div>

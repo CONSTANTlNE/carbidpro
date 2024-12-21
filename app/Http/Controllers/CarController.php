@@ -6,6 +6,7 @@ use App\Models\Auction;
 use App\Models\Car;
 use App\Models\CarStatus;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
 use App\Models\LoadType;
 use App\Models\Location;
 use App\Models\Port;
@@ -68,7 +69,6 @@ class CarController extends Controller
         } else {
             $cars = $cars->orderBy('cars.created_at', 'desc');
         }
-
 
         // Select cars columns only to avoid ambiguity
         $cars = $cars->with('Auction')->paginate(50);
@@ -191,9 +191,10 @@ class CarController extends Controller
     public function store(Request $request)
     {
 
-
         $request->validate([
             'vin' => 'required|unique:cars,vin',
+            'make_model_year' => 'required',
+            'status' => 'required',
         ]);
 
         // Create new car
@@ -212,7 +213,7 @@ class CarController extends Controller
         $car->auction = $request->input('auction');
         $car->load_type = $request->input('load_type');
         $car->from_state = $request->input('from_state');
-        $car->to_port_id = $request->input('to_port_id');
+//        $car->to_port_id = $request->input('to_port_id');
         $car->zip_code = $request->input('zip_code');
         $car->type_of_fuel = $request->input('type_of_fuel');
         $car->vehicle_owner_name = $request->input('vehicle_owner_name');
@@ -221,9 +222,19 @@ class CarController extends Controller
         $car->container_number = $request->input('container_number');
         $car->warehouse = $request->input('warehouse');
         $car->comment = $request->input('comment');
-        $car->balance = $request->input('balance');
-        $car->payed = $request->input('payed');
-        $car->debit = $request->input('debit');
+//      $car->balance = $request->input('balance');  ?? whyyy????
+
+        // Debit changed to total_cost
+        $car->total_cost = $request->input('total_cost');
+        $car->car_status_id = $request->input('status');
+
+
+        if($request->input('payed')){
+            // At this point percent on credit (if any) is not included
+            $car->amount_due =$request->input('total_cost') - $request->input('payed');
+        } else{
+            $car->amount_due = $request->input('total_cost');
+        }
 
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
@@ -232,13 +243,6 @@ class CarController extends Controller
         }
 
 
-        if (!empty($request->status)) {
-            // Assuming balance_accounting is a JSON field in the database
-            $car->status = $request->status;
-        } else {
-            $car->status = 1;
-        }
-
 
         // Handle images array
         if ($request->has('images')) {
@@ -246,8 +250,26 @@ class CarController extends Controller
             $car->images = json_encode($request->input('images'));
         }
 
-        // Save the Car model instance to the database
         $car->save();
+
+        // if payed amount is indicated during the creation, also create relevant record in customer_balance
+        if($request->input('payed') > 0){
+
+            // at the same time create fill record and deduction record
+            $balance = new CustomerBalance();
+            $balance->customer_id = $request->input('customer_id');
+            $balance->amount = $request->input('payed');
+            $balance->type = 'fill';
+            $balance->save();
+
+            $balance = new CustomerBalance();
+            $balance->customer_id = $request->input('customer_id');
+            $balance->amount = -$request->input('payed');
+            $balance->type = 'car_payment';
+            $balance->is_approved = true;
+            $balance->car_id = $car->id;
+            $balance->save();
+        }
 
         // Redirect or return a response after saving
         return redirect()->route('cars.index')->with('success', 'Car created successfully.');
@@ -274,7 +296,7 @@ class CarController extends Controller
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
             // Base query with eager loading
-            $cars = Car::with(['dispatch', 'customer', 'state', 'Auction'])->where('status', $carStatus->id); // Keep eager loading for relationships
+            $cars = Car::with(['dispatch', 'customer', 'state', 'Auction'])->where('car_status_id', $carStatus->id); // Keep eager loading for relationships
 
             // Check if there is a search query
             if ($request->filled('search')) {
@@ -403,7 +425,58 @@ class CarController extends Controller
     {
         $car = Car::findOrFail($request->id);
 
-        $car->update($request->all());
+//        $car->update($request->all());
+
+        $car->customer_id = $request->input('customer_id');
+        $car->make_model_year = $request->input('make_model_year');
+        $car->dispatch_id = $request->input('dispatch_id');
+        $car->lot = $request->input('lot');
+        $car->vin = $request->input('vin');
+        $car->percent = $request->input('percent');
+        $car->gate_or_member = $request->input('gate_or_member');
+        $car->title = $request->input('title');
+        $car->is_dispatch = $request->input('is_dispatch');
+        $car->auction = $request->input('auction');
+        $car->load_type = $request->input('load_type');
+        $car->from_state = $request->input('from_state');
+        $car->to_port_id = $request->input('to_port_id');
+        $car->zip_code = $request->input('zip_code');
+        $car->type_of_fuel = $request->input('type_of_fuel');
+        $car->vehicle_owner_name = $request->input('vehicle_owner_name');
+        $car->owner_id_number = $request->input('owner_id_number');
+        $car->owner_phone_number = $request->input('owner_phone_number');
+        $car->container_number = $request->input('container_number');
+        $car->warehouse = $request->input('warehouse');
+        $car->comment = $request->input('comment');
+        $car->balance = $request->input('balance');
+        $car->payed = $request->input('payed');
+        $car->total_cost = $request->input('debit');
+        $car->car_status_id = $request->input('status');
+
+
+        if($request->input('payed')){
+            $car->amount_due =$request->input('debit') - $request->input('payed');
+        } else{
+            $car->amount_due = $request->input('debit');
+        }
+
+        // Handle balance_accounting array
+        if ($request->has('balance_accounting')) {
+            // Assuming balance_accounting is a JSON field in the database
+            $car->balance_accounting = json_encode($request->input('balance_accounting'));
+        }
+
+
+
+        // Handle images array
+        if ($request->has('images')) {
+            // Assuming images is a JSON field in the database
+            $car->images = json_encode($request->input('images'));
+        }
+
+        $car->save();
+
+
 
         return redirect()->route('cars.index')->with('success', 'Car updated successfully.');
     }

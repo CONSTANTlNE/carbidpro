@@ -21,7 +21,7 @@ class AdminController extends Controller
             where('name', 'like', '%' . $search . '%')
                 ->paginate($perpage)->withQueryString();
             $count=$customers->total();
-            return view('pages.locations', compact('customers','count'));
+            return view('pages.customers', compact('customers','count'));
         }
 
         $customers = Customer::paginate($perpage)->withQueryString();
@@ -53,4 +53,5 @@ class AdminController extends Controller
             return back();
         }
     }
+
 }

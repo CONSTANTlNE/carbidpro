@@ -269,7 +269,7 @@
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <label for="allcost">All Cost</label>
-                                                    <input type="text" name="debit" id="allcost"
+                                                    <input type="text" name="total_cost" id="allcost"
                                                         class="form-control" x-bind:value="calculateTotal()" readonly>
                                                 </div>
 
@@ -375,7 +375,7 @@
                                                 <option value=""></option>
                                                 @foreach ($car_status as $status)
                                                     <option value="{{ $status->id }}"
-                                                        {{ $status->id == $car->status ? 'selected' : '' }}>
+                                                        {{ $status->id == $car->car_status_id ? 'selected' : '' }}>
                                                         {{ $status->name }}</option>
                                                 @endforeach
                                             </select>

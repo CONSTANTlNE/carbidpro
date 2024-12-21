@@ -20,6 +20,6 @@ class ContactController extends Controller
             $tr->setSource('en'); // Translate from English
             Session::put('locale', 'en');
         }
-        return view('pages.contact', compact('tr', 'settings'));
+        return view('frontend.pages.contact', compact('tr', 'settings'));
     }
 }

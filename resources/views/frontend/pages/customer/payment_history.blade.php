@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('frontend.layout.app')
 
 @section('content')
     @push('style')
@@ -16,40 +16,14 @@
     </section>
 
     <div class="container">
+        @include('frontend.components.customer-nav-links')
 
-        <ul class="tabs">
-            <li class="tabs__item ">
-                <a href="{{ route('customer.dashboard') }}"
-                    class="{{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">{!! $tr->translate('My cars') !!}</a>
-            </li>
-            <li class="tabs__item tabs__item_active ">
-                <a href="{{ route('customer.payment_registration') }}"
-                    class="{{ request()->routeIs('customer.payment_registration') || request()->routeIs('customer.payment_history') ? 'active' : '' }}">{!! $tr->translate('My Payments') !!}</a>
-            </li>
-
-        </ul>
-
-
-
-
-
-        <div class="d-flex gap-3">
-            <li class="tabs__item ">
-                <a href="{{ route('customer.payment_registration') }}"
-                    class="{{ request()->routeIs('customer.payment_registration') ? 'active' : '' }}">{!! $tr->translate('Active Payments') !!}</a>
-            </li>
-            <li class="tabs__item ">
-                <a href="{{ route('customer.payment_history') }}"
-                    class="{{ request()->routeIs('customer.payment_history') ? 'active' : '' }}">{!! $tr->translate('Payments History') !!}</a>
-            </li>
-        </div>
-
-
-
-        <div class="row">
             <div class="col-lg-12">
                 <br>
-                <div class="d-flex justify-content-end" style="font-size: 25px; font-weight: bold;">{!! $tr->translate('Spent') !!}: $<span>{{ isset($payment_report) ? $payment_report : 0 }}</span></div>
+{{--                <div class="d-flex justify-content-end" style="font-size: 25px; font-weight: bold;">--}}
+{{--                    {!! $tr->translate('Spent') !!}: $<span>{{ isset($payment_report) ? $payment_report : 0 }}--}}
+{{--                    </span>--}}
+{{--                </div>--}}
 
                 <table id="myTable" class="display" style="width:100%">
 
@@ -60,32 +34,18 @@
                             <th>{!! $tr->translate('Full Name') !!}</th>
                             <th>{!! $tr->translate('Approved') !!}</th>
                             <th>{!! $tr->translate('VIN') !!}</th>
-                            <th>{!! $tr->translate('Status') !!}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($recieved as $recieve)
-                            <tr style="background-color: {{ $recieve->is_approved == 1 ? '#82f98261' : '#ff898b61' }} ">
-                                <td>{{ $recieve->date }}</td>
-                                <td>${{ $recieve->amount }}</td>
-                                <td>{{ $recieve->full_name }}</td>
-                                <td>{!! $recieve->is_approved == 1 ? '<span class="true">YES</span>' : '<span class="false">NO</span>' !!}</td>
-                                <td></td>
-                                <td>{!! $tr->translate('Received') !!}</td>
-                            </tr>
-                        @endforeach
-
-                        @foreach ($charged as $charge)
-                            <tr style="background-color: #ff898b61">
-                                <td>{{ $charge->created_at->format('Y-m-d') }}</td>
-                                <td>${{ $charge->left_amount }}</td>
-                                <td></td>
-                                <td>{!! $charge->is_approved == 1 ? '<span class="true">YES</span>' : '<span class="false">NO</span>' !!}</td>
-                                <td>{{ isset($charge->car->vin) ? $charge->car->vin : '' }}</td>
-                                <td>{!! $tr->translate('Spent') !!}</td>
-                            </tr>
-                        @endforeach
-
+                    @foreach ($payment_report as $report)
+                        <tr style="background-color: {{ $report->type === 'fill' ? '#82f98261' : '#ff898b61' }} ">
+                            <td>{{ $report->date }}</td>
+                            <td>${{ $report->amount }}</td>
+                            <td>{{ $report->full_name }}</td>
+                            <td>{!! $report->is_approved == 1 ? '<span class="true">YES</span>' : '<span class="false">NO</span>' !!}</td>
+                            <td>{{$report->car?->vin }}</td>
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
 

@@ -33,14 +33,10 @@
                                     }
                                 </style>
                                 <?php echo html_entity_decode($settings->get('privacy')); ?>
-
                             </article>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>

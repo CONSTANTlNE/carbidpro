@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('price')->nullable();
+            $table->foreignId('state_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

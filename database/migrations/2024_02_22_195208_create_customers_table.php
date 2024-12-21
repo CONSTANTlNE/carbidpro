@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(0);
             $table->string('total_balance')->default(0);
             $table->string('left_balance')->default(0);
-            $table->unsignedBigInteger('parent_of')->nullable();
+            $table->unsignedBigInteger('child_of')->nullable();
             $table->string('personal_number')->default(0);
             $table->string('extra_for_team')->default(0);
             $table->string('username')->nullable();

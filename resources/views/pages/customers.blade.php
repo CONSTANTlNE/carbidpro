@@ -188,7 +188,7 @@
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Dealer</th>
-                                        <th>Login</th>
+                                        <th>Password</th>
                                         <th>Status</th>
                                         <th>Crated At</th>
                                         <th>Crated Action</th>
@@ -202,7 +202,7 @@
                                             <td>{{$customer->phone}}</td>
                                             <td>{{$customer->email}}</td>
                                             <td>dealer</td>
-                                            <td>login</td>
+                                            <td>{{$customer->unhashed_password}}</td>
                                             <td>
                                                 <form action="{{route('customer.activate')}}" method="post">
                                                     @csrf

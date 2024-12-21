@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\Service;
+use App\Models\Setting;
 use App\Models\Slider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
@@ -83,4 +85,71 @@ class HomeController extends Controller
     {
         //
     }
+
+    // ====== Pages ======
+
+    public function about(Request $request) {
+
+        $settings=Setting::where('key', 'home_text')->first();
+
+//        dd($settings);
+
+        if (Session::has('locale')) {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            $tr->setSource(); // Detect language automatically
+            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+        } else {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            Session::put('locale', 'en');
+        }
+
+        return view('frontend.pages.about', compact('settings','tr'));
+
+    }
+
+    public function terms(Request $request) {
+
+        $settings=Setting::where('key', 'terms')->first();
+
+        if (Session::has('locale')) {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            $tr->setSource(); // Detect language automatically
+            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+        } else {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            Session::put('locale', 'en');
+        }
+
+        $terms=Setting::where('key', 'terms')->first();
+
+
+        if(Session::get('locale') === 'en'){
+
+            if (Cache::has('translatedTermsEN')) {
+                $translated = Cache::get('translatedTermsEN');
+            } else {
+                Cache::put('translatedTermsEN', $tr->translate($terms->value) );
+                $translated = Cache::get('translatedTermsEN');
+            }
+        }
+
+        if(Session::get('locale') === 'ru'){
+
+            if (Cache::has('translatedTermsRU')) {
+                $translated = Cache::get('translatedTermsRU');
+            } else {
+                Cache::put('translatedTermsRU', $tr->translate($terms->value) );
+                $translated = Cache::get('translatedTermsRU');
+            }
+        }
+
+
+        return view('frontend.pages.terms', compact('translated', 'settings','tr'));
+
+    }
+
 }

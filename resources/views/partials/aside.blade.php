@@ -11,27 +11,55 @@
             </li>
 
             @if (auth()->user()->hasRole('Admin'))
-                <li class="{{ Route::is('paymentreports.index') ? 'active' : '' }}">
-                    <a href="{{ route('paymentreports.index') }}">
-                        <i class="fa fa-money"></i><span>Payment Reports</span>
-                        <span class="pull-right-container"></span>
+                <li class="treeview active">
+                    <a href="#">
+                        <i class="fa fa-money"></i><span>Payments</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left float-right"></i>
+                        </span>
                     </a>
+                    <ul class="treeview-menu">
+                        <li class="{{ Route::is('carpayment.index') ? 'active' : '' }}">
+                            <a href="{{ route('carpayment.index') }}">
+                               <span>Payment for Cars</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('customer.balance.index') }}">
+                                <span>Balance Fill Requests</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+
+
             @endif
 
 
             @if (auth()->user()->hasRole('Admin'))
-                <li class="{{ Route::is('users.index') ? 'active' : '' }}">
-                    <a href="{{ route('users.index') }}">
-                        <i class="fa fa-user-circle"></i><span>User</span>
-                        <span class="pull-right-container"></span>
+                <li class="treeview active">
+                    <a href="#">
+                        <i class="fa fa-user-circle"></i><span>Users</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left float-right"></i>
+                        </span>
                     </a>
-                </li>
-                <li class="{{ Route::is('customers.index') ? 'active' : '' }}">
-                    <a href="{{ route('customers.index') }}">
-                        <i class="fa fa-user-circle"></i><span>Customers</span>
-                        <span class="pull-right-container"></span>
-                    </a>
+                    <ul class="treeview-menu">
+                        <li class="">
+                            <a href="{{ route('users.index') }}">
+                                <span>User</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('customers.index') }}">
+                                <span>Customers</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
             @endif
@@ -89,7 +117,7 @@
             @endif
             <hr>
             @if (auth()->user()->hasRole('Admin'))
-                <li class="treeview active">
+                <li class="treeview">
                     <a href="#">
                         <i class="fa fa-gear"></i><span>Data</span>
                         <span class="pull-right-container">
@@ -128,6 +156,40 @@
                             </a>
                         </li>
 
+                    </ul>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-gear"></i><span>Site Settings</span>
+                        <span class="pull-right-container">
+                        <i class="fa fa-angle-left float-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="">
+                            <a href="{{ route('sliders.index') }}">
+                                <span>Slides</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('settings.index') }}">
+                                <span>Settings</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('announcements.index') }}">
+                                <span>Announcements</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('services.index') }}">
+                                <span>Services</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             @endif

@@ -1,0 +1,38 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\CarStatus;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class CarStatusSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        CarStatus::create([
+            'name' => 'For Dispatch',
+        ]);
+        CarStatus::create([
+            'name' => 'Listed',
+        ]);
+        CarStatus::create([
+            'name' => 'Assign',
+        ]);
+        CarStatus::create([
+            'name' => 'Pick UP',
+        ]);
+        CarStatus::create([
+            'name' => 'Delivered',
+        ]);
+        CarStatus::create([
+            'name' => 'Payment',
+        ]);
+        CarStatus::create([
+            'name' => 'Dispatched',
+        ]);
+    }
+}

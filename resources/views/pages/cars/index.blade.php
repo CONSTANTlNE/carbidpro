@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('content')
     @push('css')
         <style>
@@ -11,7 +12,7 @@
             }
         </style>
     @endpush
-@section('body-class', 'hold-transition sidebar-mini sidebar-collapse')
+{{--@section('body-class', 'hold-transition sidebar-mini sidebar-collapse')--}}
 
 <!--preloader-->
 <div id="preloader">

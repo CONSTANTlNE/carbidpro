@@ -1,0 +1,29 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\ContainerStatus;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class ContainerStatusesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        ContainerStatus::create([
+            'name' => 'For Load',
+            'slug' => 'for-load',
+        ]);
+        ContainerStatus::create([
+            'name' => 'Loading / Pending',
+            'slug' => 'loading-pending',
+        ]);
+        ContainerStatus::create([
+            'name' => 'Loaded / Payments',
+            'slug' => 'for-load',
+        ]);
+    }
+}

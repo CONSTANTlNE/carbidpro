@@ -32,7 +32,6 @@
     <link rel="stylesheet" href="{{asset('frontendassets/css/slick-theme.css')}}">
     <link rel="stylesheet" href="{{asset('frontendassets/css/style.css?v=')}}{{ time() }}">
     <link rel="stylesheet" href="{{asset('frontendassets/css/main.css?v=')}}{{ time() }}">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css">
     @stack('style')
 
 </head>
@@ -82,7 +81,6 @@
 <script src="{{asset('frontendassets/js/rbtools.min.js')}}"></script>
 <script src="{{asset('frontendassets/js/rs6.min.js')}}"></script>
 <script src="{{asset('frontendassets/js/script.js?v=')}}{{ time() }}"></script>
-<script src="https://cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
 
 @stack('scripts')
 

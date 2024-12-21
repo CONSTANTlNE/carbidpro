@@ -17,62 +17,8 @@ class Car extends Model implements HasMedia, Sortable
     use InteractsWithMedia;
     public $sortable = ['customer', 'dispatcher', 'car_statuses'];  // Add other sortable columns as needed
 
-    protected $fillable = [
-        'make_model_year',
-        'status',
-        'lot',
-        'vin',
-        'percent',
-        'type_of_fuel',
-        'title',
-        'gate_or_member',
-        'auction',
-        'load_type',
-        'from_state',
-        'to_port_id',
-        'sub_total',
-        'payed',
-        'amount_due',
-        'vehicle_owner_name',
-        'owner_id_number',
-        'owner_phone_number',
-        'container_number',
-        'images',
-        'invoice_file',
-        'title_received',
-        'key',
-        'record_color',
-        'comment',
-        'is_deleted',
-        'balance_accounting',
-        'warehouse',
-        'internal_shipping',
-        'company_name',
-        'contact_info',
-        'pickup_dates',
-        'storage',
-        'storage_cost',
-        'title_delivery',
-        'payment_method',
-        'payment_address',
-        'customer_id',
-        'dispatch_id',
-        'zip_code',
-        'arrival_time',
-        'title_take',
-        'remark',
-        'bill_of_loading',
-        'container_images',
-        'payment_company',
-        'debit',
-        'balance',
-        'is_dispatch'
-    ];
+    protected $guarded=[];
 
-    public function statusRelation()
-    {
-        return $this->belongsTo(CarStatus::class, 'status', 'id');
-    }
 
     // Example of a relationship, assuming you have a 'ports' table for 'to_port_id'
     public function port()
@@ -87,7 +33,7 @@ class Car extends Model implements HasMedia, Sortable
 
     public function toPort()
     {
-        return $this->belongsTo(PortCity::class, 'to_port_id');
+        return $this->belongsTo(PortCity::class, 'to_port_id', 'id');
     }
 
     public function loadType()
@@ -107,12 +53,20 @@ class Car extends Model implements HasMedia, Sortable
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'id', 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 
     public function CarStatus()
     {
-        return $this->hasOne(CarStatus::class, 'id');
+        return $this->belongsTo(CarStatus::class,'car_status_id','id');
+    }
+
+//    public function payments(){
+//        return $this->hasMany(CarPayment::class);
+//    }
+
+    public function payments(){
+        return $this->hasMany(CustomerBalance::class);
     }
 
     public function scopeSortByCustomer(Builder $query, $direction = 'asc')

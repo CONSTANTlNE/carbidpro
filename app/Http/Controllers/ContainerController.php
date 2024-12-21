@@ -35,7 +35,7 @@ class ContainerController extends Controller
         $containerStatus = ContainerStatus::where('slug', $slug)->first();
 
         if (auth()->user()->hasRole('Admin')) {
-            $container_status = ContainerStatus::withCount('cars', 'containerStatus')->get();
+            $container_status = ContainerStatus::withCount('cars')->get();
 
         } else {
             $container_status = ContainerStatus::withCount([
