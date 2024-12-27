@@ -273,18 +273,18 @@
                                                         class="form-control" x-bind:value="calculateTotal()" readonly>
                                                 </div>
 
-                                                <div class="col-md-4">
-                                                    <label for="payed">Payed</label>
-                                                    <input type="text" value="{{ $car->payed }}" name="payed"
-                                                        id="payed" class="form-control" x-model="payed"
-                                                        x-on:input="validateNumber" required>
-                                                </div>
+{{--                                                <div class="col-md-4">--}}
+{{--                                                    <label for="payed">Payed</label>--}}
+{{--                                                    <input type="text" value="{{ $car->payed }}" name="payed"--}}
+{{--                                                        id="payed" class="form-control" x-model="payed"--}}
+{{--                                                        x-on:input="validateNumber" required>--}}
+{{--                                                </div>--}}
 
-                                                <div class="col-md-4">
-                                                    <label for="amountDue">Amount Due</label>
-                                                    <input type="text" name="balance" id="amountDue"
-                                                        class="form-control" x-bind:value="amountDue" readonly>
-                                                </div>
+{{--                                                <div class="col-md-4">--}}
+{{--                                                    <label for="amountDue">Amount Due</label>--}}
+{{--                                                    <input type="text" name="balance" id="amountDue"--}}
+{{--                                                        class="form-control" x-bind:value="amountDue" readonly>--}}
+{{--                                                </div>--}}
                                             </div>
                                         </div>
                                     </div>

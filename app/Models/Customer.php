@@ -23,4 +23,14 @@ class Customer extends Authenticatable implements HasMedia
     public function cars(): HasMany{
         return $this->hasMany(Car::class);
     }
+
+    public function credits ()
+    {
+        return $this->hasMany(Credit::class);
+    }
+
+    public function balances()
+    {
+        return $this->hasMany(CustomerBalance::class);
+    }
 }

@@ -19,8 +19,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $slides   = Slider::where('is_active', 1)->get();
-        $services = Service::where('is_active', 1)->get();
+        $slides   = Slider::with('media')->where('is_active', 1)->get();
+        $services = Service::with('media')->where('is_active', 1)->get();
 
         if (Session::has('locale')) {
             $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
@@ -90,7 +90,7 @@ class HomeController extends Controller
 
     public function about(Request $request) {
 
-        $settings=Setting::where('key', 'home_text')->first();
+        $settings=Setting::where('key', 'about')->first();
 
 //        dd($settings);
 
@@ -104,6 +104,8 @@ class HomeController extends Controller
             $tr->setSource('en'); // Translate from English
             Session::put('locale', 'en');
         }
+
+
 
         return view('frontend.pages.about', compact('settings','tr'));
 

@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('auction')->nullable();
             $table->string('load_type')->nullable();
             $table->string('from_state')->nullable();
+            $table->foreignId('to_port_id')->references('id')->on('ports')->onDelete('cascade');
 //            $table->foreignId('to_port_id')->references('id')->on('port_cities')->onDelete('cascade');
             $table->string('zip_code')->nullable();
             $table->decimal('sub_total', 10, 2)->nullable();
@@ -43,8 +44,8 @@ return new class extends Migration {
             $table->json('balance_accounting')->nullable(); // Store balance accounting as JSON
             $table->string('warehouse')->nullable();
             $table->string('internal_shipping')->nullable(); // Cost
-            $table->string('company_name')->nullable();
-            $table->string('contact_info')->nullable();
+            $table->string('company_name')->nullable(); // internal shipping carrier name
+            $table->string('contact_info')->nullable(); // internal shipping carrier contact
             $table->string('pickup_dates')->nullable();
             $table->string('storage')->nullable();
             $table->string('storage_cost')->nullable();
@@ -66,7 +67,7 @@ return new class extends Migration {
             $table->string('left_balance')->nullable();
             $table->string('payment_company')->nullable();
             $table->string('total_cost')->nullable(); // Total amount of the car inlcuding all costs before column name was debit
-            $table->decimal('amount_due', 10, 2)->nullable();
+            $table->decimal('amount_due', 10, 2)->index()->nullable();
             $table->string('extra_price')->nullable();
             $table->dateTime('last_amount_update_date')->nullable();
             $table->enum('is_dispatch', ['no', 'yes'])->nullable();

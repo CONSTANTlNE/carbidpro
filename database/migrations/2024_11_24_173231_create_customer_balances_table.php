@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('customer_balances', function (Blueprint $table) {
             $table->id();
             $table->string('amount')->nullable();
+            $table->date('balance_fill_date')->nullable();
+            $table->date('carpayment_date')->nullable();
             $table->string('full_name')->nullable();
             $table->string('date')->nullable();
             $table->boolean('is_approved')->default(0);
@@ -21,6 +23,7 @@ return new class extends Migration
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->foreignId('car_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('type')->index();
+            $table->string('comment')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

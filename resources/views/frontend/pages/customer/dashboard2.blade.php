@@ -1,8 +1,46 @@
 @extends('frontend.layout.app')
 
 @php
-    use Illuminate\Support\Facades\Cache;use Illuminate\Support\Facades\Session;
+    use App\Services\CreditService;
+    use Illuminate\Support\Facades\Cache;
+    use Illuminate\Support\Facades\Session;
+    use Carbon\Carbon    ;
 
+$creditService = new CreditService();
+
+//     Cache::forget('dashboardStatics'.session()->get('locale'));
+           $dashboardStatics=Cache::get('dashboardStatics'.session()->get('locale'));
+
+          if($dashboardStatics===null){
+
+                $data=[
+                    'My Cars'=> $tr->translate('My Cars'),
+                    'Car History'=> $tr->translate('Car History'),
+                    'Payment History'=> $tr->translate('Payment History'),
+                    'Transferred Amount'=> $tr->translate('Transferred Amount'),
+                    'Sender'=> $tr->translate('Sender'),
+                    'Full Name'=> $tr->translate('Full Name'),
+                    'Submit'=> $tr->translate('Submit'),
+                    'Deposit'=> $tr->translate('Deposit'),
+                    'Search placeholder'=> $tr->translate('Search by VIN or Container'),
+                    'payment_confirmation'=> $tr->translate('Payment  will be confirmed within 24 hours.'),
+                    'Car list'=> $tr->translate('Car list'),
+
+                    'Date'=> $tr->translate('Date'),
+                    'Make/Model/Year'=> $tr->translate('Make/Model/Year'),
+                    'VIN / CONTAINER'=> $tr->translate('VIN / CONTAINER'),
+                    'Release car to'=> $tr->translate('Release car to'),
+                    'Add Team'=> $tr->translate('Add Team'),
+                    'Payment'=> $tr->translate('Payment'),
+                    'Total Cost'=> $tr->translate('Total Cost'),
+                    'Received'=> $tr->translate('Received'),
+                    'Amount Due'=> $tr->translate('Amount Due'),
+                    'Credit Info'=> $tr->translate('Credit Info'),
+                    'Invoice'=> $tr->translate('Invoice'),
+                    'Pay'=> $tr->translate('Pay'),
+                ];
+                Cache::forever('dashboardStatics'.session()->get('locale'), $data);
+            }
 
 @endphp
 
@@ -23,12 +61,14 @@
         </style>
     @endpush
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-             data-background="/assets/images/cargo.jpeg"
+             data-background="/frontendAssets/images/cargo.jpeg"
              style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">'Car list'</h2>
+                <h2 style="margin-top: 80px;padding: 0;">
+                    {{Cache::get('dashboardStatics'.session()->get('locale'))['Car list']}}
+                </h2>
             </div>
         </div>
     </section>
@@ -42,27 +82,27 @@
                 <br>
                 <div class="d-flex justify-content-center mb-3">
                     <input class="text-center" style="width: 250px" type="text" name="search" id="search"
-                           placeholder="Search by VIN or Container">
+                           placeholder="{{Cache::get('dashboardStatics'.session()->get('locale'))['Search placeholder']}}">
                 </div>
                 <table id="myTable" class="display m-auto">
                     <thead>
                     <tr style="text-align: center">
-                        <th>'Date</th>
-                        <th>'Make/Model/Year'</th>
-                        <th>'VIN / CONTAINER'</th>
-
+                        <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['Date']}}</th>
+                        <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['Make/Model/Year']}}</th>
+                        <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['VIN / CONTAINER']}}</th>
+{{-- {{Cache::get('dashboardStatics'.session()->get('locale'))['']}} --}}
                         @if (!auth()->user()->hasRole('portmanager'))
-                            <th>'Release car to'</th>
+                            <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['Release car to']}}</th>
                         @endif
                         @if (!auth()->user()->hasRole('portmanager'))
                             @if (session()->get('auth')->parent_of <= 0)
-                                <th>'Add Team'</th>
+                                <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['Add Team']}}</th>
                             @else
                                 <th></th>
                             @endif
                         @endif
                         @if (!auth()->user()->hasRole('portmanager'))
-                            <th>'Payment'</th>
+                            <th>{{Cache::get('dashboardStatics'.session()->get('locale'))['Payment']}}</th>
                         @endif
                         @if (!auth()->user()->hasRole('portmanager'))
                             <th></th>
@@ -158,8 +198,7 @@
                                             <input type="hidden" name="car_id" class="car_id"
                                                    value="{{ $car->id }}">
                                             <select name="team_id" class="form-control team_id" id="team_id"
-                                                    onchange="this.form.submit()"
-                                            >
+                                                    onchange="this.form.submit()">
                                                 <option value="remove_team"></option>
                                                 @foreach ($teams as $team)
                                                     <option value="{{ $team->id }}"
@@ -179,16 +218,30 @@
                                 @if (!auth()->user()->hasRole('portmanager'))
                                     <td style="text-align: left">
                                         <div>
-                                            <p class="mb-0">Total Cost:</p>
+                                            <p class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Total Cost']}} :</p>
                                             <span style="color:blue">${{ $car->total_cost }}</span>
                                         </div>
                                         <div>
-                                            <p class="mb-0">Received:</p>
+                                            <p class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Received']}} :</p>
                                             <span style="color:green">${{ $car->payments->sum('amount')*-1 }}</span>
                                         </div>
                                         <div>
-                                            <p class="mb-0">Amount Due:</p>
-                                            <span style="color:red">${{ $car->amount_due }}</span>
+                                            <p class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}} :</p>
+                                            @if($car->latestCredit)
+                                                @foreach($car->credit as $index3=> $credit)
+
+                                                    @if($index3 === count($car->credit) - 1)
+
+                                                        @if(Carbon::parse($credit->issue_or_payment_date)==Carbon::today())
+                                                            <p style="color: red ">{{$credit->credit_amount}}</p>
+                                                        @else
+                                                            <p style="color: red ">{{$credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id),2)}}</p>
+                                                        @endif
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <span style="color:red">${{ $car->amount_due }}</span>
+                                            @endif
                                         </div>
                                     </td>
                                 @endif
@@ -197,12 +250,99 @@
                             @if (!auth()->user()->hasRole('portmanager'))
                                 <td style="min-width: 200px">
                                     <div style="display: flex;justify-content: space-around" class="mb-2">
-                                        <button style="border: none;border-radius: 5px;padding: 10px;background: #2f5496;color: white">
-                                            Credit Info
-                                        </button>
+                                        {{--Credit Info--}}
+                                        @if($car->latestCredit)
+                                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                    data-target="#creditinfomodal{{$key}}">
+                                                {{Cache::get('dashboardStatics'.session()->get('locale'))['Credit Info']}}
+                                            </button>
+                                        @endif
+                                        {{--Credit modal--}}
+                                        <div class="modal fade " id="creditinfomodal{{$key}}" tabindex="-1"
+                                             role="dialog"
+                                             aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content ">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{Cache::get('dashboardStatics'.session()->get('locale'))['Credit Info']}}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body p-0 d-flex justify-content-center"
+                                                         style="overflow-x: auto; width: 100%;">
+                                                        <table>
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="p-1" style="width: 100px">Issue or
+                                                                    Payment Date
+                                                                </th>
+                                                                <th class="p-1" style="width: 100px">Credit Amount
+                                                                    <br> <span
+                                                                            style="font-size: 12px">incl interest</span>
+                                                                </th>
+                                                                <th class="p-1">Added Amount</th>
+                                                                <th class="p-1" style="width: 60px">Paid Amount</th>
+                                                                <th class="p-1" style="width: 80px">Daily Percent
+                                                                </th>
+                                                                <th class="p-1" style="width: 80px">Credit Days</th>
+                                                                <th class="p-1" style="width: 100px">Accrued
+                                                                    interest
+                                                                </th>
+                                                                <th class="p-1">Comment</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            @foreach($car->credit as $index2=> $credit)
+                                                                <tr>
+                                                                    <td class="p-1">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                                    <td class="p-1">{{$credit->credit_amount}}</td>
+                                                                    <td class="p-1"
+                                                                        style="width: 60px!important">{{$credit->added_amount}}</td>
+                                                                    <td class="p-1"
+                                                                        style="width: 60px!important">{{$credit->paid_amount}}</td>
+                                                                    <td class="p-1">
+                                                                        {{--                                                            {{round($credit->monthly_percent*12/365*1,4)}}--}}
+                                                                        {{round($credit->monthly_percent*12/365*1,4)}}
+                                                                    </td>
+                                                                    <td class="p-1">{{$credit->credit_days}}</td>
+                                                                    <td class="p-1">{{$credit->accrued_percent}}</td>
+                                                                    <td class="p-1">{{$credit->comment}}</td>
+                                                                </tr>
+                                                            @endforeach
+                                                            <tr style="background: #f2f2f2">
+                                                                <td>Till Today</td>
+                                                                {{--                                                         @dd(Carbon::parse($credit->issue_or_payment_date),Carbon::today())--}}
+                                                                @if(Carbon::parse($credit->issue_or_payment_date)==Carbon::today())
+                                                                    <td></td>
+                                                                @else
+                                                                    <td>{{$credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id),2)}}</td>
+                                                                @endif
+
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+
+                                                                <td> {{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
+                                                                <td> {{round($creditService->totalInterestFromLastCalc($car->id),2) }}</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <button type="button" class="btn btn-danger"
+                                                                data-dismiss="modal">Close
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <a>
                                             <button style="border: none;border-radius: 5px;padding: 10px;background: #e2304e;color: white">
-                                                Invoice
+                                                {{Cache::get('dashboardStatics'.session()->get('locale'))['Invoice']}}
                                             </button>
                                         </a>
 
@@ -214,7 +354,7 @@
                                             <input style="width: 100px;height: 100%;border-radius: 5px;" type="number"
                                                    name="amount">
                                             <button style="border: none;border-radius: 5px;padding: 10px;background: #00b050;color: white">
-                                                Pay
+                                                {{Cache::get('dashboardStatics'.session()->get('locale'))['Pay']}}
                                             </button>
                                         </form>
                                     </div>

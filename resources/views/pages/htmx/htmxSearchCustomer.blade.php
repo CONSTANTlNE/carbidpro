@@ -19,11 +19,13 @@
                     @if(isset($index))
                         onclick="document.getElementById('customerName'+{{$index}}).value = '{{$customer->contact_name}}';
                         document.getElementById('customerID'+{{$index}}).value = {{$customer->id}};
+                        document.getElementById('deposit'+{{$index}}).value='{{$customer->deposit}}';
                         document.getElementById('closeSearch'+{{$index}}).click();
                         "
                     @else
                         onclick="document.getElementById('customerName').value = '{{$customer->contact_name}}';
                         document.getElementById('customerID').value = {{$customer->id}};
+                        document.getElementById('deposit').value='{{$customer->deposit}}';
                         document.getElementById('closeSearch').click();
                           "
                     @endif

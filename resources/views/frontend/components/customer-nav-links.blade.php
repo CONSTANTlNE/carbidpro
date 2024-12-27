@@ -4,14 +4,14 @@
             <ul style="padding-left: 0">
                 <li class="tabs__item ">
                     <a href="{{ route('customer.dashboard') }}"
-                       class="{{ request()->routeIs('customer.dashboard')  ? 'active' : '' }}">'My
-                        cars'</a>
+                       class="{{ request()->routeIs('customer.dashboard')  ? 'active' : '' }}">
+                        {{Cache::get('dashboardStatics'.session()->get('locale'))['My Cars']}}</a>
                 </li>
                 @if (!auth()->user()->hasRole('portmanager'))
                     <li class="tabs__item ">
                         <a href="{{ route('customer.archivedcars') }}"
                            class="{{ request()->routeIs('customer.archivedcars') ? 'active' : '' }}">
-                            'Cars History'
+                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Car History']}}
                         </a>
                     </li>
                 @endif
@@ -19,7 +19,7 @@
                     <li class="tabs__item tabs__item_active ">
                         <a href="{{ route('customer.payment_history') }}"
                            class="{{ request()->routeIs('customer.payment_history') ? 'active' : '' }}">
-                            'Payment History'</a>
+                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Payment History']}}</a>
                     </li>
                 @endif
             </ul>
@@ -28,24 +28,27 @@
                       method="post">
                     @csrf
                     <div style="text-align: right ">
-                        <label for="bank_payment">Transferred Amount</label>
+                        <label for="bank_payment"> {{Cache::get('dashboardStatics'.session()->get('locale'))['Transferred Amount']}} </label>
                         <input class="mb-2" id="bank_payment" type="number" name="bank_payment">
                         <br>
-                        <label for="full_name">Sender(Full Name)</label>
+                        <label for="full_name">{{Cache::get('dashboardStatics'.session()->get('locale'))['Sender']}}({{Cache::get('dashboardStatics'.session()->get('locale'))['Full Name']}})</label>
                         <input id="full_name" type="text" name="full_name">
                         <br>
                         <button style="border: none;border-radius: 5px;padding: 10px;background: #2f5496;color: white"
                                 class="mt-2">
-                            Submit
+                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Submit']}}
                         </button>
                     </div>
                 </form>
                 @if($pending)
                     <p>Pending: <span style="color: blue"> ${{ $pending }} </span>
-                        <span style="color: blue">Payment  will be confirmed within 24 hours.</span>
+                        <span style="color: blue">
+                            {{Cache::get('dashboardStatics'.session()->get('locale'))['payment_confirmation']}}
+
+                        </span>
                     </p>
                 @endif
-                <p>Deposit:<span style="color: green"> ${{ $balance }}</span></p>
+                <p>{{Cache::get('dashboardStatics'.session()->get('locale'))['Deposit']}} :<span style="color: green"> ${{ $balance }}</span></p>
             </div>
         </div>
     </div>

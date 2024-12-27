@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\EloquentSortable\Sortable;
@@ -21,9 +22,11 @@ class Car extends Model implements HasMedia, Sortable
 
 
     // Example of a relationship, assuming you have a 'ports' table for 'to_port_id'
+
+
     public function port()
     {
-        return $this->belongsTo(Port::class, 'to_port_id');
+        return $this->belongsTo(Port::class, 'port_id');
     }
 
     public function state()
@@ -90,4 +93,19 @@ class Car extends Model implements HasMedia, Sortable
     {
         return $this->belongsToMany(ContainerGroup::class, 'container_group_container');
     }
+
+    public function credit() {
+
+        return $this->hasMany(Credit::class);
+    }
+
+
+    /**
+     * Check if credit is given for car and retrieve latest payment details
+     */
+    public function latestCredit(): HasOne
+    {
+        return $this->hasOne(Credit::class)->latestOfMany('issue_or_payment_date');
+    }
+
 }

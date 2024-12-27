@@ -1,5 +1,5 @@
 <header class="main-header">
-    <a href="index.html" class="logo">
+    <a href="{{route('dashboard')}}" class="logo">
         <!-- Logo -->
         <span class="logo-mini">
             <h2 style="color: white"> CARBIDPRO</h2>

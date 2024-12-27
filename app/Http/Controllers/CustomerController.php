@@ -377,7 +377,7 @@ class CustomerController extends Controller
 
 
         if (route('customer.archivedcars') == url()->current()) {
-            $cars = car::with(['state', 'toPort', 'payments'])
+            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
                 ->where('is_active', 1)
                 ->where('balance', 0)
                 ->where($whereLabel,
@@ -386,12 +386,12 @@ class CustomerController extends Controller
                 ->withQueryString();
 
         } elseif (auth()->user()->hasRole('portmanager')) {
-            $cars = car::with(['state', 'toPort', 'payments'])
+            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
                 ->where('is_active', 1)
                 ->paginate(50)
                 ->withQueryString();
         } else {
-            $cars = car::with(['state', 'toPort', 'payments'])
+            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
                 ->where('is_active', 1)
                 ->where('balance_accounting', '!=', null)
                 ->where($whereLabel,

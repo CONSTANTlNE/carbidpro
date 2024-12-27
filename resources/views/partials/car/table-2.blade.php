@@ -28,7 +28,7 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <label for="internal_shipping">Rate</label>
+                            <label for="internal_shipping">Internal Shipping Rate</label>
                             <input id="internal_shipping" value="{{ $car->internal_shipping }}" type="number"
                                 class="form-control" name="internal_shipping" required>
                         </td>

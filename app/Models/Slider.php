@@ -11,6 +11,6 @@ class Slider extends Model implements HasMedia
 {
     use HasFactory,InteractsWithMedia;
 
-    protected $fillable = ['title', 'content', 'image', 'is_active'];
+    protected $guarded=[];
 
 }

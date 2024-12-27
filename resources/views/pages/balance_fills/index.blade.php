@@ -48,7 +48,7 @@
                                         <div class="modal-content">
                                             <div class="modal-header modal-header-primary">
                                                 <h3><i class="fa fa-user m-r-5"></i>
-                                                    Add Payment
+                                                    Add Balance Payment
                                                 </h3>
                                                 <button type="button" class="close" data-dismiss="modal"
                                                         aria-hidden="true">×
@@ -58,21 +58,32 @@
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <form class="form-horizontal"
-                                                              action="{{route('customer.payment_registration_submit')}}"
+                                                              action="{{route('customer.balance.store')}}"
                                                               method="post">
                                                             <input type="hidden" name="customer_id" id="customerID">
                                                             @csrf
                                                                 <div class="row">
                                                                     <div class="col-md-6 form-group text-center">
                                                                         <label  class="text-center" >Customer</label>
-                                                                        <input id="customerName" name="full_name" type="text" onfocus="btn= document.getElementById('searchmodalbtn').click()">
+                                                                        <input autocomplete="off" id="customerName"  type="text" onfocus="btn= document.getElementById('searchmodalbtn').click()">
                                                                     </div>
                                                                     <div class="col-md-6 form-group text-center">
-                                                                        <label  class="text-center" >Amount</label>
-                                                                        <input type="text" name="bank_payment" id="">
+                                                                        <label  class="text-center" >Transfer Date</label>
+                                                                        <input autocomplete="off"  type="date" name="transfer_date" id="">
                                                                     </div>
 
                                                                 </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6 form-group text-center">
+                                                                    <label  class="text-center" >Full Name</label>
+                                                                    <input autocomplete="off" id="" name="full_name" type="text" >
+                                                                </div>
+                                                                <div class="col-md-6 form-group text-center">
+                                                                    <label  class="text-center" >Amount</label>
+                                                                    <input autocomplete="off" type="text" name="bank_payment" id="">
+                                                                </div>
+
+                                                            </div>
                                                             <div>
                                                                 <div class="d-flex justify-content-center mt-3">
                                                                     <button type="button"

@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Mail\SampleMail;
 use App\Models\Car;
+use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Services\CreditService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class CustomerBalanceController extends Controller
 {
 
-    // Balance Fills
+    // ================ Balance Fills ====================
 
     public function index()
     {
@@ -22,6 +25,28 @@ class CustomerBalanceController extends Controller
                 'desc')->get(); // Adjust the query to suit your admin access logic
 
         return view('pages.balance_fills.index', compact('payment_requests'));
+    }
+
+    // Store balance fill by admin
+    public function storeBalance(Request $request)
+    {
+        $request->validate([
+            'bank_payment' => 'required|numeric|min:1',
+            'full_name'    => 'required|string|max:255',
+        ]);
+
+        $balance = new CustomerBalance;
+
+
+        $balance->amount      = $request->bank_payment;
+        $balance->full_name   = $request->full_name;
+        $balance->date        = $request->payment_date;
+        $balance->type        = 'fill';
+        $balance->is_approved = true;
+        $balance->customer_id = $request->customer_id;
+        $balance->save();
+
+        return back();
     }
 
     /**
@@ -43,7 +68,7 @@ class CustomerBalanceController extends Controller
     }
 
     /**
-     * General amount transfer (like filling balance)
+     * General amount transfer (like filling balance by customer)
      */
     public function registrPaymentRequest(Request $request)
     {
@@ -88,7 +113,7 @@ class CustomerBalanceController extends Controller
     }
 
     /**
-     * Dealer pays for a particular car from General balance
+     * Customer/dealer pays for a particular car from General balance
      */
     public function setCarAmount(Request $request)
     {
@@ -99,6 +124,8 @@ class CustomerBalanceController extends Controller
 
 
         $car = car::find($request->car_id);
+
+//          dd($car->latestCredit->monthly_percent*12/365);
 
 
         if ($car->amount_due < $request->amount) {
@@ -111,18 +138,25 @@ class CustomerBalanceController extends Controller
             ->sum('amount');
 
         if ($deposit > $request->amount) {
-            $balance              = new CustomerBalance;
-            $balance->amount      = -$request->amount;
-            $balance->is_approved = true;
-            $balance->type        = 'car_payment';
-            $balance->customer_id = auth()->user()->id;
-            $balance->car_id      = $request->car_id;
-
+            $balance                  = new CustomerBalance;
+            $balance->amount          = -$request->amount;
+            $balance->is_approved     = true;
+            $balance->type            = 'car_payment';
+            $balance->customer_id     = auth()->user()->id;
+            $balance->car_id          = $request->car_id;
+            $balance->carpayment_date = Carbon::now();
             $balance->save();
 
-            $car             = car::find($request->car_id);
             $car->amount_due = $car->amount_due - $request->amount;
             $car->save();
+
+
+            // Calculate the first credit payment (applied only if credit is granted)
+            (new CreditService())->firstCreditPayment($car, $request, $balance);
+
+            // Calculate the second and all other credit payments (applied only if credit is granted)
+            (new CreditService())->creditPayment($car, $request, $balance);
+
 
             $content = [
                 'dealer_name'  => auth()->user()->contact_name,
@@ -155,10 +189,11 @@ class CustomerBalanceController extends Controller
      */
     public function searchCustomerHtmx(Request $request)
     {
-
-
         if (!empty($request->search)) {
-            $customers = Customer::where('contact_name', 'like', '%'.$request->search.'%')
+            $customers = Customer::with('balances')
+                ->select('customers.*')
+                ->selectRaw('(SELECT SUM(amount) FROM customer_balances WHERE customer_balances.customer_id = customers.id) as deposit')
+                ->where('contact_name', 'like', '%'.$request->search.'%')
                 ->orWhere('company_name', 'like', '%'.$request->search.'%')
                 ->orWhere('email', 'like', '%'.$request->search.'%')
                 ->get();
@@ -167,9 +202,9 @@ class CustomerBalanceController extends Controller
         }
 
         // When search is used for update modal
-        if($request->has('index')){
+        if ($request->has('index')) {
+            $index = $request->index;
 
-            $index=$request->index;
             return view('pages.htmx.htmxSearchCustomer', compact('customers', 'index'));
         }
 
@@ -177,7 +212,7 @@ class CustomerBalanceController extends Controller
     }
 
 
-    // Car Payments
+    // ============ Car Payments by Admin ===============
 
     public function carPaymentIndex()
     {
@@ -186,14 +221,21 @@ class CustomerBalanceController extends Controller
             ->orderBy('created_at', 'desc')->get(); // Adjust the query to suit your admin access logic
         $cars            = Car::all();
         $customers       = Customer::all();
+        $deposit         = CustomerBalance::where('is_approved', 1)->sum('amount');
 
-        return view('pages.payment-report.index', compact('payment_reports', 'cars', 'customers'));
+        return view('pages.payment-report.index', compact('payment_reports', 'cars', 'customers', 'deposit'));
     }
 
+    /**
+     *  payment for particular cars from overall general balance (by admin)
+     */
     public function carPaymentStore(Request $request)
     {
+        $request->validate([
+            'amount'       => 'required|numeric|min:1',
+            'payment_date' => 'required',
+        ]);
 
-//        dd($request->all());
         $car = Car::where('customer_id', $request->customer_id)
             ->where('id', $request->car_id)
             ->first();
@@ -202,96 +244,89 @@ class CustomerBalanceController extends Controller
             ->where('is_approved', 1)
             ->sum('amount');
 
-        if($deposit < $request->amount){
+        if ($deposit < $request->amount) {
             return back()->with('error', 'Not enough deposit');
         }
 
-        if($car->amount_due < $request->amount){
+        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car->id), 2);
+        if ($car->amount_due + $accruedPercent < $request->amount) {
             return back()->with('error', 'You can not pay more than amount due');
         }
 
-        $car->amount_due = $car->amount_due - $request->amount;
+
+        $car->amount_due = $request->amount > $car->amount_due ? 0 : $car->amount_due - $request->amount;
         $car->save();
 
-        $carpayment = new CustomerBalance();
-        $carpayment->customer_id = $request->customer_id;
-        $carpayment->car_id = $request->car_id;
-        $carpayment->amount = -$request->amount;
-        $carpayment->type = 'car_payment';
-        $carpayment->is_approved = 1;
-        $carpayment->save();
+
+        $balance                  = new CustomerBalance();
+        $balance->customer_id     = $request->customer_id;
+        $balance->car_id          = $request->car_id;
+        // negative because fill and deduction has same column in database
+        $balance->amount          = -$request->amount;
+        $balance->carpayment_date = $request->payment_date;
+        $balance->comment = $request->comment;
+        $balance->type            = 'car_payment';
+        $balance->is_approved     = 1;
+        $balance->save();
+
+
+        // if credit was granted also apply the credit payment
+        $newCredit =  (new CreditService())->creditPayment($car, $request, $balance);
+
+        (new CreditService())->reCalculateOnDeleteOrAdd($car,$newCredit);
+
 
         return back();
-
     }
 
     public function carPaymentUpdate(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'payment_id' => 'required|exists:customer_balances,id',
-            'customer_id' => 'required|exists:customers,id',
-            'car_id' => 'required|exists:cars,id',
+            'amount'       => 'required|numeric|min:1',
+            'payment_date' => 'required',
         ]);
 
-        $car = Car::where('id', $request->car_id)->first();
+        $car = Car::where('customer_id', $request->customer_id)
+            ->where('id', $request->car_id)
+            ->first();
+
+        $payment = CustomerBalance::find($request->payment_id);
+
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
             ->where('is_approved', 1)
             ->sum('amount');
 
-        if($deposit < $request->amount){
+        if ($deposit < $request->amount) {
             return back()->with('error', 'Not enough deposit');
         }
 
-        if($car->amount_due < $request->amount){
+
+        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car->id), 2);
+
+        if ($car->amount_due + $accruedPercent < $request->amount && $payment->amount*-1 < $request->amount) {
             return back()->with('error', 'You can not pay more than amount due');
         }
 
+        (new CreditService())->reCalculateOnUpdate($car,$payment, $request->amount, $request->comment, $request->payment_date);
 
-        $carpayment=CustomerBalance::find($request->payment_id);
 
-
-        // payments for cars (deduction from general balance) are recorded with negative,
-        // and amount_due in cars are positive number
-        // so we need to multiply balance amount by -1
-
-        // if previous amount was less than new amount
-        if(($carpayment->amount)*-1 < $request->amount){
-            $amountToBeAdded =$request->amount-($carpayment->amount)*-1;
-            $car->amount_due -= $amountToBeAdded;
-            $car->save();
-        }
-
-        // if previous amount was greater than new amount
-        if(($carpayment->amount)*-1 > $request->amount){
-            $amountToBeRemoved =($carpayment->amount)*-1-$request->amount;
-            $car->amount_due += $amountToBeRemoved;
-            $car->save();
-        }
-
-        $carpayment->amount=-$request->amount;
-        $carpayment->customer_id=$request->customer_id;
-        $carpayment->car_id=$request->car_id;
-        if($request->approve==='on'){
-            $carpayment->is_approved=1;
-        }else{
-            $carpayment->is_approved=0;
-        }
-        $carpayment->save();
 
         return back();
-
     }
 
     public function carPaymentDelete(Request $request)
     {
         $payment = CustomerBalance::find($request->id);
-        $car = Car::where('id', $payment->car_id)->first();
+        $car     = Car::where('id', $payment->car_id)->first();
 
-        $car->amount_due = $car->amount_due + $payment->amount;
+        //  payment amount is negative , thats why multiply by -1
+        $car->amount_due = $car->amount_due + $payment->amount * -1;
         $car->save();
 
+
         $payment->delete();
+
+        (new CreditService())->reCalculateOnDeleteOrAdd($car);
 
         return back();
     }
@@ -301,28 +336,46 @@ class CustomerBalanceController extends Controller
      */
     public function carSearchHtmx(Request $request)
     {
-
         if (!empty($request->search)) {
-            $cars = Car::where('customer_id', $request->customer_id)
+            $cars = Car::where('amount_due', '>', 0)
+                ->where('customer_id', $request->customer_id)
                 ->where(function ($query) use ($request) {
-                    $query->where('vin', 'like', '%'.$request->search.'%')
+                    $query
+                        ->where('vin', 'like', '%'.$request->search.'%')
                         ->orWhere('make_model_year', 'like', '%'.$request->search.'%');
                 })
-                ->get();
+                ->with([
+                    'credit' => function ($query) {
+                        $query
+                            ->selectRaw('car_id, SUM(accrued_percent) as total_accrued_percent')
+                            ->groupBy('car_id');
+                    },
+                ])->get();
         } else {
             $cars = collect();
         }
 
-        if($request->has('index')){
+        if ($request->has('index')) {
+            $index = $request->index;
 
-            $index=$request->index;
             return view('pages.htmx.htmxSearchCar', compact('cars', 'index'));
         }
 
 
-
         return view('pages.htmx.htmxSearchCar', compact('cars'));
     }
+
+    public function percentTillDateHtmx(Request $request)
+    {
+//       $totaldue =
+        $total_percent = (new CreditService())->totalAccruedInterestTillDate($request->car_id2, $request->payment_date);
+        $total_due=$request->due2+$total_percent;
+
+        return view('pages.htmx.htmxPercentTillDate', compact('total_percent','total_due'));
+    }
+
+
+
 
 
 }

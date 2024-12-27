@@ -12,10 +12,4 @@ class Port extends Model
         'name',
         'price',
     ];
-
-
-    public function cars()
-    {
-        return $this->hasMany(Car::class);
-    }
 }

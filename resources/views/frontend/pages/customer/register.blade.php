@@ -1,8 +1,34 @@
 @extends('frontend.layout.app')
 
+@php
+    use Illuminate\Support\Facades\Cache;use Illuminate\Support\Facades\Session;
+
+//         TRANSLATE STATICK WORDS AND PUT IN CACHE
+           $headerStatics=Cache::get('headerStatics'.session()->get('locale'));
+
+            if($headerStatics===null){
+
+                $data=[
+                    'Home'=> $tr->translate('Home'),
+                    'About us'=>$tr->translate('About us'),
+                    'Announcements'=>$tr->translate('Announcements'),
+                    'Contact'=>$tr->translate('Contact'),
+                    'Calculator'=>$tr->translate('Calculator'),
+                    'Login'=>$tr->translate('Login'),
+                    'Logout'=>$tr->translate('Logout'),
+                    'Register'=>$tr->translate('Register'),
+                    'Add Team'=>$tr->translate('Add Team'),
+                    'My cars'=>$tr->translate('My cars'),
+                ];
+
+                Cache::forever('headerStatics'.session()->get('locale'), $data);
+            }
+
+@endphp
+
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-        data-background="/assets/images/cargo.jpeg" style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
+             data-background="/frontendAssets/images/cargo.jpeg" style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">

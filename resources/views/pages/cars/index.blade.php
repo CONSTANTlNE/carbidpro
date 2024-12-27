@@ -15,9 +15,9 @@
 {{--@section('body-class', 'hold-transition sidebar-mini sidebar-collapse')--}}
 
 <!--preloader-->
-<div id="preloader">
-    <div id="status"></div>
-</div>
+{{--<div id="preloader">--}}
+{{--    <div id="status"></div>--}}
+{{--</div>--}}
 
 <!-- Site wrapper -->
 <div class="wrapper">
@@ -133,10 +133,7 @@
                                             <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
                                         </form>
                                     </div>
-
-
                                 </div>
-
                             </div>
                             @if ($currentStatus == 'for-dispatch')
                                 @include('partials.car.table-1')
@@ -239,37 +236,7 @@
             });
 
 
-            // Open delete modal and set user ID
-            $('#deleteCarModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var carId = button.data('car-id'); // Extract user ID from data-* attribute
-                var modal = $(this);
 
-                // Set the user ID in the hidden input field in the form
-                modal.find('#deleteCarId').val(carId);
-            });
-
-            // Handle the form submission for deleting the user
-            $('#deleteCarForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent the default form submission
-
-                var carId = $('#deleteCarId').val(); // Get the user ID from the hidden input
-                var formData = $(this).serialize(); // Serialize form data for submission
-
-                $.ajax({
-                    url: `/dashboard/car/${carId}`, // URL for deleting the user
-                    type: 'DELETE', // HTTP method for deletion
-                    data: formData, // Send the serialized form data (including the CSRF token)
-                    success: function(response) {
-                        alert(response.message); // Show success message
-                        $('#deleteCarModal').modal('hide'); // Hide the modal
-                        location.reload(); // Optionally reload the page to update the user list
-                    },
-                    error: function(xhr) {
-                        alert('Something went wrong.'); // Handle errors
-                    }
-                });
-            });
         </script>
     @endpush
 </div>

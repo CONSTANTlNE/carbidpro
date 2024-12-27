@@ -62,7 +62,6 @@
 
 <div id="htmxerrors"></div>
 @yield('content')
-
 @yield('auctions')
 @yield('locations')
 @yield('load-types')

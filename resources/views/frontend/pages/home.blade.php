@@ -12,8 +12,8 @@
                 <rs-slides>
                     @foreach ($slides as $key => $slider)
                         <rs-slide style="position: absolute;" data-key="rs-{{ $key }}" data-title="Slide"
-                            data-thumb="{{ Storage::url($slider->image) }}" data-in="o:0;" data-out="a:false;">
-                            <img src="{{ Storage::url($slider->image) }}" alt="Image" title="slider-1" width="1614"
+                            data-thumb="{{ $slider->media[0]->getUrl() }}" data-in="o:0;" data-out="a:false;">
+                            <img src="{{ $slider->media[0]->getUrl() }}" alt="Image" title="slider-1" width="1614"
                                 height="908" class="rev-slidebg tp-rs-img" data-parallax="3"
                                 data-panzoom="d:10000;ss:100;se:120%;" data-no-retina>
                             <rs-layer id="slider-27-slide-70-layer-0" data-type="image" data-rsp_ch="on"
@@ -121,15 +121,15 @@
                                         data-wow-duration="1500ms">
                                         <div class="ft-service-slider-item">
                                             <div class="ft-service-inner-img">
-                                                <img src="{{ Storage::url($service->image) }}"
+                                                <img src="{{ $service->media[0]->getUrl() }}"
                                                     alt="{{ $service->title }}">
                                             </div>
                                             <div class="ft-service-inner-text headline pera-content position-relative">
                                                 <h3><a href="{{ $service->button_url }}">{!! $tr->translate($service->title) !!}</a></h3>
-
                                                 <a class="service-more"
                                                     href="{{ $service->button_url }}">{!! $tr->translate($service->button_title) !!}
-                                                    <span>+</span></a>
+                                                    <span>+</span>
+                                                </a>
                                                 <div class="ft-service-serial position-absolute">
                                                     1
                                                 </div>
