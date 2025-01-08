@@ -55,8 +55,9 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <form action="{{route('customers.store')}}" method="post">
+                                            <form action="{{route('customer.register.post')}}" method="post">
                                                 @csrf
+                                                <input type="hidden" name="admin" value="admin">
                                                 <div class="modal-body">
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
@@ -67,12 +68,13 @@
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Company/Personal ID</label>
-                                                            <input name="company_id" required type="text" placeholder=""
+                                                            <input name="personal_number" required type="text"
+                                                                   placeholder=""
                                                                    class="form-control">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Contact Person</label>
-                                                            <input name="contact_person" required type="text"
+                                                            <input name="contact_name" required type="text"
                                                                    placeholder="" class="form-control">
                                                         </div>
                                                     </div>
@@ -90,7 +92,7 @@
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Car purchase per Month</label>
-                                                            <select name="car_number" id="" class="form-control">
+                                                            <select name="number_of_cars" id="" class="form-control">
                                                                 <option value="10">10</option>
                                                                 <option value="20">20</option>
                                                                 <option value="50">50</option>
@@ -101,31 +103,25 @@
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Extra For Calculator</label>
-                                                            <input name="extra" required type="text" placeholder=""
+                                                            <input name="extra_for_team" required type="text"
+                                                                   placeholder=""
                                                                    class="form-control">
                                                         </div>
-                                                        <!-- Text input-->
-                                                        <div class="col-md-4 form-group text-center">
-                                                            <label class="control-label">Status Active</label>
-                                                            <input name="status" required type="checkbox" checked
-                                                                   class="form-control">
-                                                        </div>
-                                                        <div class="col-md-4 form-group">
-                                                            <label class="control-label">Role</label>
-                                                            <select name="role" id="" class="form-control">
-                                                                <option value="10">10</option>
-                                                                <option value="20">20</option>
-                                                                <option value="50">50</option>
-                                                                <option value="100">100 +</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
+
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">password</label>
                                                             <input name="password" required type="text" placeholder=""
                                                                    class="form-control">
                                                         </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label class="control-label">confirm password</label>
+                                                            <input name="password_confirmation" required type="text"
+                                                                   placeholder=""
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -146,14 +142,14 @@
                                 <form action="{{route('customers.index')}}">
                                     <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
                                             onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
                                         <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
+                                        <option value="90" {{request('perpage') == 90 ? 'selected' : ''}}>90</option>
+                                        <option value="150" {{request('perpage') == 150 ? 'selected' : ''}}>150</option>
                                     </select>
                                 </form>
                                 {{-- Search--}}
                                 <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
+                                      action="{{route('customers.index')}}">
                                     <input type="text" name="search" class="form-control"
                                            value="{{request()->query('search')}}">
                                     <button type="submit"
@@ -162,22 +158,15 @@
                                 </form>
                                 {{--Return All Data--}}
                                 @if(request()->query('search'))
-                                    <form action="{{route('locations.index')}}">
+                                    <form action="{{route('customers.index')}}">
                                         <button type="submit"
                                                 class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
                                         </button>
                                     </form>
                                 @endif
-                                {{-- Auction--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 120px" class="ml-3 form-control" name="auction" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="all">All Auctions</option>
-                                        {{--                                        @foreach($auctions as $auction)--}}
-                                        {{--                                            <option @selected(request()->query('auction') == $auction->id) value="{{$auction->id}}" >{{$auction->name}}</option>--}}
-                                        {{--                                        @endforeach--}}
-                                    </select>
-                                </form>
+                                <button type="button" class="btn btn-danger custom_grreen2 ml-2 mb-3 " >
+                                    Archived {{$trashedCount}}
+                                </button>
                             </div>
                             <div class="table-responsive">
                                 <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
@@ -187,7 +176,7 @@
                                         <th>Contact Person</th>
                                         <th>Phone</th>
                                         <th>Email</th>
-                                        <th>Dealer</th>
+                                        <th>Main Dealer</th>
                                         <th>Password</th>
                                         <th>Status</th>
                                         <th>Crated At</th>
@@ -201,16 +190,18 @@
                                             <td>{{$customer->contact_name}}</td>
                                             <td>{{$customer->phone}}</td>
                                             <td>{{$customer->email}}</td>
-                                            <td>dealer</td>
+                                            <td>{{$customers->where('id',$customer->child_of)->first()?->contact_name}}</td>
                                             <td>{{$customer->unhashed_password}}</td>
                                             <td>
-                                                <form action="{{route('paymentrequest.approve')}}" method="post">
+                                                <form action="{{route('customer.activate')}}" method="post" novalidate>
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{$customer->id}}">
                                                     @if($customer->is_active==1)
-                                                        <button class="btn btn-success btn-rounded w-md m-b-5">Active</button>
+                                                        <button type="submit" class="btn btn-success btn-rounded w-md m-b-5">Active
+                                                        </button>
                                                     @else
-                                                        <button  class="btn btn-danger btn-rounded w-md m-b-5">Inactive</button
+                                                        <button type="submit" class="btn btn-danger btn-rounded w-md m-b-5">Inactive
+                                                        </button
                                                     @endif
                                                 </form>
                                             </td>
@@ -222,7 +213,7 @@
                                                 </button>
                                                 <div class="modal fade" id="update{{$index}}" tabindex="-1"
                                                      role="dialog" style="display: none;" aria-hidden="true">
-                                                    <div class="modal-dialog">
+                                                    <div class="modal-dialog modal-lg">
                                                         <div class="modal-content">
                                                             <div class="modal-header modal-header-primary">
                                                                 <h3> Edit customer</h3>
@@ -230,43 +221,104 @@
                                                                         aria-hidden="true">×
                                                                 </button>
                                                             </div>
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <form class="form-horizontal"
-                                                                              action="{{route('locations.update')}}"
-                                                                              method="post">
-                                                                            @csrf
-                                                                            <input type="hidden" name="id"
-                                                                                   value="{{$customer->id}}" id="">
-                                                                            <div class="row flex justify-content-center">
+                                                            <form action="{{route('customers.update', )}}" method="post">
+                                                                @csrf
+                                                                <input type="hidden" name="id" value="{{$customer->id}}">
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Company
+                                                                                Name</label>
+                                                                            <input name="company_name"
+                                                                                   type="text"
+                                                                                   placeholder="" class="form-control"
+                                                                                   value="{{$customer->company_name}}">
+                                                                        </div>
+                                                                        <!-- Text input-->
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Company/Personal
+                                                                                ID</label>
+                                                                            <input name="personal_number" required
+                                                                                   type="text" placeholder=""
+                                                                                   class="form-control"
+                                                                                   value="{{$customer->personal_number}}">
+                                                                        </div>
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Contact
+                                                                                Person</label>
+                                                                            <input name="contact_name" required
+                                                                                   type="text"
+                                                                                   placeholder="" class="form-control"
+                                                                                   value="{{$customer->contact_name}}">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Phone</label>
+                                                                            <input name="phone" required type="text"
+                                                                                   placeholder=""
+                                                                                   class="form-control"
+                                                                                   value="{{$customer->phone}}">
+                                                                        </div>
+                                                                        <!-- Text input-->
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Email</label>
+                                                                            <input name="email" required type="text"
+                                                                                   placeholder=""
+                                                                                   class="form-control"
+                                                                                   value="{{$customer->email}}">
+                                                                        </div>
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Car purchase
+                                                                                per Month</label>
+                                                                            <select name="number_of_cars" id=""
+                                                                                    class="form-control">
+                                                                                <option @selected($customer->number_of_cars == 10) value="10">
+                                                                                    10
+                                                                                </option>
+                                                                                <option @selected($customer->number_of_cars == 20) value="20">
+                                                                                    20
+                                                                                </option>
+                                                                                <option @selected($customer->number_of_cars == 50) value="50">
+                                                                                    50
+                                                                                </option>
+                                                                                <option @selected($customer->number_of_cars == 100) value="100">
+                                                                                    100 +
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">Extra For
+                                                                                Calculator</label>
+                                                                            <input name="extra_for_team" required
+                                                                                   type="text" placeholder=""
+                                                                                   class="form-control"
+                                                                                   value="{{$customer->extra_for_team}}">
+                                                                        </div>
+                                                                        <div class="col-md-4 form-group">
+                                                                            <label class="control-label">password</label>
+                                                                            <input name="password"  type="text"
+                                                                                   placeholder=""
+                                                                                   class="form-control">
+                                                                        </div>
+                                                   
+                                                                    </div>
+                                                                    <div class="row">
 
-                                                                                Content
-
-                                                                                <div class="col-md-12 form-group user-form-group mt-3">
-                                                                                    <div class="flex justify-content-center">
-                                                                                        <button type="button"
-                                                                                                data-dismiss="modal"
-                                                                                                class="btn btn-danger btn-sm">
-                                                                                            Cancel
-                                                                                        </button>
-                                                                                        <button type="submit"
-                                                                                                class="btn btn-add btn-sm">
-                                                                                            Update
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        </form>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            {{--                                                            <div class="modal-footer">--}}
-                                                            {{--                                                                <button type="button" class="btn btn-danger float-left"--}}
-                                                            {{--                                                                        data-dismiss="modal">Close--}}
-                                                            {{--                                                                </button>--}}
-                                                            {{--                                                            </div>--}}
+                                                                <div class="modal-footer justify-content-center">
+                                                                    <button type="button"
+                                                                            class="btn btn-danger float-left"
+                                                                            data-dismiss="modal">Close
+                                                                    </button>
+                                                                    <button type="submit" class="btn green_btn custom_grreen2">
+                                                                        Update
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                         <!-- /.modal-content -->
                                                     </div>
@@ -292,7 +344,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <form class="form-horizontal"
-                                                                              action="{{route('locations.destroy')}}"
+                                                                              action="{{route('customers.delete')}}"
                                                                               method="post">
                                                                             @csrf
                                                                             <input type="hidden" name="id"

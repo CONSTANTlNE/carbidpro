@@ -15,25 +15,20 @@ class PortsSeeder extends Seeder
     {
         Port::create([
             'name'=>'NJ New Jersey',
-            'state_id'=>4,
-            'price'=>900
+            'state_id'=>4
+            'price'=>
         ]);
         Port::create([
             'name'=>'TX Texas',
-            'state_id'=>51,
-            'price'=>1000
+            'state_id'=>51
         ]);
         Port::create([
             'name'=>'CA California',
-            'state_id'=>6,
-            'price'=>1500
-
+            'state_id'=>6
         ]);
         Port::create([
             'name'=>'GA Georgia',
-            'state_id'=>13,
-            'price'=>850
-
+            'state_id'=>13
         ]);
     }
 }

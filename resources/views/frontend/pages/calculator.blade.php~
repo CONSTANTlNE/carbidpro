@@ -3,8 +3,8 @@
 
 @php
 
-//                      Cache::forget('calculatorStaticsen');
-//                      Cache::forget('calculatorStaticsru');
+                      Cache::forget('calculatorStaticsen');
+                      Cache::forget('calculatorStaticsru');
 
         $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
 

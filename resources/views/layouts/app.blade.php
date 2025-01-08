@@ -58,7 +58,7 @@
 </head>
 
 {{--<body class="@yield('body-class', '')">--}}
-<body class="hold-transition sidebar-mini sidebar-collapse">
+<body class="sidebar-mini  pace-done">
 
 <div id="htmxerrors"></div>
 @yield('content')
@@ -100,6 +100,7 @@
 <script src="/assets/plugins/fastclick/fastclick.min.js"></script>
 <!-- CRMadmin frame -->
 <script src="/assets/dist/js/custom.js"></script>
+
 <!-- End Core Plugins
      =====================================================================-->
 <!-- Start Page Lavel Plugins

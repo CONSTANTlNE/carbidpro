@@ -6,7 +6,7 @@
 
     $homeStatics=Cache::get('homeStatics'.session()->get('locale'));
 
-//dd(Cache::get('servicesTranslate'.session()->get('locale')));
+dd(Cache::get('servicesTranslate'.session()->get('locale')));
 //       cache::forget('sliderTranslate'.session()->get('locale'));
 
          $sliderTranslate=Cache::get('sliderTranslate'.session()->get('locale'));

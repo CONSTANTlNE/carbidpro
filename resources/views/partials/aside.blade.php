@@ -9,9 +9,23 @@
                     <span class="pull-right-container"></span>
                 </a>
             </li>
-
+            @if (auth()->user()->hasRole('Dispatch'))
+                <li class="{{ Route::is('car.showStatus') ? 'active' : '' }}">
+                    <a href="/dashboard/cars/status/for-dispatch">
+                        <i class="fa fa-automobile"></i><span>Cars</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @elseif(auth()->user()->hasRole('Admin'))
+                <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
+                    <a href="{{ route('cars.index') }}">
+                        <i class="fa fa-automobile"></i><span>Cars</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            @endif
             @if (auth()->user()->hasRole('Admin'))
-                <li class="treeview active">
+                <li class="treeview active {{request()->routeIs('customer.balance.index') || request()->routeIs('carpayment.index') ? 'active' : ''}}">
                     <a href="#">
                         <i class="fa fa-money"></i><span>Payments</span>
                         <span class="pull-right-container">
@@ -19,27 +33,28 @@
                         </span>
                     </a>
                     <ul class="treeview-menu">
+                        <li>
+                            <a href="{{ route('customer.balance.index') }}">
+                                <span>Deposit Requests</span>
+                                <span class="pull-right-container"></span>
+                                @if($balancecomposers)
+                                    <span style="background: red!important;color: white!important" class="pull-right badge">{{$deposits}}</span>
+                                @endif
+                            </a>
+                        </li>
                         <li class="{{ Route::is('carpayment.index') ? 'active' : '' }}">
                             <a href="{{ route('carpayment.index') }}">
                                <span>Payment for Cars</span>
                                 <span class="pull-right-container"></span>
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('customer.balance.index') }}">
-                                <span>Balance Fill Requests</span>
-                                <span class="pull-right-container"></span>
-                            </a>
-                        </li>
                     </ul>
                 </li>
-
-
             @endif
 
 
             @if (auth()->user()->hasRole('Admin'))
-                <li class="treeview active">
+                <li class="treeview">
                     <a href="#">
                         <i class="fa fa-user-circle"></i><span>Users</span>
                         <span class="pull-right-container">
@@ -65,21 +80,7 @@
             @endif
 
 
-            @if (auth()->user()->hasRole('Dispatch'))
-                <li class="{{ Route::is('car.showStatus') ? 'active' : '' }}">
-                    <a href="/dashboard/cars/status/for-dispatch">
-                        <i class="fa fa-automobile"></i><span>Cars</span>
-                        <span class="pull-right-container"></span>
-                    </a>
-                </li>
-            @elseif(auth()->user()->hasRole('Admin'))
-                <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
-                    <a href="{{ route('cars.index') }}">
-                        <i class="fa fa-automobile"></i><span>Cars</span>
-                        <span class="pull-right-container"></span>
-                    </a>
-                </li>
-            @endif
+
 
 
             @if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Loader'))
@@ -114,9 +115,6 @@
                         <span class="pull-right-container"></span>
                     </a>
                 </li>
-            @endif
-            <hr>
-            @if (auth()->user()->hasRole('Admin'))
                 <li class="treeview">
                     <a href="#">
                         <i class="fa fa-gear"></i><span>Data</span>
@@ -158,6 +156,9 @@
 
                     </ul>
                 </li>
+            @endif
+            <hr>
+            @if (auth()->user()->hasRole('Admin'))
                 <li class="treeview">
                     <a href="#">
                         <i class="fa fa-gear"></i><span>Site Settings</span>

@@ -6338,15 +6338,15 @@ select:visited {
   position: relative;
 }
 
-.ft-project-overview-list-item li:before {
-  top: 0;
-  left: 0;
-  content: "";
-  font-weight: 900;
-  position: absolute;
-  color: #ea1e00;
-  font-family: "Font Awesome 5 Pro";
-}
+/*.ft-project-overview-list-item li:before {*/
+/*  top: 0;*/
+/*  left: 0;*/
+/*  content: "";*/
+/*  font-weight: 900;*/
+/*  position: absolute;*/
+/*  color: #ea1e00;*/
+/*  font-family: "Font Awesome 5 Pro";*/
+/*}*/
 
 .ft-project-overview-comment-wrapper {
   padding: 40px;

@@ -92,9 +92,6 @@
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
             let table = new DataTable('#myTable');
-
-            let text = document.querySelector('[for="dt-length-0"]');
-            text.style.display='none';
         </script>
     @endpush
 

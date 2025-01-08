@@ -113,20 +113,16 @@
                                                         return $pickupDateExpired;
                                                     });
                                                 }
-
                                             @endphp
                                             <a href="{{ route('car.showStatus', $status->slug) }}"
                                                 class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
                                                 {{ $status->name }} {{ $status->id == 7 ?  $errorCount :  $status->cars_count }}
                                             </a>
                                         @endforeach
-
-
                                     </div>
 
                                     <div>
                                         <form class="form-inline my-2 my-lg-0" method="GET">
-
                                             <input class="form-control mr-sm-2"
                                                 value="{{ isset($_GET['search']) ? $_GET['search'] : '' }}"
                                                 name="search" type="search" placeholder="Search" aria-label="Search">

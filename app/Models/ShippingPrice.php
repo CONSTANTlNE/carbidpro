@@ -39,4 +39,18 @@ class ShippingPrice extends Model
     {
         return optional($this->location)->name; // Handle null values
     }
+
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Default values
+            if (is_null($model->auction_ids)) {
+                $model->auction_ids = [1, 2, 3];
+            }
+        });
+    }
 }

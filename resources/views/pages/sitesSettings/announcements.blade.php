@@ -3,6 +3,7 @@
 
 
 @section('announces')
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
     @include('partials.header')
     <!-- Left side column. contains the sidebar -->
     @include('partials.aside')
@@ -35,7 +36,7 @@
                     <div class="card lobicard" id="lobicard-custom-controls" data-sortable="true">
                         <div class="card-header">
                             <div class="card-title custom_title">
-                                <h1>Announces </h1>
+                                <h1>Announcements </h1>
                             </div>
                         </div>
                         <div class="card-body">
@@ -43,24 +44,39 @@
                                 {{-- Location Create Modal--}}
                                 <button type="button" class="btn green_btn custom_grreen2 mb-3" data-toggle="modal"
                                         data-target="#mymodals">
-                                    Add New Slider
+                                    Add New Announce
                                 </button>
                                 <div class="modal fade" id="mymodals" tabindex="-1" role="dialog" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                    <div class="modal-dialog modal-lg" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">New Slider</h5>
+                                                <h5 class="modal-title">New Announcement</h5>
                                                 <button type="button" class="close" data-dismiss="modal"
                                                         aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <form action="{{route('locations.store')}}" method="post">
+                                            <form action="{{route('announcements.store')}}" method="post">
                                                 @csrf
                                                 <div class="modal-body">
-                                                    <div style="display: flex" class="flex">
-                                                        <input required type="text" name="name"
-                                                               placeholder="Location Name" class="form-control mb-3">
+                                                    <div style="display: flex" class="flex justify-content-center mb-2">
+                                                        <div class="form-group w-100 text-center">
+                                                            <label class="text-center">Title</label>
+                                                            <input name="title" type="text" class="form-control w-100"
+                                                                   required="">
+                                                        </div>
+                                                    </div>
+                                                    <div style="display: flex" class="flex justify-content-center mb-2">
+                                                        <div class="form-group text-center">
+                                                            <label class="text-center">Date</label>
+                                                            <input name="date" type="date" class="form-control w-100"
+                                                                   required="">
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-center">Content</p>
+                                                    <textarea style="display: none" name="announcement"
+                                                              id="quill_content"></textarea>
+                                                    <div id="editor">
 
                                                     </div>
                                                 </div>
@@ -79,23 +95,28 @@
                                 {{--End Auction Create Modal--}}
 
                                 {{-- Per Page--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
-                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
-                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>
-                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>
-                                    </select>
-                                </form>
+{{--                                <form action="{{route('services.index')}}">--}}
+{{--                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""--}}
+{{--                                            onchange="this.form.submit()">--}}
+{{--                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>--}}
+{{--                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>--}}
+{{--                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>--}}
+{{--                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>--}}
+{{--                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>--}}
+{{--                                    </select>--}}
+{{--                                </form>--}}
                                 {{-- Search--}}
                                 <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
+                                      action="{{route('announcements.index')}}">
                                     <input type="text" name="search" class="form-control"
                                            value="{{request()->query('search')}}">
                                     <button type="submit"
                                             class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
+                                    </button>
+                                </form>
+
+                                <form action="{{route('announcements.index')}}">
+                                    <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
                                     </button>
                                 </form>
 
@@ -104,88 +125,73 @@
                                 <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
-                                        <th>Name</th>
+                                        <th>Title</th>
                                         <th>Status</th>
-                                        <th>Created</th>
+                                        <th>Date</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($sliders as $index=> $slider)
+                                    @foreach($announcements as $index=> $announce)
                                         <tr class="text-center">
-                                            <td>{{$slider->name}}</td>
+                                            <td>{{$announce->title}}</td>
                                             <td>
-                                                @if($slider->is_active===1)
-                                                    <span class="label label-danger-outline ">Active</span>
-                                                @else
-                                                    <span class="label label-danger ">Inactive</span>
-                                                @endif
+                                                <form action="{{route('announcements.activate')}}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{$announce->id}}">
+                                                    @if($announce->is_active===1)
+                                                        <button class="btn btn-success btn-rounded w-md m-b-5">
+                                                            Active
+                                                        </button>
+                                                    @else
+                                                        <button class="btn btn-danger btn-rounded w-md m-b-5">
+                                                            Inactive
+                                                        </button
+                                                    @endif
+                                                </form>
                                             </td>
 
-                                            <td>{{$slider->created_at->format('d-m-Y')}}</td>
+                                            <td>{{$announce->created_at->format('d-m-Y')}}</td>
                                             <td>
                                                 {{--Edit Modal--}}
-                                                <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
+                                                {{--htmx returns initialized quill editor --}}
+                                                <button hx-get="{{route('announcements.update.htmx')}}"
+                                                        hx-target="#target{{$index}}"
+                                                        hx-vals='{"id": "{{$announce->id}}"}'
+                                                        type="button" class="btn btn-add btn-sm" data-toggle="modal"
                                                         data-target="#update{{$index}}"><i class="fa fa-pencil"></i>
                                                 </button>
-                                                <div class="modal fade" id="update{{$index}}" tabindex="-1"
-                                                     role="dialog" style="display: none;" aria-hidden="true">
-                                                    <div class="modal-dialog">
+                                                <div class="modal fade" id="update{{$index}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
                                                         <div class="modal-content">
-                                                            <div class="modal-header modal-header-primary">
-                                                                <h3> Edit Slider</h3>
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Update Announcement</h5>
                                                                 <button type="button" class="close" data-dismiss="modal"
-                                                                        aria-hidden="true">×
+                                                                        aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                             </div>
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <form class="form-horizontal"
-                                                                              action="{{route('sliders.update')}}"
-                                                                              method="post">
-                                                                            @csrf
-                                                                            <input type="hidden" name="id"
-                                                                                   value="{{$slider->id}}" id="">
-                                                                            <div class="row flex justify-content-center">
+                                                            <form action="{{route('announcements.update')}}" method="post">
+                                                                @csrf
+                                                                <input type="hidden" name="id" value="{{$announce->id}}">
+                                                                <div id="target{{$index}}">
 
-                                                                                <div class="col-md-6 form-group">
-                                                                                    <label class="control-label">Name</label>
-                                                                                    <input type="text"
-                                                                                           name="name"
-                                                                                           value="{{$slider->name}}"
-                                                                                           class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-2 form-group">
-                                                                                    <label class="control-label">Active</label>
-                                                                                    <input name="status" type="checkbox"
-                                                                                           @checked($slider->is_active===1)
-                                                                                           class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-12 form-group user-form-group mt-3">
-                                                                                    <div class="flex justify-content-center">
-                                                                                        <button type="button"
-                                                                                                data-dismiss="modal"
-                                                                                                class="btn btn-danger btn-sm">
-                                                                                            Cancel
-                                                                                        </button>
-                                                                                        <button type="submit"
-                                                                                                class="btn btn-add btn-sm">
-                                                                                            Update
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
                                                                 </div>
-                                                            </div>
+
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                                                        Close
+                                                                    </button>
+                                                                    <button type="submit" class="btn green_btn custom_grreen2">
+                                                                        Update
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         </div>
-                                                        <!-- /.modal-content -->
                                                     </div>
-                                                    <!-- /.modal-dialog -->
                                                 </div>
+
+
 
                                                 {{--Delete Modal--}}
                                                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
@@ -196,7 +202,7 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header modal-header-primary">
-                                                                <h3><i class="fa fa-user m-r-5"></i> Delete Location
+                                                                <h3><i class="fa fa-user m-r-5"></i> Delete Announce
                                                                 </h3>
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-hidden="true">×
@@ -206,15 +212,15 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <form class="form-horizontal"
-                                                                              action="{{route('sliders.delete')}}"
+                                                                              action="{{route('announcements.delete')}}"
                                                                               method="post">
                                                                             @csrf
                                                                             <input type="hidden" name="id"
-                                                                                   value="{{$slider->id}}">
+                                                                                   value="{{$announce->id}}">
                                                                             <fieldset>
                                                                                 <div class="col-md-12 form-group user-form-group">
                                                                                     <label class="control-label">Delete
-                                                                                        Auction : {{$slider->name}}
+                                                                                        Announce : {{$announce->title}}
                                                                                         ?</label>
                                                                                     <div class="flex justify-content-center mt-3">
                                                                                         <button type="button"
@@ -243,7 +249,7 @@
                                     @endforeach
                                     </tbody>
                                 </table>
-                                @if($sliders->isEmpty())
+                                @if($announcements->isEmpty())
                                     <div style="width: 100%;display: flex;justify-content: center">
                                         <span style="font-size: 20px" class="label label-pill label-danger m-r-15">No Records Found</span>
                                     </div>
@@ -259,5 +265,38 @@
         </section>
         <!-- /.content -->
     </div>
+    <!-- Initialize Quill editor -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
+            const quill = new Quill('#editor', {
+                modules: {
+                    toolbar: [
+                        [{header: [1, 2, false]}],
+                        [{size: ['small', 'large', 'huge']}],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote'],
+                        ['link', 'image', 'video'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                        [{ 'align': [] }],
+                    ],
+                },
+                placeholder: 'Compose an epic...',
+                theme: 'snow', // or 'bubble'
+            });
+            const textarea = document.getElementById('quill_content');
+
+            quill.on('text-change', () => {
+                textarea.value = quill.root.innerHTML
+            })
+
+            textarea.addEventListener('input', () => {
+                quill.root.innerHTML = textarea.value
+            })
+
+        })
+
+    </script>
 @endsection

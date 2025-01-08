@@ -40,7 +40,7 @@
                         </div>
                         <div class="card-body">
                             <div class="btn-group flex">
-                                {{-- Location Create Modal--}}
+                                {{-- Slider Modal--}}
                                 <button type="button" class="btn green_btn custom_grreen2 mb-3" data-toggle="modal"
                                         data-target="#mymodals">
                                     Add New Slider
@@ -55,12 +55,20 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <form action="{{route('locations.store')}}" method="post">
+                                            <form action="{{route('sliders.store')}}" method="post" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-body">
-                                                    <div style="display: flex" class="flex">
-                                                        <input required type="text" name="name"
-                                                               placeholder="Location Name" class="form-control mb-3">
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Title</label>
+                                                        <input  type="text" name="title"
+                                                                class="form-control mb-3" required>
+
+                                                    </div>
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Image</label>
+
+                                                        <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
+                                                               class="input-file mb-3" required>
 
                                                     </div>
                                                 </div>
@@ -78,33 +86,12 @@
                                 </div>
                                 {{--End Auction Create Modal--}}
 
-                                {{-- Per Page--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
-                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
-                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>
-                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>
-                                    </select>
-                                </form>
-                                {{-- Search--}}
-                                <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
-                                    <input type="text" name="search" class="form-control"
-                                           value="{{request()->query('search')}}">
-                                    <button type="submit"
-                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
-                                    </button>
-                                </form>
-
                             </div>
                             <div class="table-responsive">
                                 <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
-                                        <th>Name</th>
+                                        <th>Title</th>
                                         <th>Status</th>
                                         <th>Created</th>
                                         <th>Action</th>
@@ -113,13 +100,21 @@
                                     <tbody>
                                     @foreach($sliders as $index=> $slider)
                                         <tr class="text-center">
-                                            <td>{{$slider->name}}</td>
+                                            <td>{{$slider->title}}</td>
                                             <td>
-                                                @if($slider->is_active===1)
-                                                    <span class="label label-danger-outline ">Active</span>
-                                                @else
-                                                    <span class="label label-danger ">Inactive</span>
-                                                @endif
+                                                <form action="{{route('sliders.activate')}}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{$slider->id}}">
+                                                    @if($slider->is_active===1)
+                                                        <button class="btn btn-success btn-rounded w-md m-b-5">
+                                                            Active
+                                                        </button>
+                                                    @else
+                                                        <button class="btn btn-danger btn-rounded w-md m-b-5">
+                                                            Inactive
+                                                        </button
+                                                    @endif
+                                                </form>
                                             </td>
 
                                             <td>{{$slider->created_at->format('d-m-Y')}}</td>
@@ -143,25 +138,26 @@
                                                                     <div class="col-md-12">
                                                                         <form class="form-horizontal"
                                                                               action="{{route('sliders.update')}}"
-                                                                              method="post">
+                                                                              method="post" enctype="multipart/form-data">
                                                                             @csrf
                                                                             <input type="hidden" name="id"
                                                                                    value="{{$slider->id}}" id="">
                                                                             <div class="row flex justify-content-center">
+                                                                                <div  class="col-md-12 form-group">
+                                                                                    <label class="control-label">Title</label>
+                                                                                    <input  type="text" name="title" value="{{$slider->title}}"
+                                                                                            class="form-control mb-3" required>
 
-                                                                                <div class="col-md-6 form-group">
-                                                                                    <label class="control-label">Name</label>
-                                                                                    <input type="text"
-                                                                                           name="name"
-                                                                                           value="{{$slider->name}}"
-                                                                                           class="form-control">
                                                                                 </div>
-                                                                                <div class="col-md-2 form-group">
-                                                                                    <label class="control-label">Active</label>
-                                                                                    <input name="status" type="checkbox"
-                                                                                           @checked($slider->is_active===1)
-                                                                                           class="form-control">
+                                                                                <div  class="col-md-12 form-group">
+                                                                                    <label class="control-label">Image</label>
+
+                                                                                    <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
+                                                                                           class="input-file mb-3" required>
+
                                                                                 </div>
+
+
                                                                                 <div class="col-md-12 form-group user-form-group mt-3">
                                                                                     <div class="flex justify-content-center">
                                                                                         <button type="button"
@@ -196,7 +192,7 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header modal-header-primary">
-                                                                <h3><i class="fa fa-user m-r-5"></i> Delete Location
+                                                                <h3><i class="fa fa-user m-r-5"></i> Delete Slider
                                                                 </h3>
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-hidden="true">×
@@ -214,7 +210,7 @@
                                                                             <fieldset>
                                                                                 <div class="col-md-12 form-group user-form-group">
                                                                                     <label class="control-label">Delete
-                                                                                        Auction : {{$slider->name}}
+                                                                                        Slider : {{$slider->title}}
                                                                                         ?</label>
                                                                                     <div class="flex justify-content-center mt-3">
                                                                                         <button type="button"
@@ -243,7 +239,7 @@
                                     @endforeach
                                     </tbody>
                                 </table>
-                                @if($locations->isEmpty())
+                                @if($sliders->isEmpty())
                                     <div style="width: 100%;display: flex;justify-content: center">
                                         <span style="font-size: 20px" class="label label-pill label-danger m-r-15">No Records Found</span>
                                     </div>
@@ -253,9 +249,9 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-content-center">
-                {{ $locations->links() }}
-            </div>
+{{--            <div class="flex justify-content-center">--}}
+{{--                {{ $locations->links() }}--}}
+{{--            </div>--}}
         </section>
         <!-- /.content -->
     </div>

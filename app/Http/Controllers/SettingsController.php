@@ -14,6 +14,8 @@ class SettingsController extends Controller
 
 
         return view('pages.sitesSettings.settings', compact('settings'));
+
+
     }
 
     public function store(Request $request)
@@ -26,9 +28,6 @@ class SettingsController extends Controller
         $setting->value=$request->setting_value;
         $setting->save();
 
-        Cache::forget('settings');
-        Cache::forever('settings', Setting::all());
-
          return back();
     }
 
@@ -37,7 +36,7 @@ class SettingsController extends Controller
         $setting = Setting::where('key', $request->key)->first();
         $key = $request->key;
 
-        return view('pages.htmx.htmxSettings', compact('setting', 'key'));
+        return view('pages.htmx.htmxUpdateSettings', compact('setting', 'key'));
     }
 
     public function update(Request $request) {
@@ -49,8 +48,13 @@ class SettingsController extends Controller
         $setting->value=$request->setting_value;
         $setting->save();
 
-        Cache::forget('settings');
-        Cache::forever('settings', Setting::all());
+        // About
+        Cache::forget('translatedAboutEN');
+        Cache::forget('translatedAboutEN');
+        //Terms
+        Cache::forget('translatedTermsEN');
+        Cache::forget('translatedTermsRU');
+
 
         return back();
     }

@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="d-flex mt-4 justify-content-around">
+        <div class="d-flex mt-4 justify-content-between">
             <ul style="padding-left: 0">
                 <li class="tabs__item ">
                     <a href="{{ route('customer.dashboard') }}"
@@ -23,7 +23,7 @@
                     </li>
                 @endif
             </ul>
-            <div>
+            <div style="width: min-content">
                 <form action="{{route('customer.payment_registration_submit')}}" class="text-center"
                       method="post">
                     @csrf
@@ -32,7 +32,8 @@
                         <input class="mb-2" id="bank_payment" type="number" name="bank_payment">
                         <br>
                         <label for="full_name">{{Cache::get('dashboardStatics'.session()->get('locale'))['Sender']}}({{Cache::get('dashboardStatics'.session()->get('locale'))['Full Name']}})</label>
-                        <input id="full_name" type="text" name="full_name">
+                        <input  id="full_name" type="text" name="full_name">
+                        <br>
                         <br>
                         <button style="border: none;border-radius: 5px;padding: 10px;background: #2f5496;color: white"
                                 class="mt-2">
@@ -40,19 +41,20 @@
                         </button>
                     </div>
                 </form>
-                @if($pending)
-                    <p>Pending: <span style="color: blue"> ${{ $pending }} </span>
-                        <span style="color: blue">
-                            {{Cache::get('dashboardStatics'.session()->get('locale'))['payment_confirmation']}}
 
-                        </span>
-                    </p>
-                @endif
-                <p>{{Cache::get('dashboardStatics'.session()->get('locale'))['Deposit']}} :<span style="color: green"> ${{ $balance }}</span></p>
             </div>
         </div>
     </div>
 </div>
+@if($pending)
+    <p class="text-center mt-3">Pending: <span style="color: blue"> ${{ $pending }} </span>
+        <span style="color: blue">
+                            {{Cache::get('dashboardStatics'.session()->get('locale'))['payment_confirmation']}}
+                        </span>
+    </p>
+@endif
+<p class="text-center">{{Cache::get('dashboardStatics'.session()->get('locale'))['Deposit']}} :<span style="color: green"> ${{ $balance }}</span></p>
+
 <div class="d-flex justify-content-center">
     @session('error')
     <p class="alert alert-danger mb-0">{{ session('error') }}</p>

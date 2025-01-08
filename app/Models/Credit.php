@@ -32,13 +32,4 @@ class Credit extends Model
     }
 
 
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope('order', function (Builder $builder) {
-            $builder->orderBy('issue_or_payment_date', 'asc');
-        });
-    }
 }

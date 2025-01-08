@@ -1,5 +1,22 @@
 @extends('frontend.layout.app')
 
+@php
+    $aboutStatics=Cache::get('aboutStatics'.session()->get('locale'));
+
+     if($aboutStatics===null){
+
+         $data=[
+             'About us'=> $tr->translate('About us'),
+
+         ];
+
+         Cache::forever('aboutStatics'.session()->get('locale'), $data);
+         $aboutStatics=Cache::get('aboutStatics'.session()->get('locale'));
+
+     }
+ @endphp
+
+
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
         data-background="https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg"
@@ -7,7 +24,7 @@
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 50px;">{!! $tr->translate('About us') !!}</h2>
+                <h2 style="margin-top: 50px;">{{ $aboutStatics['About us'] }}</h2>
             </div>
         </div>
     </section>
@@ -18,7 +35,7 @@
                     <div class="ft-blog-details-item">
                         <div class="blog-details-text headline">
                             <article>
-                                {!! $tr->translate($settings->value) !!}
+                                {!! $translated !!}
                             </article>
                         </div>
                     </div>

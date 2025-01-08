@@ -64,6 +64,13 @@
                                                         <input required style="max-width: 100px"  type="number" name="price"
                                                                placeholder="Price" class="form-control mb-3 ml-2">
                                                     </div>
+                                                    <div style="display: flex" class="flex">
+                                                        <select name="state_id" id="" class="form-control text-center">
+                                                            @foreach($states as $state)
+                                                                <option value="{{$state->id}}">{{$state->name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger" data-dismiss="modal">
@@ -134,6 +141,13 @@
                                                                                     <label class="control-label">Price</label>
                                                                                     <input name="price" min="1" type="number"
                                                                                            class="form-control" value="{{$port->price}}">
+                                                                                </div>
+                                                                                <div  class="col-md-8 ">
+                                                                                    <select name="state_id" id="" class="form-control text-center">
+                                                                                        @foreach($states as $state)
+                                                                                            <option @selected($state->id===$port->state_id) value="{{$state->id}}">{{$state->name}}</option>
+                                                                                        @endforeach
+                                                                                    </select>
                                                                                 </div>
 
                                                                                 <div class="col-md-12 form-group user-form-group mt-3">

@@ -11,9 +11,7 @@
     </div>
     <p class="text-center">Text</p>
     <!-- Hidden Textarea -->
-    <textarea style="display: none" name="setting_value" id="quill_content{{$key}}">
-        {{ $setting->value }}
-    </textarea>
+    <textarea style="display: none" name="setting_value" id="quill_content{{$key}}">{{ $setting->value }}</textarea>
     <!-- Quill Editor -->
     <div id="editor{{$key}}"></div>
 </div>
@@ -21,8 +19,21 @@
 <script>
     // Initialize Quill editor
      quill{{$key}} = new Quill('#editor{{$key}}', {
-        theme: 'snow'
-    });
+         modules: {
+             toolbar: [
+                 [{header: [1, 2, false]}],
+                 [{size: ['small', 'large', 'huge']}],
+                 ['bold', 'italic', 'underline', 'strike'],
+                 ['blockquote'],
+                 ['link', 'image', 'video'],
+                 [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                 [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                 [{ 'align': [] }],
+             ],
+         },
+         placeholder: 'Compose an epic...',
+         theme: 'snow', // or 'bubble'
+     });
 
     // Get the textarea
      textarea{{$key}} = document.getElementById('quill_content{{$key}}');

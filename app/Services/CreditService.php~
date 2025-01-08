@@ -236,7 +236,7 @@ class CreditService
                 $cr->accrued_percent = $accruedPercent;
                 $cr->credit_days     = $creditDays;
                 $cr->save();
-                $car->amount_due = round($creditAmount );
+                $car->amount_due = $creditAmount;
                 $car->save();
             }
         }

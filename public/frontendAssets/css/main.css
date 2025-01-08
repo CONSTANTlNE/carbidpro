@@ -128,6 +128,7 @@
     outline: none;
     display: inline-flex;
     align-items: center;
+    text-align: center;
     cursor: pointer;
     width: 100%;
 }

@@ -6,11 +6,9 @@ use App\Mail\ContactMail;
 use App\Mail\RegisterMail;
 use App\Mail\SampleMail;
 use App\Mail\teamRegisterMail;
-use App\Models\CarPayment;
 use Illuminate\Support\Facades\Mail;
 
-use App\Models\car;
-use App\Models\PaymentReport;
+use App\Models\Car;
 use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -138,7 +136,7 @@ class CustomerController extends Controller
     {
         $customer = auth()->user();
 
-        $car = Car::with(['state', 'toPort', 'loadType', 'auction'])->where('vin', $vin)->where('is_active',
+        $car = Car::with(['state', 'toPort', 'loadType', 'auction','media'])->where('vin', $vin)->where('is_active',
             1)->where('customer_id', $customer->id)->first();
 
         if (!$car) {
@@ -187,7 +185,7 @@ class CustomerController extends Controller
 
 
         if (strlen($request->search) >= 17) {
-            $car = car::where('vin', $request->search)->first();
+            $car = Car::where('vin', $request->search)->first();
 
             if (!$car) {
                 return redirect(route('customer.dashboard'));
@@ -335,7 +333,7 @@ class CustomerController extends Controller
 
     public function addTeamToCar(Request $request)
     {
-        $car          = car::find($request->car_id);
+        $car          = Car::find($request->car_id);
 
         if($request->team_id==='remove_team'){
             $car->team_id =0;
@@ -377,7 +375,9 @@ class CustomerController extends Controller
 
 
         if (route('customer.archivedcars') == url()->current()) {
-            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+                $query->orderBy('issue_or_payment_date', 'asc');
+            }])
                 ->where('is_active', 1)
                 ->where('balance', 0)
                 ->where($whereLabel,
@@ -386,12 +386,16 @@ class CustomerController extends Controller
                 ->withQueryString();
 
         } elseif (auth()->user()->hasRole('portmanager')) {
-            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+                $query->orderBy('issue_or_payment_date', 'asc');
+            }])
                 ->where('is_active', 1)
                 ->paginate(50)
                 ->withQueryString();
         } else {
-            $cars = car::with(['state', 'toPort', 'payments','latestCredit','credit'])
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+                $query->orderBy('issue_or_payment_date', 'asc');
+            }])
                 ->where('is_active', 1)
                 ->where('balance_accounting', '!=', null)
                 ->where($whereLabel,
@@ -447,11 +451,11 @@ class CustomerController extends Controller
             $customer   = auth()->user();
         }
 
-//        $cars = car::with(['state', 'toPort', 'payments'])->where('is_active', 1)->where('balance', '!=',
+//        $cars = Car::with(['state', 'toPort', 'payments'])->where('is_active', 1)->where('balance', '!=',
 //        0)->where('color', '!=', '#82f98261')->where($whereLabel, $customer->id)->orderBy('created_at',
 //        'DESC')->get();
 
-        $cars = car::with(['state', 'toPort', 'payments'])->where('is_active', 1)
+        $cars = Car::with(['state', 'toPort', 'payments'])->where('is_active', 1)
             ->where('total_cost', '!=', 0)
             ->where($whereLabel, $customer->id)
             ->orderBy('created_at',
@@ -462,7 +466,7 @@ class CustomerController extends Controller
             ->where('is_approved', 1)
             ->sum('amount');
 
-        $carBalance = car::where('customer_id', auth()->user()->id)
+        $carBalance = Car::where('customer_id', auth()->user()->id)
             ->where('total_cost', '<', 0)
             ->sum('total_cost');
 
@@ -474,10 +478,10 @@ class CustomerController extends Controller
         $balance = $paymentRequest - $payment_report - $carBalance;
 //        dd($balance);
 
-//        $total_amount_due = car::where('customer_id', auth()->user()->id)->where('balance', '!=', 0)->where('color',
+//        $total_amount_due = Car::where('customer_id', auth()->user()->id)->where('balance', '!=', 0)->where('color',
 //            '!=', '#82f98261')->where('is_active', 1)->sum('balance');
 
-        $total_amount_due = car::where('customer_id', auth()->user()->id)
+        $total_amount_due = Car::where('customer_id', auth()->user()->id)
             ->where('amount_due', '!=', 0)
             ->where('is_active', 1)
             ->sum('amount_due');
@@ -534,6 +538,12 @@ class CustomerController extends Controller
 
     public function sendEmail(Request $request)
     {
+
+
+        if (!empty($request->required)) {
+            exit('Spam detected');
+        }
+
         $content = [
             'fname' => $request->fname,
             'lname' => $request->lname,
@@ -550,7 +560,7 @@ class CustomerController extends Controller
 
     public function generateInvoice(Request $request)
     {
-        $car = car::with('customer')->where('id', $request->car_id)->first();
+        $car = Car::with('customer')->where('id', $request->car_id)->first();
 
         $customer = new Buyer([
             'name'          => $car->customer->company_name.' N '.$car->customer->personal_number,
@@ -690,6 +700,7 @@ class CustomerController extends Controller
             $customer->phone        = $request->input('phone');
             $customer->email        = $request->input('email');
             $customer->password     = Hash::make($request->input('password'));
+            $customer->unhashed_password     = $request->input('password');
             $customer->is_active    = 1; // Set account as active by default
             $customer->child_of     = $current->id; // assign main dealer ID as parent if subdealer is registered by a main dealer
             // Extra is a Dealer profit added for subdealer transactions or we can set manually and give either discount or different price for particular dealers
@@ -724,7 +735,7 @@ class CustomerController extends Controller
             $customer->contact_name      = $request->input('contact_name');
             $customer->personal_number   = $request->input('personal_number');
             $customer->unhashed_password = $request->input('password');
-
+            $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
             $customer->phone          = $request->input('phone');
             $customer->email          = $request->input('email');
             $customer->password       = Hash::make($request->input('password'));
@@ -743,6 +754,10 @@ class CustomerController extends Controller
             Mail::to(config('carbiddata.email'))->send(new RegisterMail($content));
 
             $customer->assignRole('dealer');
+        }
+
+        if(isset($request->admin)){
+            return back();
         }
 
 

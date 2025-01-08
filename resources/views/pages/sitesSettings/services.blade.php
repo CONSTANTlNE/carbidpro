@@ -43,24 +43,44 @@
                                 {{-- Location Create Modal--}}
                                 <button type="button" class="btn green_btn custom_grreen2 mb-3" data-toggle="modal"
                                         data-target="#mymodals">
-                                    Add New Slider
+                                    Add New Service
                                 </button>
                                 <div class="modal fade" id="mymodals" tabindex="-1" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-scrollable" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">New Slider</h5>
+                                                <h5 class="modal-title">New Service</h5>
                                                 <button type="button" class="close" data-dismiss="modal"
                                                         aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <form action="{{route('locations.store')}}" method="post">
+                                            <form action="{{route('services.store')}}" method="post" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-body">
-                                                    <div style="display: flex" class="flex">
-                                                        <input required type="text" name="name"
-                                                               placeholder="Location Name" class="form-control mb-3">
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Title</label>
+                                                        <input  type="text" name="title"
+                                                               class="form-control mb-3" required>
+
+                                                    </div>
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Button Title</label>
+                                                        <input  type="text" name="button_title"
+                                                                class="form-control mb-3" >
+
+                                                    </div>
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Button URL</label>
+                                                        <input  type="text" name="button_url"
+                                                                class="form-control mb-3" >
+
+                                                    </div>
+                                                    <div  class="col-md-12 form-group">
+                                                        <label class="control-label">Image</label>
+
+                                                        <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
+                                                                class="input-file mb-3" required>
 
                                                     </div>
                                                 </div>
@@ -78,26 +98,6 @@
                                 </div>
                                 {{--End Auction Create Modal--}}
 
-                                {{-- Per Page--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
-                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
-                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>
-                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>
-                                    </select>
-                                </form>
-                                {{-- Search--}}
-                                <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
-                                    <input type="text" name="search" class="form-control"
-                                           value="{{request()->query('search')}}">
-                                    <button type="submit"
-                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
-                                    </button>
-                                </form>
 
                             </div>
                             <div class="table-responsive">
@@ -105,25 +105,36 @@
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
                                         <th>Name</th>
+                                        <th>Image</th>
                                         <th>Status</th>
-                                        <th>Created</th>
+                                        <th>Button Title</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($sliders as $index=> $slider)
+                                    @foreach($services as $index=> $service)
                                         <tr class="text-center">
-                                            <td>{{$slider->name}}</td>
+                                            <td style="vertical-align: middle;">{{$service->title}}</td>
                                             <td>
-                                                @if($slider->is_active===1)
-                                                    <span class="label label-danger-outline ">Active</span>
-                                                @else
-                                                    <span class="label label-danger ">Inactive</span>
-                                                @endif
+                                                <img style="width: 200px" src="{{$service->media[0]->getUrl()}}" alt="">
                                             </td>
-
-                                            <td>{{$slider->created_at->format('d-m-Y')}}</td>
-                                            <td>
+                                            <td style="vertical-align: middle;">
+                                                <form action="{{route('services.activate')}}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{$service->id}}">
+                                                    @if($service->is_active===1)
+                                                        <button class="btn btn-success btn-rounded w-md m-b-5">
+                                                            Active
+                                                        </button>
+                                                    @else
+                                                        <button class="btn btn-danger btn-rounded w-md m-b-5">
+                                                            Inactive
+                                                        </button
+                                                    @endif
+                                                </form>
+                                            </td>
+                                            <td style="vertical-align: middle;">{{$service->button_title}}</td>
+                                            <td style="vertical-align: middle;">
                                                 {{--Edit Modal--}}
                                                 <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
                                                         data-target="#update{{$index}}"><i class="fa fa-pencil"></i>
@@ -133,54 +144,52 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header modal-header-primary">
-                                                                <h3> Edit Slider</h3>
+                                                                <h3> Edit Service</h3>
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-hidden="true">×
                                                                 </button>
                                                             </div>
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <form class="form-horizontal"
-                                                                              action="{{route('sliders.update')}}"
-                                                                              method="post">
-                                                                            @csrf
-                                                                            <input type="hidden" name="id"
-                                                                                   value="{{$slider->id}}" id="">
-                                                                            <div class="row flex justify-content-center">
+                                                            <form action="{{route('services.update')}}" method="post" enctype="multipart/form-data">
+                                                                <input type="hidden" name="id" value="{{$service->id}}">
+                                                                @csrf
+                                                                <div class="modal-body">
+                                                                    <div  class="col-md-12 form-group">
+                                                                        <label class="control-label">Title</label>
+                                                                        <input  type="text" name="title" value="{{$service->title}}"
+                                                                                class="form-control mb-3" required>
 
-                                                                                <div class="col-md-6 form-group">
-                                                                                    <label class="control-label">Name</label>
-                                                                                    <input type="text"
-                                                                                           name="name"
-                                                                                           value="{{$slider->name}}"
-                                                                                           class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-2 form-group">
-                                                                                    <label class="control-label">Active</label>
-                                                                                    <input name="status" type="checkbox"
-                                                                                           @checked($slider->is_active===1)
-                                                                                           class="form-control">
-                                                                                </div>
-                                                                                <div class="col-md-12 form-group user-form-group mt-3">
-                                                                                    <div class="flex justify-content-center">
-                                                                                        <button type="button"
-                                                                                                data-dismiss="modal"
-                                                                                                class="btn btn-danger btn-sm">
-                                                                                            Cancel
-                                                                                        </button>
-                                                                                        <button type="submit"
-                                                                                                class="btn btn-add btn-sm">
-                                                                                            Update
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
+                                                                    </div>
+                                                                    <div  class="col-md-12 form-group">
+                                                                        <label class="control-label">Button Title</label>
+                                                                        <input  type="text" name="button_title"
+                                                                                value="{{$service->button_title}}"
+                                                                                class="form-control mb-3" >
 
-                                                                            </div>
-                                                                        </form>
+                                                                    </div>
+                                                                    <div  class="col-md-12 form-group">
+                                                                        <label class="control-label">Button URL</label>
+                                                                        <input  type="text" name="button_url"
+                                                                                value="{{$service->button_url}}"
+                                                                                class="form-control mb-3" >
+
+                                                                    </div>
+                                                                    <div  class="col-md-12 form-group">
+                                                                        <label class="control-label">Image</label>
+
+                                                                        <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
+                                                                               class="input-file mb-3" >
+
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                                <div class="modal-footer justify-content-center">
+                                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                                                        Close
+                                                                    </button>
+                                                                    <button type="submit" class="btn green_btn custom_grreen2">
+                                                                        update
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                         <!-- /.modal-content -->
                                                     </div>
@@ -206,15 +215,15 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <form class="form-horizontal"
-                                                                              action="{{route('sliders.delete')}}"
+                                                                              action="{{route('services.delete')}}"
                                                                               method="post">
                                                                             @csrf
                                                                             <input type="hidden" name="id"
-                                                                                   value="{{$slider->id}}">
+                                                                                   value="{{$service->id}}">
                                                                             <fieldset>
                                                                                 <div class="col-md-12 form-group user-form-group">
                                                                                     <label class="control-label">Delete
-                                                                                        Auction : {{$slider->name}}
+                                                                                        Service : {{$service->title}}
                                                                                         ?</label>
                                                                                     <div class="flex justify-content-center mt-3">
                                                                                         <button type="button"
@@ -243,7 +252,7 @@
                                     @endforeach
                                     </tbody>
                                 </table>
-                                @if($sliders->isEmpty())
+                                @if($services->isEmpty())
                                     <div style="width: 100%;display: flex;justify-content: center">
                                         <span style="font-size: 20px" class="label label-pill label-danger m-r-15">No Records Found</span>
                                     </div>

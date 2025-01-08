@@ -1,13 +1,49 @@
 @extends('frontend.layout.app')
 
+@php
+
+
+//                     Cache::forget('addTeamStaticsen');
+//                     Cache::forget('addTeamStaticsru');
+
+       $editTeamStatics=Cache::get('editTeamStatics'.session()->get('locale'));
+
+                 if($editTeamStatics===null){
+
+                     $data=[
+                         'Add Team'=>$tr->translate('Add Team'),
+                         'Role'=>$tr->translate('Role'),
+                         'Contact Name'=>$tr->translate('Contact Name'),
+                         'Dealer'=>$tr->translate('Dealer'),
+                         'Enter your contact name'=>$tr->translate('Enter your contact name'),
+                         'Email Address'=>$tr->translate('Email Address'),
+                         'Enter your email address'=>$tr->translate('Enter your email address'),
+                         'Phone'=>$tr->translate('Phone'),
+                         'Enter your Phone'=>$tr->translate('Enter your Phone'),
+                         'Extra for Calculator'=>$tr->translate('Extra for Calculator'),
+                         'Enter your Extra'=>$tr->translate('Enter your Extra'),
+                         'Enter a strong password'=>$tr->translate('Enter a strong password'),
+                         'Password'=>$tr->translate('Password'),
+                         'Confirm Password'=>$tr->translate('Confirm Password'),
+                         'Confirm your password'=>$tr->translate('Confirm your password'),
+                         'Add'=>$tr->translate('Add'),
+                         'Update'=>$tr->translate('Update'),
+                     ];
+
+                     Cache::forever('editTeamStatics'.session()->get('locale'), $data);
+                     $editTeamStatics=Cache::get('editTeamStatics'.session()->get('locale'));
+                 }
+
+@endphp
+
+
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-        data-background="/assets/images/cargo.jpeg" style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
+        data-background="/frontendAssets/images/cargo.jpeg" style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{!! $tr->translate('Add Team') !!}</h2>
-
+                <h2 style="margin-top: 80px;padding: 0;">{{$editTeamStatics['Add Team']}}</h2>
             </div>
         </div>
     </section>
@@ -15,7 +51,6 @@
         <div class="row">
             <div class="col-lg-12">
                 <br>
-
                 <div class="auth_page_wrapper">
 
                     @if ($errors->any())
@@ -39,48 +74,48 @@
 
 
                         <div class="form-group mb-3">
-                            <label for="">{!! $tr->translate('Role') !!}</label> <br>
+                            <label for="">{{$editTeamStatics['Role']}}</label> <br>
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" value="dealer" checked id="yes" name="role"
                                     class="custom-control-input">
-                                <label class="custom-control-label" for="yes">{!! $tr->translate('Dealer') !!}</label>
+                                <label class="custom-control-label" for="yes">{{$editTeamStatics['Dealer']}}</label>
                             </div>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="contact_name">{!! $tr->translate('Contact Name') !!}</label>
+                            <label for="contact_name">{{$editTeamStatics['Contact Name']}}</label>
                             <input type="text" value="{{ $team->contact_name }}" class="form-control" id="contact_name"
-                                name="contact_name" placeholder="{!! $tr->translate('Enter your contact name') !!}" required>
+                                name="contact_name" placeholder="{{$editTeamStatics['Enter your contact name']}}" required>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="email">{!! $tr->translate('Email Address') !!} </label>
+                            <label for="email">{{$editTeamStatics['Email Address']}} </label>
                             <input type="email" value="{{ $team->email }}" class="form-control" id="email"
-                                name="email" placeholder="{!! $tr->translate('Enter your email address') !!}" required>
+                                name="email" placeholder="{{$editTeamStatics['Enter your email address']}}" required>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="phone">{!! $tr->translate('Phone') !!} </label>
+                            <label for="phone">{{$editTeamStatics['Phone']}}</label>
                             <input type="tel" value="{{ $team->phone }}" class="form-control" id="phone"
-                                name="phone" placeholder="{!! $tr->translate('Enter your Phone') !!}" required>
+                                name="phone" placeholder="{{$editTeamStatics['Enter your Phone']}}" required>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="extra_for_team">{!! $tr->translate('Extra for Calculator') !!} </label>
+                            <label for="extra_for_team">{{$editTeamStatics['Extra for Calculator']}} </label>
                             <input type="number" class="form-control" id="extra_for_team" name="extra_for_team"
-                                placeholder="{!! $tr->translate('Enter your Extra') !!}" value="{{ $team->extra_for_team }}">
+                                placeholder="{{$editTeamStatics['Enter your Extra']}}" value="{{ $team->extra_for_team }}">
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="password">{!! $tr->translate('Password') !!}</label>
+                            <label for="password">{{$editTeamStatics['Password']}} </label>
                             <input type="password" class="form-control" id="password" name="password"
-                                placeholder="{!! $tr->translate('Enter a strong password') !!}" required>
+                                placeholder="{{$editTeamStatics['Enter a strong password']}}" required>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="password_confirmation">{!! $tr->translate('Confirm Password') !!}"</label>
+                            <label for="password_confirmation">{{$editTeamStatics['Confirm Password']}}</label>
                             <input type="password" class="form-control" id="password_confirmation"
-                                name="password_confirmation" placeholder="{!! $tr->translate('Confirm your password') !!}" required>
+                                name="password_confirmation" placeholder="{{$editTeamStatics['Confirm your password']}}" required>
                         </div>
                         <div class="form-group mb-3">
                             <label for="">Is Active</label> <br>
@@ -98,7 +133,7 @@
                         </div>
 
 
-                        <button type="submit" class="btn btn-primary">{!! $tr->translate('Update') !!}</button>
+                        <button type="submit" class="btn btn-primary">{{$editTeamStatics['Update']}}</button>
 
                     </form>
                 </div>

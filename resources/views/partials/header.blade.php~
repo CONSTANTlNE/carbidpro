@@ -33,7 +33,7 @@
                                     <div class="menues">
                                         <p>
                                             <i class="fa fa-dot-circle-o color-red"></i>
-                                           Deposit : {{$balancecomposer->customer->contact_name}} - {{$balancecomposer->amount}}
+                                            {{$balancecomposer->customer->contact_name}} - {{$balancecomposer->amount}}
                                         </p>
                                     </div>
                                 </a>

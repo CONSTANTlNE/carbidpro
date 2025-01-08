@@ -21,6 +21,8 @@
                 ];
 
                 Cache::forever('headerStatics'.session()->get('locale'), $data);
+                $headerStatics=Cache::get('headerStatics'.session()->get('locale'));
+
             }
 
 @endphp
@@ -45,20 +47,20 @@
                                 <li>
 
 
-                                    <a href="/">{{ Cache::get('headerStatics' . session()->get('locale'))['Home'] }}
+                                    <a href="/">{{ $headerStatics['Home'] }}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/about">{{ Cache::get('headerStatics' . session()->get('locale'))['About us'] }}</a>
+                                    <a href="/about">{{ $headerStatics['About us'] }}</a>
                                 </li>
                                 <li>
-                                    <a href="/announcements">{{ Cache::get('headerStatics' . session()->get('locale'))['Announcements'] }}</a>
+                                    <a href="/announcements">{{$headerStatics['Announcements'] }}</a>
                                 </li>
                                 <li>
-                                    <a href="/contact">{{ Cache::get('headerStatics' . session()->get('locale'))['Contact'] }}</a>
+                                    <a href="/contact">{{ $headerStatics['Contact'] }}</a>
                                 </li>
                                 <li>
-                                    <a href="/calculator">{{ Cache::get('headerStatics' . session()->get('locale'))['Calculator'] }}</a>
+                                    <a href="/calculator">{{ $headerStatics['Calculator'] }}</a>
                                 </li>
                                 <li class="{{ session()->has('auth') ? 'dropdown' : '' }}"
                                     style="background: #e2304e;padding: 9px;border-radius: 6px;">
@@ -68,22 +70,22 @@
 
                                         <div class="dropdown-menu dropdown-menu-end">
                                             <a href="{{ route('customer.dashboard') }}" class="dropdown-item">
-                                                {{ Cache::get('headerStatics' . session()->get('locale'))['My cars'] }}
+                                                {{ $headerStatics['My cars'] }}
                                             </a>
                                             @if (auth()->user() && !auth()->user()->hasRole('portmanager'))
                                                 @if (session()->get('auth')->parent_of <= 0)
                                                     <a href="{{ route('customer.teamList') }}" class="dropdown-item">
-                                                        {{ Cache::get('headerStatics' . session()->get('locale'))['Add Team'] }}
+                                                        {{ $headerStatics['Add Team'] }}
                                                     </a>
                                                 @endif
                                             @endif
 
                                             <div class="dropdown-divider"></div>
                                             <a href="{{ route('customer.logout') }}"
-                                               class="dropdown-item">{{ Cache::get('headerStatics' . session()->get('locale'))['Logout'] }}</a>
+                                               class="dropdown-item">{{ $headerStatics['Logout'] }}</a>
                                         </div>
                                     @else
-                                        <a href="{{ route('customer.login.get') }}">{{ Cache::get('headerStatics' . session()->get('locale'))['Login'] }}</a>
+                                        <a href="{{ route('customer.login.get') }}">{{ $headerStatics['Login'] }}</a>
                                     @endif
                                 </li>
 
@@ -117,20 +119,20 @@
                             <nav class="mobile-main-navigation  clearfix ul-li">
                                 <ul id="m-main-nav" class="navbar-nav text-capitalize clearfix">
                                     <li>
-                                        <a href="/">{{ Cache::get('headerStatics' . session()->get('locale'))['Home'] }}
+                                        <a href="/">{{ $headerStatics['Home'] }}
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/about">{{ Cache::get('headerStatics' . session()->get('locale'))['About us'] }}</a>
+                                        <a href="/about">{{ $headerStatics['About us'] }}</a>
                                     </li>
                                     <li>
-                                        <a href="/announcements">{{ Cache::get('headerStatics' . session()->get('locale'))['Announcements'] }}</a>
+                                        <a href="/announcements">{{$headerStatics['Announcements'] }}</a>
                                     </li>
                                     <li>
-                                        <a href="/contact">{{ Cache::get('headerStatics' . session()->get('locale'))['Contact'] }}</a>
+                                        <a href="/contact">{{ $headerStatics['Contact'] }}</a>
                                     </li>
                                     <li>
-                                        <a href="/calculator">{{ Cache::get('headerStatics' . session()->get('locale'))['Calculator'] }}
+                                        <a href="/calculator">{{ $headerStatics['Calculator'] }}
                                             }</a></li>
                                     <li class="{{ session()->has('auth') ? 'dropdown' : '' }}"
                                         style="">
@@ -151,11 +153,11 @@
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="{{ route('customer.logout') }}"
-                                                   class="dropdown-item">{{ Cache::get('headerStatics' . session()->get('locale'))['Logout'] }}</a>
+                                                   class="dropdown-item">{{ $headerStatics['Logout'] }}</a>
                                             </div>
                                         @else
                                             <a
-                                                    href="{{ route('customer.login.get') }}">{{ Cache::get('headerStatics' . session()->get('locale'))['Login'] }}</a>
+                                                    href="{{ route('customer.login.get') }}">{{$headerStatics['Login'] }}</a>
                                         @endif
                                     </li>
 

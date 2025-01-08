@@ -61,7 +61,7 @@
                                                     <div style="display: flex" class="flex">
                                                         <input required type="text" name="name"
                                                                placeholder="Location Name" class="form-control mb-3">
-                                                        <input required style="max-width: 100px"  type="number" name="price"
+                                                        <input required style="max-width: 100px"  type="number" min="1" name="price"
                                                                placeholder="Price" class="form-control mb-3 ml-2">
                                                     </div>
                                                     <input style="padding-top: 3px!important;" type="file" name="icon"
@@ -82,31 +82,32 @@
                                 {{--End Auction Create Modal--}}
 
                                 {{-- Per Page--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
-                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
-                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>
-                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>
-                                    </select>
-                                </form>
+{{--                                <form action="{{route('locations.index')}}">--}}
+{{--                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""--}}
+{{--                                            onchange="this.form.submit()">--}}
+{{--                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>--}}
+{{--                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>--}}
+{{--                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>--}}
+{{--                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>--}}
+{{--                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>--}}
+{{--                                    </select>--}}
+{{--                                </form>--}}
                                 {{-- Search--}}
-                                <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
-                                    <input type="text" name="search" class="form-control"
-                                           value="{{request()->query('search')}}">
-                                    <button type="submit"
-                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
-                                    </button>
-                                </form>
+{{--                                <form style="display: flex!important;" class="ml-3 "--}}
+{{--                                      action="{{route('locations.index')}}">--}}
+{{--                                    <input type="text" name="search" class="form-control"--}}
+{{--                                           value="{{request()->query('search')}}">--}}
+{{--                                    <button type="submit"--}}
+{{--                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search--}}
+{{--                                    </button>--}}
+{{--                                </form>--}}
                             </div>
                             <div class="table-responsive">
                                 <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
                                         <th>Name</th>
+                                        <th>Image</th>
                                         <th>price</th>
                                         <th>Created</th>
                                         <th>Action</th>
@@ -115,10 +116,13 @@
                                     <tbody>
                                     @foreach($loadTypes as $index=> $type)
                                         <tr class="text-center">
-                                            <td>{{$type->name}}</td>
-                                            <td>{{$type->price}}</td>
-                                            <td>{{$type->created_at->format('d-m-Y')}}</td>
+                                            <td style="vertical-align: middle">{{$type->name}}</td>
                                             <td>
+                                                <img style="width: 100px" src=" {{ Storage::url($type->icon) }}" alt="">
+                                            </td>
+                                            <td style="vertical-align: middle">{{$type->price}}</td>
+                                            <td style="vertical-align: middle">{{$type->created_at->format('d-m-Y')}}</td>
+                                            <td style="vertical-align: middle">
                                                 {{--Edit Modal--}}
                                                 <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
                                                         data-target="#update{{$index}}"><i class="fa fa-pencil"></i>
@@ -138,7 +142,7 @@
                                                                     <div class="col-md-12">
                                                                         <form class="form-horizontal"
                                                                               action="{{route('load-types.update')}}"
-                                                                              method="post">
+                                                                              method="post" enctype="multipart/form-data">
                                                                             @csrf
                                                                             <input type="hidden" name="id"
                                                                                    value="{{$type->id}}" id="">

@@ -30,8 +30,9 @@ class CarController extends Controller
         $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
         // Base query with eager loading
-        $cars = Car::with(['dispatch', 'customer', 'state', 'CarStatus', 'auction','credit','latestCredit']); // Keep eager loading for relationships
-        // Check if there is a search query
+        $cars = Car::with(['dispatch', 'customer', 'state', 'CarStatus', 'Auction', 'credit' => function ($query) {
+            $query->orderBy('issue_or_payment_date', 'asc');
+        }, 'latestCredit']);
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
 
@@ -74,7 +75,7 @@ class CarController extends Controller
         }
 
         // Select cars columns only to avoid ambiguity
-        $cars = $cars->with('Auction','credit','latestCredit')->paginate(50);
+        $cars = $cars->paginate(50);
 
         $car_status = CarStatus::with('cars')->withCount('cars')->get();
 
@@ -485,10 +486,11 @@ class CarController extends Controller
 
 
         // Handle images array
-        if ($request->has('images')) {
-            // Assuming images is a JSON field in the database
-            $car->images = json_encode($request->input('images'));
-        }
+
+//        if ($request->has('images')) {
+//            // Assuming images is a JSON field in the database
+//            $car->images = json_encode($request->input('images'));
+//        }
 
         $car->save();
 

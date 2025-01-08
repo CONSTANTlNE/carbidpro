@@ -55,7 +55,7 @@
                                     <div id="locationDropdown" class="dropdown"
                                          style="display: none; position: absolute;top:150px ;left: 49.5%; transform: translateX(-49.5%);z-index: 100000;   width: 498px; border: 1px solid #ccc; background: #fff; max-height: 500px; overflow-y: auto;">
                                         @foreach($locations as $location)
-                                            <p class="location-item" style="display: none">{{$location->name}}</p>
+                                            <p class="location-item text-center"  style="display: none">{{$location->name}}</p>
                                         @endforeach
                                     </div>
                                     <div class="modal-dialog modal-dialog-scrollable" role="document">
@@ -70,23 +70,21 @@
                                             <form action="{{route('shipping-prices.store')}}" method="post">
                                                 @csrf
                                                 <div class="modal-body" style="overflow: visible">
-                                                    <div style="display: flex;gap:20px">
-                                                        <input type="text" id="locationSearch" class="form-control"
-                                                               placeholder="Search Location"
-                                                               style="max-width: 150px; margin-bottom: 10px;">
+                                                    <input type="text" id="locationSearch" class="form-control text-center"
+                                                           placeholder="Search Location"
+                                                           style=" margin-bottom: 10px;">
+                                                    <div class="d-flex justify-content-center gap-3 mt-3 mb-4">
 
                                                         <select id="locationSelect" required name="location_id"
                                                                 style="max-width: 150px"
-                                                                class="form-control">
+                                                                class="form-control mr-2">
                                                             <option value="">From Location</option>
                                                             @foreach($locations as $location)
                                                                 <option class="options"
                                                                         value="{{$location->id}}">{{$location->name}}</option>
                                                             @endforeach
                                                         </select>
-                                                    </div>
 
-                                                    <div style="display: flex;gap:20px">
                                                         <select required name="port_id" style="width: 150px"
                                                                 class=" form-control">
                                                             <option value="">To Port</option>
@@ -94,12 +92,17 @@
                                                                 <option value="{{$port->id}}">{{$port->name}}</option>
                                                             @endforeach
                                                         </select>
+                                                    </div>
+
+                                                    <div class="d-flex justify-content-center">
+
                                                         <input style="width: 150px; " required type="number"
                                                                name="price"
+                                                               min="1"
                                                                placeholder="Price" class="form-control">
                                                     </div>
 
-                                                    <div style="display: flex;flex-wrap: wrap; gap: 10px;margin-top: 10px">
+                                                    <div class="d-flex justify-content-center gap-4 mt-3">
                                                         @foreach($auctions as $auction)
                                                             <div style="margin: 10px; width: 80px;">
                                                                 <label class="text-center">{{$auction->name}}</label>

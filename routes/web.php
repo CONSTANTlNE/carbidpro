@@ -2,12 +2,10 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnnouncementsController;
-use App\Http\Controllers\AnnouncmentController;
 use App\Http\Controllers\ArrivedController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\calculatorController;
 use App\Http\Controllers\CarController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\CustomerController;
@@ -23,24 +21,15 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserController;
-use App\Models\Car;
 use App\Models\Credit;
 use App\Models\CustomerBalance;
-use App\Models\Setting;
 use App\Models\State;
-use App\Services\SettingsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
-//
 
 Route::get('/lang/{locale}', function ($locale) {
     Session::put('locale', $locale);
@@ -50,39 +39,16 @@ Route::get('/lang/{locale}', function ($locale) {
 
 
 // FRONTEND ROUTES No Auth
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about', [HomeController::class, 'about']);
-Route::get('/terms-and-conditions', [HomeController::class, 'terms'])->name('terms');
-Route::get('/announcements', [AnnouncmentController::class, 'index']);
-Route::get('/contact', [ContactController::class, 'index']);
-
-
-Route::get('/privacy-and-policy', function (SettingsService $settings) {
-    if (Session::has('locale')) {
-        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
-        $tr->setSource('en'); // Translate from English
-        $tr->setSource(); // Detect language automatically
-        $tr->setTarget(Session::get('locale')); // Translate to Georgian
-    } else {
-        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
-        $tr->setSource('en'); // Translate from English
-        Session::put('locale', 'en');
-    }
-
-    return view('frontend.pages.privacy', compact('tr', 'settings'));
-})->name('privacy');
-Route::get('/create-setting', function () {
-    Setting::create([
-        'key'   => 'privacy',
-        'label' => 'Privacy',
-        'value' => null,
-        'type'  => 'textarea',
-    ]);
-})->name('st');
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/',  'index')->name('home');
+    Route::get('/about',  'about');
+    Route::get('/terms-and-conditions',  'terms')->name('terms');
+    Route::get('/announcements',  'announcements');
+    Route::get('/contact', 'contact');
+});
 
 Route::get('/calculator', [calculatorController::class, 'index']);
 Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
-Route::post('/send-email', [CustomerController::class, 'sendEmail'])->name('sendEmail');
 
 
 // Customers / Dealers Login-registration
@@ -95,37 +61,38 @@ Route::prefix('dealer')->group(function () {
         Route::get('/logout', 'logout')->name('customer.logout');
         Route::get('/search', 'searchResult')->name('customer.searchResult');
         Route::get('/download-images/{vin}', 'download')->name('customer.download_images');
+        Route::post('/send-email',  'sendEmail')->name('sendEmail');
     });
 });
 
 
 // =======  ADMIN ROUTES  ========
+Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function () {
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-Route::middleware('auth')->group(function () {
     // Users
     Route::controller(UserController::class)->group(function () {
-        Route::get('/dashboard/users', 'index')->name('users.index');
-        Route::post('/dashboard/users', 'store')->name('users.store');
-        Route::post('/dashboard/users/{user}', 'update')->name('users.update');
-        Route::delete('/dashboard/users/{user}', 'destroy')->name('users.destroy');
+        Route::get('/users', 'index')->name('users.index');
+        Route::post('/users', 'store')->name('users.store');
+        Route::post('/users/{user}', 'update')->name('users.update');
+        Route::delete('/users/{user}', 'destroy')->name('users.destroy');
     });
 
     // Cars
     Route::controller(CarController::class)->group(function () {
-        Route::get('/dashboard/cars', 'index')->name('cars.index');
-        Route::get('/dashboard/car/create', 'create')->name(name: 'car.create');
-        Route::post('/dashboard/car/create', 'store')->name(name: 'car.store');
-        Route::get('/dashboard/car/edit/{id}', 'edit')->name(name: 'car.edit');
-        Route::post('/dashboard/car/edit/{id}', 'update')->name(name: 'car.update');
-        Route::post('/dashboard/car/list-update/{id}', 'listUpdate')->name(name: 'car.listupdate');
-        Route::post('/dashboard/car/update', 'listUpdate')->name(name: 'car.updateByid');
-        Route::get('/dashboard/cars/status/{slug}', 'showStatus')->name(name: 'car.showStatus');
+        Route::get('/cars', 'index')->name('cars.index');
+        Route::get('/car/create', 'create')->name(name: 'car.create');
+        Route::post('/car/create', 'store')->name(name: 'car.store');
+        Route::get('/car/edit/{id}', 'edit')->name(name: 'car.edit');
+        Route::post('/car/edit/{id}', 'update')->name(name: 'car.update');
+        Route::post('/car/list-update/{id}', 'listUpdate')->name(name: 'car.listupdate');
+        Route::post('/car/update', 'listUpdate')->name(name: 'car.updateByid');
+        Route::get('/cars/status/{slug}', 'showStatus')->name(name: 'car.showStatus');
 //        Route::delete('/dashboard/car/{user}', 'destroy')->name('car.destroy');
-        Route::post('/dashboard/car/delete', 'destroy')->name('car.destroy');
+        Route::post('/car/delete', 'destroy')->name('car.destroy');
         Route::post('/calculate-shipping-cost', 'calculateShippingCost')->name('calculate.shipping.cost');
         Route::post('/fetch-locations', 'fetchLocations')->name('fetch.locations');
         Route::post('/fetch-ports', 'fetchPorts')->name('fetch.ports');
@@ -136,55 +103,55 @@ Route::middleware('auth')->group(function () {
 
     // Containers
     Route::controller(ContainerController::class)->group(function () {
-        Route::post('/dashboard/container/group-create', 'groupSelectedCars')->name(name: 'container.selected');
-        Route::post('/dashboard/container/create', 'store')->name(name: 'container.store');
-        Route::get('/dashboard/container/edit/{id}', 'edit')->name(name: 'container.edit');
-        Route::post('/dashboard/container/edit/{id}', 'update')->name(name: 'container.update');
-        Route::post('/dashboard/container/list-update', 'listUpdate')->name(name: 'container.listupdate');
-        Route::get('/dashboard/containers/status/{slug}', 'showStatus')->name(name: 'container.showStatus');
-        Route::post('/dashboard/containers/update/group', 'updateGroup')->name(name: 'container.updateGroup');
-        Route::post('/dashboard/containers/send-email', 'sendEmail')->name(name: 'container.sendEmail');
-        Route::post('/dashboard/containers/get-avaliable-cars', 'availableCars')->name(name: 'container.availableCars');
-        Route::post('/dashboard/containers/replace-car', 'replaceCar')->name(name: 'container.replaceCar');
-        Route::post('/dashboard/containers/remove-from-list', 'removeFromList')->name(name: 'container.removeFromList');
-        Route::post('/dashboard/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
-        Route::post('/dashboard/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
+        Route::post('/container/group-create', 'groupSelectedCars')->name(name: 'container.selected');
+        Route::post('/container/create', 'store')->name(name: 'container.store');
+        Route::get('/container/edit/{id}', 'edit')->name(name: 'container.edit');
+        Route::post('/container/edit/{id}', 'update')->name(name: 'container.update');
+        Route::post('/container/list-update', 'listUpdate')->name(name: 'container.listupdate');
+        Route::get('/containers/status/{slug}', 'showStatus')->name(name: 'container.showStatus');
+        Route::post('/containers/update/group', 'updateGroup')->name(name: 'container.updateGroup');
+        Route::post('/containers/send-email', 'sendEmail')->name(name: 'container.sendEmail');
+        Route::post('/containers/get-avaliable-cars', 'availableCars')->name(name: 'container.availableCars');
+        Route::post('/containers/replace-car', 'replaceCar')->name(name: 'container.replaceCar');
+        Route::post('/containers/remove-from-list', 'removeFromList')->name(name: 'container.removeFromList');
+        Route::post('/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
+        Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
     });
 
     // Arrived ?? what this does ??
     Route::controller(ArrivedController::class)->group(function () {
-        Route::get('/dashboard/arrived/index', 'index')->name(name: 'arrived.index');
-        Route::post('/dashboard/arrived/container/{id}/save', 'update')->name(name: 'arrived.update');
-        Route::post('/dashboard/arrived/car/{id}/update', 'updateCar')->name(name: 'arrived.car-update');
-        Route::get('/dashboard/arrived/car/{id}/show-image/', 'showImages')->name(name: 'arrived.showImages');
+        Route::get('/arrived/index', 'index')->name(name: 'arrived.index');
+        Route::post('/arrived/container/{id}/save', 'update')->name(name: 'arrived.update');
+        Route::post('/arrived/car/{id}/update', 'updateCar')->name(name: 'arrived.car-update');
+        Route::get('/arrived/car/{id}/show-image/', 'showImages')->name(name: 'arrived.showImages');
     });
 
     // Port Emails
     Route::controller(PortEmailController::class)->group(function () {
-        Route::get('/dashboard/portemails', 'index')->name('portemail.index');
-        Route::post('/dashboard/portemails', 'store')->name('portemail.store');
-        Route::post('/dashboard/portemails/{user}', 'update')->name('portemail.update');
-        Route::delete('/dashboard/portemails/{user}', 'destroy')->name('portemail.destroy');
+        Route::get('/portemails', 'index')->name('portemail.index');
+        Route::post('/portemails', 'store')->name('portemail.store');
+        Route::post('/portemails/{user}', 'update')->name('portemail.update');
+        Route::delete('/portemails/{user}', 'destroy')->name('portemail.destroy');
     });
 
     // Balance
     Route::controller(CustomerBalanceController::class)->group(function () {
         // Balance Fills
-        Route::get('/dashboard/balances', 'index')->name('customer.balance.index');
-        Route::post('/dashboard/balances/aprove', 'approveBalance')->name('customer.balance.approve');
-        Route::post('/dashboard/balances/store', 'storeBalance')->name('customer.balance.store');
-        Route::post('/dashboard/balances/update', 'updateBalance')->name('customer.balance.update');
-        Route::post('/dashboard/balances/delete', 'deleteBalance')->name('customer.balance.delete');
-        Route::get('/dashboard/balances/search/customer/htmx', 'searchCustomerHtmx')->name('customer.search.htmx');
+        Route::get('/deposits', 'index')->name('customer.balance.index');
+        Route::post('/deposits/aprove', 'approveBalance')->name('customer.balance.approve');
+        Route::post('/deposits/store', 'storeBalance')->name('customer.balance.store');
+        Route::post('/deposits/update', 'updateBalance')->name('customer.balance.update');
+        Route::post('/deposits/delete', 'deleteBalance')->name('customer.balance.delete');
+        Route::get('/deposits/search/customer/htmx', 'searchCustomerHtmx')->name('customer.search.htmx');
 
         // Car Payments
-        Route::get('/dashboard/car-payments', 'carPaymentIndex')->name('carpayment.index');
-        Route::post('/dashboard/car-payments/store', 'carPaymentStore')->name('carpayment.store');
-        Route::post('/dashboard/car-payments/update', 'carPaymentUpdate')->name('carpayment.update');
-        Route::post('/dashboard/car-payments/delete', 'carPaymentDelete')->name('carpayment.delete');
-        Route::get('/dashboard/balances/search/car/htmx', 'carSearchHtmx')->name('car.search.htmx');
+        Route::get('/car-payments', 'carPaymentIndex')->name('carpayment.index');
+        Route::post('/car-payments/store', 'carPaymentStore')->name('carpayment.store');
+        Route::post('/car-payments/update', 'carPaymentUpdate')->name('carpayment.update');
+        Route::post('/car-payments/delete', 'carPaymentDelete')->name('carpayment.delete');
+        Route::get('/balances/search/car/htmx', 'carSearchHtmx')->name('car.search.htmx');
 
-        Route::get('/dashboard/calculate/percenttilldate',
+        Route::get('/calculate/percenttilldate',
             'percentTillDateHtmx')->name('car.calculate.percenttilldate');
     });
 
@@ -198,44 +165,44 @@ Route::middleware('auth')->group(function () {
 
     // Load Types (locations)
     Route::controller(LocationsController::class)->group(function () {
-        Route::get('/dashboard/locations', 'index')->name('locations.index');
-        Route::post('/dashboard/locations/store', 'store')->name('locations.store');
-        Route::post('/dashboard/locations/destroy', 'destroy')->name('locations.destroy');
-        Route::post('/dashboard/locations/update', 'update')->name('locations.update');
+        Route::get('/locations', 'index')->name('locations.index');
+        Route::post('/locations/store', 'store')->name('locations.store');
+        Route::post('/locations/destroy', 'destroy')->name('locations.destroy');
+        Route::post('/locations/update', 'update')->name('locations.update');
     });
 
     // Shipping Prices
     Route::controller(ShippingPricesController::class)->group(function () {
-        Route::get('/dashboard/shipping-prices', 'index')->name('shipping-prices.index');
-        Route::post('/dashboard/shipping-prices/store', 'store')->name('shipping-prices.store');
-        Route::post('/dashboard/shipping-prices/destroy', 'destroy')->name('shipping-prices.destroy');
-        Route::get('/dashboard/shipping-prices/locations/htmx', 'htmxLocations')->name('htmx.locations');
-        Route::post('/dashboard/shipping-prices/update', 'update')->name('shipping-prices.update');
+        Route::get('/shipping-prices', 'index')->name('shipping-prices.index');
+        Route::post('/shipping-prices/store', 'store')->name('shipping-prices.store');
+        Route::post('/shipping-prices/destroy', 'destroy')->name('shipping-prices.destroy');
+        Route::get('/shipping-prices/locations/htmx', 'htmxLocations')->name('htmx.locations');
+        Route::post('/shipping-prices/update', 'update')->name('shipping-prices.update');
     });
 
     // Load Types
     Route::controller(LoadTypesController::class)->group(function () {
-        Route::get('/dashboard/load-types', 'index')->name('load-types.index');
-        Route::post('/dashboard/load-types/store', 'store')->name('load-types.store');
-        Route::post('/dashboard/load-types/destroy', 'destroy')->name('load-types.destroy');
-        Route::post('/dashboard/load-types/update', 'update')->name('load-types.update');
+        Route::get('/load-types', 'index')->name('load-types.index');
+        Route::post('/load-types/store', 'store')->name('load-types.store');
+        Route::post('/load-types/destroy', 'destroy')->name('load-types.destroy');
+        Route::post('/load-types/update', 'update')->name('load-types.update');
     });
 
     // Ports
     Route::controller(PortsController::class)->group(function () {
-        Route::get('/dashboard/ports', 'index')->name('ports.index');
-        Route::post('/dashboard/ports/store', 'store')->name('ports.store');
-        Route::post('/dashboard/ports/destroy', 'destroy')->name('ports.destroy');
-        Route::post('/dashboard/ports/update', 'update')->name('ports.update');
+        Route::get('/ports', 'index')->name('ports.index');
+        Route::post('/ports/store', 'store')->name('ports.store');
+        Route::post('/ports/destroy', 'destroy')->name('ports.destroy');
+        Route::post('/ports/update', 'update')->name('ports.update');
     });
 
     // Customers
     Route::controller(AdminController::class)->group(function () {
-        Route::get('/dashboard/customers', 'customerIndex')->name('customers.index');
-        Route::post('/dashboard/customers/store', 'store')->name('customers.store');
-        Route::post('/dashboard/customers/activate', 'customerActivate')->name('customer.activate');
-        Route::post('/dashboard/customers/destroy', 'destroy')->name('customers.destroy');
-        Route::post('/dashboard/customers/update', 'update')->name('customers.update');
+        Route::get('/customers', 'customerIndex')->name('customers.index');
+//        Route::post('/customers/store', 'store')->name('customers.store');
+        Route::post('/customers/activate', 'customerActivate')->name('customer.activate');
+        Route::post('/customers/destroy', 'delete')->name('customers.delete');
+        Route::post('/customers/update', 'update')->name('customers.update');
     });
 
     // Credit
@@ -248,6 +215,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(SliderController::class)->group(function () {
         Route::get('/sliders', 'index')->name('sliders.index');
         Route::post('/sliders/store', 'store')->name('sliders.store');
+        Route::post('/sliders/activate', 'activate')->name('sliders.activate');
         Route::post('/sliders/update', 'update')->name('sliders.update');
         Route::post('/sliders/delete', 'delete')->name('sliders.delete');
     });
@@ -263,6 +231,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(ServicesController::class)->group(function () {
         Route::get('/services', 'index')->name('services.index');
         Route::post('/services/store', 'store')->name('services.store');
+        Route::post('/services/activate', 'activate')->name('services.activate');
         Route::post('/services/update', 'update')->name('services.update');
         Route::post('/services/delete', 'delete')->name('services.delete');
     });
@@ -270,10 +239,13 @@ Route::middleware('auth')->group(function () {
     Route::controller(AnnouncementsController::class)->group(function () {
         Route::get('/announcements', 'index')->name('announcements.index');
         Route::post('/announcements/store', 'store')->name('announcements.store');
+        Route::post('/announcements/activate', 'activate')->name('announcements.activate');
+        Route::get('/announcements/update/htmx', 'updateHtmx')->name('announcements.update.htmx');
         Route::post('/announcements/update', 'update')->name('announcements.update');
         Route::post('/announcements/delete', 'delete')->name('announcements.delete');
     });
 });
+
 
 
 // SEED STATES
@@ -343,21 +315,11 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
     });
 });
 
-// TEST ROUTEs
-
-Route::get('/cache', function () {
-//    if(Cache::has('translated')) {
-//        Cache::forget('translated');
-//
-//        return 'Cache cleared';
-//    }
 
 
-    $gg = Cache::get('headerStatics'.session()->get('locale'))['Logout'];
 
-    return $gg;
-});
 
+// TEST ROUTES
 
 route::get('/logout', function () {
     Auth::guard('web')->logout();

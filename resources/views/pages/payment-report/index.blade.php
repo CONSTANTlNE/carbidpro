@@ -56,7 +56,17 @@
                                         <a href="#" class="btn btn-add" data-toggle="modal" data-target="#addModal">
                                             <i class="fa fa-plus"></i> Add Car Payment
                                         </a>
+
                                     </div>
+
+                                    <form style="display: flex!important;" class="ml-3 " action="{{route('carpayment.index')}}">
+                                        <input type="text" name="search" class="form-control" value="">
+                                        <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search</button>
+                                    </form>
+
+                                    <a href="{{route('carpayment.index')}}" style="color: white;max-width: 50px" type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
+                                    </a>
+
                                 </div>
                                 {{-- Add Carpayment Modal--}}
                                 <div class="modal fade" id="addModal" tabindex="-1"
@@ -119,8 +129,6 @@
                                                                            hx-target="#percenttarget"
                                                                            hx-include="#carID2,#due2"
                                                                     >
-
-
                                                                 </div>
                                                                 <div id="percenttarget"></div>
                                                             </div>
@@ -291,9 +299,8 @@
                                     <table id="dataTableExample1"
                                            class="table table-bordered table-striped table-hover">
                                         <thead class="back_table_color">
-                                        <tr class="info">
+                                        <tr class="info text-center">
                                             <th>#</th>
-                                            <th>Create Date</th>
                                             <th>Payment Date</th>
                                             <th>CAR</th>
                                             <th>Customer</th>
@@ -304,11 +311,8 @@
                                         </thead>
                                         <tbody>
                                         @foreach ($payment_reports as $index => $payment_report)
-                                            <tr>
+                                            <tr class="text-center">
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>
-                                                    {{ $payment_report->created_at->format('d-m-Y') }}
-                                                </td>
                                                 <td>
                                                     {{  $payment_report->carpayment_date->format('d-m-Y') }}
                                                 </td>

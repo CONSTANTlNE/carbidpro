@@ -40,6 +40,15 @@
                                                     class="fa fa-plus"></i> Add Report
                                         </a>
                                     </div>
+
+                                    <form style="display: flex!important;" class="ml-3 " action="{{route('customer.balance.index')}}">
+                                        <input type="text" name="search" class="form-control" value="">
+                                        <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search</button>
+                                    </form>
+
+                                    <a href="{{route('customer.balance.index')}}" style="color: white;max-width: 50px" type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
+                                    </a>
+
                                 </div>
                                 {{-- Add Payment to Balance Modal--}}
                                 <div class="modal fade" id="addModal" tabindex="-1"
@@ -165,22 +174,27 @@
                                     <table id="dataTableExample1"
                                            class="table table-bordered table-striped table-hover">
                                         <thead class="back_table_color">
-                                        <tr class="info">
+                                        <tr class="info text-center">
                                             <th>#</th>
                                             <th>Date</th>
                                             <th>Amount</th>
-                                            <th>Dealer</th>
+                                            <th>Payer Full Name</th>
+                                            <th>Company Name</th>
+                                            <th>Contact Name</th>
                                             <th>Approve</th>
                                             <th>Action</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach ($payment_requests as $index => $prequest)
-                                            <tr>
+                                            <tr class="text-center">
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $prequest->created_at->format('m-d-Y') }}</td>
                                                 <td>{{ $prequest->amount }}</td>
-                                                <td>{{ $prequest->customer->name }}</td>
+                                                <td>{{ $prequest->full_name }}</td>
+                                                <td>{{ $prequest->customer->company_name }}</td>
+
+                                                <td>{{ $prequest->customer->contact_name }}</td>
                                                 <td>
                                                     <form action="{{route('customer.balance.approve')}}" method="post">
                                                         @csrf
@@ -319,8 +333,9 @@
                         </div>
                     </div>
                 </div>
-
-
+                <div class="flex justify-content-center">
+                    {{ $payment_requests->links() }}
+                </div>
             </section>
             <!-- /.content -->
         </div>

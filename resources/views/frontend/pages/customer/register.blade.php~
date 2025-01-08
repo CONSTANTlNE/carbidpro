@@ -46,7 +46,7 @@
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{{ $registerStatics['Register'] }}</h2>
+                <h2 style="margin-top: 80px;padding: 0;">{{ Cache::get('registerStatics' . session()->get('locale'))['Register'] }}</h2>
             </div>
         </div>
     </section>

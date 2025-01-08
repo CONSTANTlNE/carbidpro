@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('shipping_prices', function (Blueprint $table) {
             $table->id();
             $table->string('price');
-            $table->json('auction_ids')->default(json_encode([1, 2, 3]));
+            $table->json('auction_ids');
             $table->unsignedBigInteger('from_location_id');
             $table->unsignedBigInteger('to_port_id');
             $table->foreign('from_location_id')->references('id')->on('locations')->onDelete('cascade');

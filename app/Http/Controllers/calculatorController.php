@@ -11,6 +11,8 @@ use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\ShippingPrice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class calculatorController extends Controller
 {
@@ -19,10 +21,23 @@ class calculatorController extends Controller
      */
     public function index()
     {
+        if (Session::has('locale')) {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            $tr->setSource(); // Detect language automatically
+            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+        } else {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            Session::put('locale', 'en');
+        }
+
+
+
         $auctions = Auction::all();
         $loadtypes = LoadType::all();
-        $countries = Country::all();
-        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'countries'));
+//        $countries = Country::all();
+        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr'));
     }
 
     public function calculate(Request $request)

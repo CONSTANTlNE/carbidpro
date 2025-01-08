@@ -94,25 +94,25 @@
                                 {{--End Auction Create Modal--}}
 
                                 {{-- Per Page--}}
-                                <form action="{{route('locations.index')}}">
-                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
-                                            onchange="this.form.submit()">
-                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>
-                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>
-                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>
-                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>
-                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>
-                                    </select>
-                                </form>
+{{--                                <form action="{{route('locations.index')}}">--}}
+{{--                                    <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""--}}
+{{--                                            onchange="this.form.submit()">--}}
+{{--                                        <option value="10" {{request('perpage') == 10 ? 'selected' : ''}}>10</option>--}}
+{{--                                        <option value="25" {{request('perpage') == 25 ? 'selected' : ''}}>25</option>--}}
+{{--                                        <option value="50" {{request('perpage') == 50 ? 'selected' : ''}}>50</option>--}}
+{{--                                        <option value="100" {{request('perpage') == 100 ? 'selected' : ''}}>100</option>--}}
+{{--                                        <option value="500" {{request('perpage') == 500 ? 'selected' : ''}}>500</option>--}}
+{{--                                    </select>--}}
+{{--                                </form>--}}
                                 {{-- Search--}}
-                                <form style="display: flex!important;" class="ml-3 "
-                                      action="{{route('locations.index')}}">
-                                    <input type="text" name="search" class="form-control"
-                                           value="{{request()->query('search')}}">
-                                    <button type="submit"
-                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
-                                    </button>
-                                </form>
+{{--                                <form style="display: flex!important;" class="ml-3 "--}}
+{{--                                      action="{{route('locations.index')}}">--}}
+{{--                                    <input type="text" name="search" class="form-control"--}}
+{{--                                           value="{{request()->query('search')}}">--}}
+{{--                                    <button type="submit"--}}
+{{--                                            class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search--}}
+{{--                                    </button>--}}
+{{--                                </form>--}}
 
                             </div>
                             <div class="table-responsive">
@@ -144,7 +144,7 @@
                                                     <div class="modal-dialog modal-lg">
                                                         <div class="modal-content ">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">New Settings</h5>
+                                                                <h5 class="modal-title">Update Settings</h5>
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -263,7 +263,9 @@
                         ['bold', 'italic', 'underline', 'strike'],
                         ['blockquote'],
                         ['link', 'image', 'video'],
-                        [ 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+                        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                        [{ 'align': [] }],
                     ],
                 },
                 placeholder: 'Compose an epic...',

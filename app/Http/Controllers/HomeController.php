@@ -38,61 +38,14 @@ class HomeController extends Controller
         return view('frontend.pages.home', compact('slides', 'services', 'announcement', 'tr'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
     // ====== Pages ======
 
     public function about(Request $request) {
 
-        $settings=Setting::where('key', 'about')->first();
 
-//        dd($settings);
+
 
         if (Session::has('locale')) {
             $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
@@ -105,9 +58,31 @@ class HomeController extends Controller
             Session::put('locale', 'en');
         }
 
+        $about=Setting::where('key', 'about')->first();
+
+        if(Session::get('locale') === 'en'){
+
+            if (Cache::has('translatedAboutEN')) {
+                $translated = Cache::get('translatedAboutEN');
+            } else {
+                Cache::forever('translatedAboutEN', $tr->translate($about->value) );
+                $translated = Cache::get('translatedAboutEN');
+            }
+        }
+
+        if(Session::get('locale') === 'ru'){
+
+            if (Cache::has('translatedAboutRU')) {
+                $translated = Cache::get('translatedAboutRU');
+            } else {
+                Cache::forever('translatedAboutRU', $tr->translate($about->value) );
+                $translated = Cache::get('translatedAboutRU');
+            }
+        }
 
 
-        return view('frontend.pages.about', compact('settings','tr'));
+
+        return view('frontend.pages.about', compact('tr','translated'));
 
     }
 
@@ -134,7 +109,7 @@ class HomeController extends Controller
             if (Cache::has('translatedTermsEN')) {
                 $translated = Cache::get('translatedTermsEN');
             } else {
-                Cache::put('translatedTermsEN', $tr->translate($terms->value) );
+                Cache::forever('translatedTermsEN', $tr->translate($terms->value) );
                 $translated = Cache::get('translatedTermsEN');
             }
         }
@@ -144,7 +119,7 @@ class HomeController extends Controller
             if (Cache::has('translatedTermsRU')) {
                 $translated = Cache::get('translatedTermsRU');
             } else {
-                Cache::put('translatedTermsRU', $tr->translate($terms->value) );
+                Cache::forever('translatedTermsRU', $tr->translate($terms->value) );
                 $translated = Cache::get('translatedTermsRU');
             }
         }
@@ -152,6 +127,63 @@ class HomeController extends Controller
 
         return view('frontend.pages.terms', compact('translated', 'settings','tr'));
 
+    }
+
+    public function contact(Request $request)
+    {
+
+        if (Session::has('locale')) {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            $tr->setSource(); // Detect language automatically
+            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+        } else {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            Session::put('locale', 'en');
+        }
+
+
+
+        $settings = Setting::all();
+
+
+        return view('frontend.pages.contact', compact( 'settings', 'tr'));
+    }
+
+    public function announcements(Request $request)
+    {
+
+        if (Session::has('locale')) {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            $tr->setSource(); // Detect language automatically
+            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+        } else {
+            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+            $tr->setSource('en'); // Translate from English
+            Session::put('locale', 'en');
+        }
+
+
+        $translated = array();
+
+        if(!Cache::get('translatedAnnouncements'.Session::get('locale'))){
+            $announcements = Announcement::where('is_active', 1)->get();
+
+            foreach($announcements as $announcement){
+
+                $translated[$announcement->id] = [
+                    'title' => $tr->translate($announcement->title),
+                    'content' => $tr->translate($announcement->content),
+                    'date' => $announcement->date
+                ];
+            }
+            Cache::forever('translatedAnnouncements'.Session::get('locale'), $translated);
+        }
+
+
+        return view('frontend.pages.announcement', compact(  'tr'));
     }
 
 }
