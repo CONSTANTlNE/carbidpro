@@ -16,7 +16,7 @@ class AnnouncementsSeeder extends Seeder
         Announcement::create([
             'title' => 'DONT BUY Flooded hybrid and electric vehicles!',
             'content'=>'<p><span style="background-color: rgb(255, 255, 255); color: rgb(224, 62, 45);">Please note that due to new regulations, the transportation of Flooded hybrid and electric vehicles by container is prohibited.!</span></p>',
-            'date'=>'2024-04-12'
+            'date'=>'2024-04-12',
         ]);
 
         Announcement::create([

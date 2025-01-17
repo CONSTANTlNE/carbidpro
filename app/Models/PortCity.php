@@ -14,4 +14,8 @@ class PortCity extends Model
     public function cars(){
         $this->hasMany(Car::class);
     }
+
+    public function country(){
+        return $this->belongsTo(Country::class);
+    }
 }

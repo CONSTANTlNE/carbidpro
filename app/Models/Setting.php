@@ -8,13 +8,10 @@ use Spatie\Translatable\HasTranslations;
 
 class Setting extends Model
 {
-    use HasTranslations ;
 
     protected $primaryKey = 'key';
     protected $keyType = 'string';
     public $incrementing = false;
-    public $translatable = ['value'];
-
 
     protected $guarded=[];
 

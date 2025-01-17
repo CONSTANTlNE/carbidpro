@@ -1,4 +1,3 @@
-
 @php
     use Illuminate\Support\Facades\Cache;use Illuminate\Support\Facades\Session;
 
@@ -59,13 +58,15 @@
                                 <li>
                                     <a href="/contact">{{ $headerStatics['Contact'] }}</a>
                                 </li>
-                                <li>
-                                    <a href="/calculator">{{ $headerStatics['Calculator'] }}</a>
-                                </li>
+                                @auth()
+                                    <li>
+                                        <a href="{{route('calculator.index')}}">{{ $headerStatics['Calculator'] }}</a>
+                                    </li>
+                                @endauth
                                 <li class="{{ session()->has('auth') ? 'dropdown' : '' }}"
                                     style="background: #e2304e;padding: 9px;border-radius: 6px;">
                                     @if (session()->has('auth'))
-                                        <a href="#" class="nav-link dropdown-toggle"
+                                        <a style="padding: 0!important;padding: 0!important" href="#" class="nav-link dropdown-toggle"
                                            data-bs-toggle="dropdown">{{ session()->get('auth')->contact_name }}</a>
 
                                         <div class="dropdown-menu dropdown-menu-end">
@@ -88,7 +89,11 @@
                                         <a href="{{ route('customer.login.get') }}">{{ $headerStatics['Login'] }}</a>
                                     @endif
                                 </li>
-
+                                @if(!auth()->check())
+                                <li  >
+                                    <a href="{{ route('customer.register.get') }}">{{ $headerStatics['Register'] }}</a>
+                                </li>
+                                @endif
                                 @if (session()->get('locale') == 'en')
                                     <li><a href="{{ route('set-locale', 'ru') }}">RU</a>
                                     </li>
@@ -132,8 +137,10 @@
                                         <a href="/contact">{{ $headerStatics['Contact'] }}</a>
                                     </li>
                                     <li>
-                                        <a href="/calculator">{{ $headerStatics['Calculator'] }}
-                                            }</a></li>
+                                        <a href="{{route('calculator.index')}}">
+                                            {{ $headerStatics['Calculator'] }}
+                                            </a>
+                                    </li>
                                     <li class="{{ session()->has('auth') ? 'dropdown' : '' }}"
                                         style="">
                                         @if (session()->has('auth'))

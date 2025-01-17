@@ -70,11 +70,15 @@
 @yield('ports')
 @yield('customers')
 @yield('payment_request')
+@yield('allsms')
+@yield('smsdrafts')
+@yield('selectedsms')
 {{--Site Settings--}}
 @yield('sliders')
 @yield('announces')
 @yield('settings')
 @yield('services')
+
 
 <!-- jQuery -->
 <script src="/assets/plugins/jQuery/jquery-1.12.4.min.js"></script>

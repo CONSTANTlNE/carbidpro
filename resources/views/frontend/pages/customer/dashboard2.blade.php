@@ -8,11 +8,9 @@
 
 $creditService = new CreditService();
 
-//     Cache::forget('dashboardStatics'.session()->get('locale'));
+//             Cache::forget('dashboardStatics'.session()->get('locale'));
+
            $dashboardStatics=Cache::get('dashboardStatics'.session()->get('locale'));
-
-
-
 
           if($dashboardStatics===null){
 
@@ -24,7 +22,7 @@ $creditService = new CreditService();
                     'Sender'=> $tr->translate('Sender'),
                     'Full Name'=> $tr->translate('Full Name'),
                     'Submit'=> $tr->translate('Submit'),
-                    'Deposit'=> $tr->translate('Deposit'),
+                    'My Deposit'=> $tr->translate('My Deposit'),
                     'Search placeholder'=> $tr->translate('Search by VIN or Container'),
                     'payment_confirmation'=> $tr->translate('Payment  will be confirmed within 24 hours.'),
                     'Car list'=> $tr->translate('Car list'),
@@ -41,12 +39,14 @@ $creditService = new CreditService();
                     'Credit Info'=> $tr->translate('Credit Info'),
                     'Invoice'=> $tr->translate('Invoice'),
                     'Pay'=> $tr->translate('Pay'),
+                    'Action'=> $tr->translate('Action'),
                 ];
                 Cache::forever('dashboardStatics'.session()->get('locale'), $data);
-           $dashboardStatics=Cache::get('dashboardStatics'.session()->get('locale'));
+                $dashboardStatics=Cache::get('dashboardStatics'.session()->get('locale'));
 
             }
 
+//          dd(auth()->user());
 @endphp
 
 @push('style')
@@ -83,11 +83,11 @@ $creditService = new CreditService();
     </section>
 
     <div class="container">
+
         @include('frontend.components.customer-nav-links')
 
-
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <br>
                 {{--                <div class="d-flex justify-content-center mb-3">--}}
                 {{--                    <input class="text-center" style="width: 250px" type="text" name="search" id="search"--}}
@@ -115,7 +115,7 @@ $creditService = new CreditService();
                                 <th class="text-center">{{$dashboardStatics['Payment']}}</th>
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
-                                <th></th>
+                                <th class="text-center">{{$dashboardStatics['Action']}}</th>
                             @endif
                         </tr>
                         </thead>
@@ -134,21 +134,60 @@ $creditService = new CreditService();
                             @endphp
                             <tr style="background-color: {{ $color }}" class="text-center">
                                 <td style="font-size: 12px;min-width: 90px"
-                                    class="text-center">{{ $car->created_at->format('d-m-Y') }}</td>
+                                    class="text-center">
+                                    {{ $car->created_at->format('d-m-Y') }}
+                                    <span>Days:  {{ $car->created_at->diffInDays(now())}}</span>
+                                </td>
                                 <td class="text-center">{{ $car->make_model_year }}</td>
+                                {{-- Car VIN AND CONTAINER --}}
+
                                 <td class="text-center">
-                                    <a style="color: #1a7fca;font-size: 15px;" target="_blank"
-                                       href="{{route('customer.car-info', $car->vin)}}"> {!! $car->getMedia()->first() ? '📷 ' . $car->vin : $car->vin !!}
-                                    </a>
-                                    <span style="cursor: pointer;" class="p-cursor"
-                                          onclick="navigator.clipboard.writeText('{{ $car->vin }}')">
-                                    <img width="20px" src="https://vsbrothers.com/img/copy_icon.svg">
-                                </span>
+                                    <div class="d-flex flex-column text-center gap-2">
+                                        <div>
+                                            <a style="color: #1a7fca;font-size: 15px;" target="_blank"
+                                               href="{{route('customer.car-info', $car->vin)}}"> {!! $car->getMedia()->first() ? '📷 ' . $car->vin : $car->vin !!}
+                                            </a>
+                                            <span style="cursor: pointer;" class="p-cursor"
+                                                  onclick="navigator.clipboard.writeText('{{ $car->vin }}')">
+                                              <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
+                                            </span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center align-items-middle gap-2">
+                                            <a style="color: #1a7fca;font-size: 15px; " target="_blank"
+                                               @if($car->groups->first()?->thc_agent==='MAERSK')
+                                                   href="{{'https://www.maersk.com/tracking/' . $car->groups->first()?->container_id}}"
+                                               @endif
+                                               @if($car->groups->first()?->thc_agent==='Hapag-Eisa')
+                                                   href="{{'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container=' . $car->groups->first()?->container_id}}
+                                                " {{$car->groups->first()?->container_id}}
+                                               @endif
+                                               @if($car->groups->first()?->thc_agent==='COSCO')
+                                                   href="{{'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number=' . $car->groups->first()?->container_id}}
+                                                " {{$car->groups->first()?->container_id}}
+                                               @endif
+                                               @if($car->groups->first()?->thc_agent==='Turkon-DTS')
+                                                   href="{{'https://my.turkon.com/container-tracking'}}
+                                                " {{$car->groups->first()?->container_id}}
+                                               @endif
+                                               @if($car->groups->first()?->thc_agent==='One net-Wilhelmsen')
+                                                   href="{{'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking' }}
+                                                " {{$car->groups->first()?->container_id}}
+                                                    @endif
+                                            >{{$car->groups->first()?->container_id}}</a>
+                                            @if($car->groups->first())
+                                                <span style="cursor: pointer;" class="p-cursor"
+                                                      onclick="navigator.clipboard.writeText('{{ $car->groups->first()->container_id}}')">
+                                              <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 {{-- Car Owner To--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
                                     <td class="text-center" style="min-width: 160px">
-                                        <div  class="my-cars__td-relase-car-to-item  d-flex align-items-center justify-content-center"
+                                        <div class="my-cars__td-relase-car-to-item  d-flex align-items-center justify-content-center"
                                              onclick="
                                     tglbtn= document.getElementById('release_to_{{ $car->id }}');
                                     if(tglbtn.style.display == 'none'){
@@ -175,24 +214,31 @@ $creditService = new CreditService();
                                                         class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_user">
                                                     <input class="release_to form-control" name="vehicle_owner_name"
                                                            placeholder="Full name"
-                                                           value="{{ $car->vehicle_owner_name }}">
+                                                           required value="{{ $car->vehicle_owner_name }}">
                                                     <input type="hidden" class="car_id" name="car_id"
-                                                           value="{{ $car->id }}">
+                                                           required value="{{ $car->id }}">
                                                 </li>
 
                                                 <li
                                                         class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_id">
                                                     <input class="id_number form-control" name="owner_id_number"
-                                                           placeholder="ID Number" value="{{ $car->owner_id_number }}">
+                                                           required placeholder="ID Number"
+                                                           value="{{ $car->owner_id_number }}">
                                                 </li>
 
                                                 <li
                                                         class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_phone">
                                                     <input class="release_phone form-control" name="owner_phone_number"
                                                            placeholder="Phone"
-                                                           value="{{ $car->owner_phone_number }}">
+                                                           required value="{{ $car->owner_phone_number }}">
                                                 </li>
                                                 <li class="my-cars__td-relase-car-to-inputs-item">
+                                                    <button
+                                                            onclick="document.getElementById('release_to_{{ $car->id }}').style.display = 'none';"
+                                                            type="button"
+                                                            class="btn btn-primary save-release-information"
+                                                            data-behavior="save-release-information">cancel
+                                                    </button>
                                                     <button class="btn btn-primary save-release-information"
                                                             data-behavior="save-release-information">Save
                                                     </button>
@@ -225,7 +271,7 @@ $creditService = new CreditService();
                                         <td></td>
                                     @endif
                                 @endif
-                                {{-- Payment--}}
+                                {{-- Payments Column--}}
                                 @if (session()->get('auth')->parent_of <= 0)
                                     @if (!auth()->user()->hasRole('portmanager'))
                                         <td style="text-align: left">
@@ -257,13 +303,14 @@ $creditService = new CreditService();
                                         </td>
                                     @endif
                                 @endif
-                                {{-- Invoice--}}
+                                {{-- Invoice payment and credit info--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
                                     <td style="min-width: 200px">
                                         <div style="display: flex;justify-content: space-around" class="mb-2">
                                             {{--Credit Info--}}
                                             @if($car->latestCredit)
-                                                <button type="button" class="btn btn-primary btn-sm w-100"
+                                                <button style="width: 67%!important;"
+                                                        type="button" class="btn btn-primary btn-sm w-100"
                                                         data-toggle="modal"
                                                         data-target="#creditinfomodal{{$key}}">
                                                     {{$dashboardStatics['Credit Info']}}
@@ -274,76 +321,86 @@ $creditService = new CreditService();
                                                  role="dialog"
                                                  aria-hidden="true">
                                                 <div class="modal-dialog modal-lg" role="document">
-                                                    <div class="modal-content p-1 text-center">
-                                                        <div class="modal-header justify-content-center">
-                                                            <h5 class="modal-title">{{$dashboardStatics['Credit Info']}}</h5>
-                                                        </div>
-                                                        <div class="modal-body p-0 d-flex justify-content-center">
-                                                            <div style="overflow-x: auto; width: 100%;">
-                                                                <table style="margin: auto">
-                                                                    <thead>
-                                                                    <tr>
-                                                                        <th class="p-1 text-center"
-                                                                            style="min-width: 100px">Date
-                                                                        </th>
-                                                                        <th class="p-1 text-center"
-                                                                            style="width: 100px">
-                                                                            Begin Amount due
-                                                                        <th class="p-1 text-center">Added Amount</th>
-                                                                        <th class="p-1 text-center" style="width: 80px">
-                                                                            Credit
-                                                                            Days
-                                                                        </th>
-                                                                        <th class="p-1 text-center"
-                                                                            style="width: 100px">Credit
-                                                                            Fee
-                                                                        </th>
-                                                                        <th class="p-1 text-center"
-                                                                            style="width: 100px">Total
-                                                                            Amount
-                                                                        </th>
-                                                                        <th class="p-1 text-center" style="width: 60px">
-                                                                            Paid
-                                                                            Amount
-                                                                        </th>
-                                                                    </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                    @foreach($car->credit as $index2=> $credit)
-                                                                        <tr>
-                                                                            @if($credit->added_amount!==null)
-                                                                                <td class="p-1">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
-                                                                            @elseif($index2-1>=0)
-                                                                                <td style="min-width: 100px"
-                                                                                    class="p-1">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}</td>
-                                                                            @endif
-                                                                            @if($index2-1>=0)
-                                                                                <td class="p-1">{{round($car->credit[$index2-1]->credit_amount)}}</td>
-                                                                            @endif
-                                                                            <td class="p-1" style="width: 60px!important">
-                                                                                {{ $credit->added_amount}}
-                                                                            </td>
-                                                                            <td class="p-1">{{$credit->credit_days}}</td>
-                                                                            <td class="p-1">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}}</td>
-                                                                            @if($index2-1>=0)
-                                                                                <td class="p-1">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}}</td>
-                                                                            @endif
-                                                                            <td class="p-1"
-                                                                                style="width: 60px!important">{{$credit->paid_amount}}</td>
-                                                                        </tr>
-                                                                    @endforeach
+                                                    <div class="modal-content ">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Issue Date :
+                                                                {{$car->firstCredit->issue_or_payment_date->format('d-m-Y')}}
+                                                                :
+                                                                {{ $car->firstCredit->credit_amount }} $
+                                                            </h5>
 
-                                                                    <tr style="background: #f2f2f2">
-                                                                        <td class="p-1">{{Carbon::now()->format('d-m-Y')}}</td>
-                                                                        <td class="p-1">{{round( $credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
-                                                                        <td></td>
-                                                                        <td> {{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                                        <td> {{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                            {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body p-0 "
+                                                             style="overflow-x: auto; width: 100%;">
+                                                            <table style="margin: auto">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th class="p-1 text-center"
+                                                                        style="min-width: 100px!important;">Date
+                                                                    </th>
+                                                                    <th class="p-1 text-center" style="width: 100px">
+                                                                        Begin Amount due
+                                                                    </th>
+                                                                    <th class="p-1 text-center">Added Amount</th>
+                                                                    <th class="p-1 text-center" style="width: 80px">
+                                                                        Credit Days
+                                                                    </th>
+                                                                    <th class="p-1 text-center" style="width: 100px">
+                                                                        Credit Fee
+                                                                    </th>
+                                                                    <th class="p-1 text-center" style="width: 100px">
+                                                                        Total Amount
+                                                                    </th>
+                                                                    <th class="p-1 text-center" style="width: 60px">Paid
+                                                                        Amount
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                @foreach($car->credit as $index2=> $credit)
+                                                                    <tr>
+                                                                        @if($credit->added_amount!==null)
+                                                                            <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                                        @elseif($index2-1>=0)
+                                                                            <td style="min-width: 100px"
+                                                                                class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                                        @endif
+                                                                        @if($index2-1>=0)
+                                                                            <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>
+                                                                        @endif
+                                                                        <td class="p-1 text-center"
+                                                                            style="width:min-content!important">
+                                                                            {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
+                                                                        </td>
+                                                                        <td class="p-1 text-center">{{$credit->credit_days}}</td>
+                                                                        <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}}</td>
+                                                                        @if($index2-1>=0)
+                                                                            <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}}</td>
+                                                                        @endif
+                                                                        <td class="p-1 text-center"
+                                                                            style="width: 60px!important">{{$credit->paid_amount}}</td>
                                                                     </tr>
-                                                                    </tbody>
-                                                                </table>
+                                                                @endforeach
+
+                                                                <tr style="background: #f2f2f2">
+                                                                    <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
+                                                                    <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
+                                                                    <td></td>
+                                                                    <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
+                                                                    <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                                                <p>Amount Due Till
+                                                                    Today: {{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</p>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer justify-content-center">
@@ -354,34 +411,43 @@ $creditService = new CreditService();
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
+                                        {{--Invoice--}}
+                                        {{--                                        <a target="_blank" href="{{route('customer.generate_invoice', ['car_id'=>$car->id])}}">--}}
+                                        {{--                                            <button class="mb-1"--}}
+                                        {{--                                                    style="width: 67%; border: none;border-radius: 5px;background: #e2304e;color: white">--}}
+                                        {{--                                                {{$dashboardStatics['Invoice']}}--}}
+                                        {{--                                            </button>--}}
+                                        {{--                                        </a>--}}
+                                        <form target="_blank" action="{{route('customer.generate_invoice')}}"
+                                              method="get">
 
-                                        <a>
+                                            <input type="hidden" value="{{ $car->id }}" name="car_id">
                                             <button class="mb-1"
-                                                    style="width: 100%; border: none;border-radius: 5px;background: #e2304e;color: white">
-                                                {{Cache::get('dashboardStatics'.session()->get('locale'))['Invoice']}}
+                                                    style="width: 67%; border: none;border-radius: 5px;background: #e2304e;color: white">
+                                                {{$dashboardStatics['Invoice']}}
                                             </button>
-                                        </a>
-                                        <div style="display: flex;justify-content: center;height: 30px">
-
+                                        </form>
+                                        {{--Payment--}}
+                                        @if(!request()->routeIs('customer.archivedcars'))
+                                            <div style="display: flex;justify-content: center;height: 30px">
                                                 <form action="{{route('customer.set_amount')}}" method="post">
                                                     @csrf
                                                     <input type="hidden" value="{{ $car->id }}" name="car_id">
                                                     <input style="width: 80px;height: 100%;border-radius: 5px;"
-                                                           type="number"
+                                                           type="text"
                                                            name="amount">
                                                     <button style="width: 80px;border: none;border-radius: 5px;padding: 2px;background: #00b050;color: white">
-                                                        {{Cache::get('dashboardStatics'.session()->get('locale'))['Pay']}}
+                                                        {{$dashboardStatics['Pay']}}
                                                     </button>
                                                 </form>
-
-                                        </div>
+                                            </div>
+                                        @endif
                                     </td>
                                 @endif
                             </tr>
 
-                            <!-- Modal -->
+                            <!-- Add PRice To Invoice ?? -->
                             <div class="modal fade" id="exampleModal{{ $key }}" tabindex="-1" role="dialog"
                                  aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
@@ -441,11 +507,14 @@ $creditService = new CreditService();
     @push('scripts')
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
-            let table = new DataTable('#myTable');
+            let table = new DataTable('#myTable', {
+                order: [[0, 'desc']]
+
+            });
 
             document.getElementById('myTable_wrapper').children[0].style.width = '100%';
             let text = document.querySelector('[for="dt-length-0"]');
-            text.style.display='none';
+            text.style.display = 'none';
         </script>
     @endpush
 @endsection

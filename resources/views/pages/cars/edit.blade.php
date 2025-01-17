@@ -108,8 +108,8 @@
 
                                         <div class="form-group">
                                             <label>Percent</label>
-                                            <input type="text" value="{{ $car->percent }}" name="percent"
-                                                class="form-control">
+                                            <input type="text" value="{{ $car->credit->first()?->monthly_percent*100 }}" name="percent"
+                                                class="form-control" disabled>
                                         </div>
 
 
@@ -215,15 +215,9 @@
                                                         class="form-control" name="warehouse" id="warehouse"
                                                         value="{{ old('warehouse') }}" required>
                                                 </div>
-
-
                                             </div>
                                         </div>
-
-
-
                                     </div>
-
                                 </div>
 
                                 <div class="container">
@@ -237,14 +231,23 @@
                                         <template x-for="(item, index) in balance_accounting" :key="index">
                                             <div class="row repeater-item mt-2 align-items-center">
                                                 <div class="col-md-4">
-                                                    <input type="text" :name="`balance_accounting[${index}][name]`"
+                                                    <input required type="text" :name="`balance_accounting[${index}][name]`"
                                                         x-model="item.name" class="name-autocomplete form-control"
                                                         placeholder="Enter item name">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="number" :name="`balance_accounting[${index}][value]`"
+                                                    <input required type="number" :name="`balance_accounting[${index}][value]`"
                                                         x-model.number="item.value" class="form-control"
                                                         placeholder="Enter item value">
+                                                </div>
+                                                {{-- DATE--}}
+                                                <div class="col-md-4">
+                                                    <input required
+                                                            type="date"
+                                                            :name="`balance_accounting[${index}][date]`"
+                                                            x-model="item.date"
+                                                            class="form-control"
+                                                            x-init="item.date = item.date || new Date().toISOString().split('T')[0]">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button type="button" class="btn btn-danger"
@@ -257,15 +260,15 @@
                                         <button type="button" class="btn btn-primary mt-3" @click="addField">Add
                                             Another Item</button>
 
-                                        <div x-data="{
-                                            payed: {{ $car->payed }},
-                                            get amountDue() {
-                                                return calculateTotal() - parseFloat(this.payed || 0);
-                                            },
-                                            validateNumber() {
-                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point
-                                            }
-                                        }">
+{{--                                        <div x-data="{--}}
+{{--                                            payed: {{ $car->payed }}--}}
+{{--                                            get amountDue() {--}}
+{{--                                                return calculateTotal() - parseFloat(this.payed || 0);--}}
+{{--                                            },--}}
+{{--                                            validateNumber() {--}}
+{{--                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point--}}
+{{--                                            }--}}
+{{--                                        }">--}}
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <label for="allcost">All Cost</label>
@@ -289,7 +292,7 @@
                                         </div>
                                     </div>
 
-                                </div>
+
 
 
 
@@ -474,12 +477,13 @@
             // Ensure Alpine.js Reactive Store is initialized properly
             document.addEventListener('alpine:init', () => {
                 Alpine.store('balanceAccountingStore', {
-                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0]]), // Load existing data or default
+                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
 
                     addField() {
                         this.balance_accounting.push({
                             name: '',
-                            value: 0
+                            value: 0,
+                            date:''
                         });
                     },
                     // New method with confirmation
@@ -547,7 +551,7 @@
                 'Fee amount',
                 'Insurance cost',
                 'Hybrid',
-                'STORAGE',
+                'Storage',
                 'TITLE',
                 'Sublot',
                 'Credit',

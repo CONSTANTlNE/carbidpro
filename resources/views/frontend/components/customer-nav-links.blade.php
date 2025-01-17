@@ -1,44 +1,74 @@
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="d-flex mt-4 justify-content-between">
+    <div class="col-lg-12">
+        <div class="d-flex mt-4 justify-content-between flex-column flex-md-row">
             <ul style="padding-left: 0">
-                <li class="tabs__item ">
+                <li  class="tabs__item ">
                     <a href="{{ route('customer.dashboard') }}"
-                       class="{{ request()->routeIs('customer.dashboard')  ? 'active' : '' }}">
-                        {{Cache::get('dashboardStatics'.session()->get('locale'))['My Cars']}}</a>
+                       class="m-auto m-md-0 {{ request()->routeIs('customer.dashboard')  ? 'active' : '' }}">
+                        {{Cache::get('dashboardStatics' . session()->get('locale'))['My Cars']}}</a>
                 </li>
                 @if (!auth()->user()->hasRole('portmanager'))
                     <li class="tabs__item ">
                         <a href="{{ route('customer.archivedcars') }}"
-                           class="{{ request()->routeIs('customer.archivedcars') ? 'active' : '' }}">
-                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Car History']}}
+                           class="m-auto m-md-0 {{ request()->routeIs('customer.archivedcars') ? 'active' : '' }}">
+                            {{Cache::get('dashboardStatics' . session()->get('locale'))['Car History']}}
                         </a>
                     </li>
                 @endif
                 @if (!auth()->user()->hasRole('portmanager'))
                     <li class="tabs__item tabs__item_active ">
                         <a href="{{ route('customer.payment_history') }}"
-                           class="{{ request()->routeIs('customer.payment_history') ? 'active' : '' }}">
-                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Payment History']}}</a>
+                           class="m-auto m-md-0 {{ request()->routeIs('customer.payment_history') ? 'active' : '' }}">
+                            {{Cache::get('dashboardStatics' . session()->get('locale'))['Payment History']}}</a>
                     </li>
                 @endif
             </ul>
-            <div style="width: min-content">
+
+
+            <div style="width: max-content;background: #F2F2F2" class="p-3">
+                @if($pending)
+                    <p style="color:blue; word-wrap: break-word;word-break: break-word;font-size: 14px"
+                       class="text-center mt-3">
+                        {{Cache::get('dashboardStatics' . session()->get('locale'))['payment_confirmation']}}
+                    </p>
+                @endif
                 <form action="{{route('customer.payment_registration_submit')}}" class="text-center"
                       method="post">
                     @csrf
                     <div style="text-align: right ">
-                        <label for="bank_payment"> {{Cache::get('dashboardStatics'.session()->get('locale'))['Transferred Amount']}} </label>
-                        <input class="mb-2" id="bank_payment" type="number" name="bank_payment">
-                        <br>
-                        <label for="full_name">{{Cache::get('dashboardStatics'.session()->get('locale'))['Sender']}}({{Cache::get('dashboardStatics'.session()->get('locale'))['Full Name']}})</label>
-                        <input  id="full_name" type="text" name="full_name">
-                        <br>
-                        <br>
-                        <button style="border: none;border-radius: 5px;padding: 10px;background: #2f5496;color: white"
-                                class="mt-2">
-                            {{Cache::get('dashboardStatics'.session()->get('locale'))['Submit']}}
+
+                        <div class="d-flex justify-content-between text-center gap-2">
+                            <div>
+                                <label style="font-size: 14px"
+                                       for="bank_payment"> {{Cache::get('dashboardStatics' . session()->get('locale'))['Transferred Amount']}} </label>
+                                <input style="max-width: 70px;" class="mb-2" id="bank_payment" type="text"
+                                       name="bank_payment">
+                            </div>
+                            <div>
+                                <span style="font-size: 14px">Pending:</span>
+                                <span style="color: blue;font-size: 14px"> ${{ $pending }} </span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <label style="font-size: 14px" for="full_name">{{Cache::get('dashboardStatics' . session()->get('locale'))['Sender']}}
+                                    ({{Cache::get('dashboardStatics' . session()->get('locale'))['Full Name']}})</label>
+                                <input style="max-width: 70px;margin-left: 7px" id="full_name" type="text" name="full_name">
+                            </div>
+                            @if(session()->get('locale')==='en')
+                            <button  style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;margin-right: 10px">
+                                {{Cache::get('dashboardStatics' . session()->get('locale'))['Submit']}}
+                            </button>
+                            @endif
+                        </div>
+                        @if(session()->get('locale')==='ru')
+                        <button  style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;margin-right: 10px">
+                            {{Cache::get('dashboardStatics' . session()->get('locale'))['Submit']}}
                         </button>
+                        @endif
+                        <p style="font-size: 14px" class="text-center mt-3">{{Cache::get('dashboardStatics' . session()->get('locale'))['My Deposit']}} :<span
+                                    style="color: green"> ${{ $balance }}</span>
+                        </p>
                     </div>
                 </form>
 
@@ -46,14 +76,7 @@
         </div>
     </div>
 </div>
-@if($pending)
-    <p class="text-center mt-3">Pending: <span style="color: blue"> ${{ $pending }} </span>
-        <span style="color: blue">
-                            {{Cache::get('dashboardStatics'.session()->get('locale'))['payment_confirmation']}}
-                        </span>
-    </p>
-@endif
-<p class="text-center">{{Cache::get('dashboardStatics'.session()->get('locale'))['Deposit']}} :<span style="color: green"> ${{ $balance }}</span></p>
+
 
 <div class="d-flex justify-content-center">
     @session('error')

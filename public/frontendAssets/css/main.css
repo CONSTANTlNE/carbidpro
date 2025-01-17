@@ -38,13 +38,13 @@
 }
 
 .true {
-    border: 2px solid #4CAF50;
+    /*border: 2px solid #4CAF50;*/
     padding: 4px;
     color: #4caf50;
 }
 
 .false {
-    border: 2px solid #f44336;
+    /*border: 2px solid #f44336;*/
     padding: 4px;
     color: #f44336;
 }

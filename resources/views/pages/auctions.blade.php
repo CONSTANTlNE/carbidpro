@@ -239,6 +239,4 @@
     <script src="{{asset('assets/plugins/modals/modalEffects.js')}}"></script>
     <!-- End Page Lavel Plugins
 
-
-
 @endsection

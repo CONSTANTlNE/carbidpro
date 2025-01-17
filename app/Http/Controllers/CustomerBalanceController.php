@@ -7,7 +7,9 @@ use App\Models\Car;
 use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Models\MobileNumbers;
 use App\Services\CreditService;
+use App\Services\smsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -61,13 +63,17 @@ class CustomerBalanceController extends Controller
         $balance = new CustomerBalance;
 
 
-        $balance->amount      = $request->bank_payment;
-        $balance->full_name   = $request->full_name;
-        $balance->date        = $request->payment_date?:Carbon::now();
-        $balance->type        = 'fill';
-        $balance->is_approved = true;
-        $balance->customer_id = $request->customer_id;
+        $balance->amount            = $request->bank_payment;
+        $balance->full_name         = $request->full_name;
+        $balance->date              = $request->payment_date ?: Carbon::now();
+        $balance->balance_fill_date = $request->payment_date ?: Carbon::now();
+        $balance->type              = 'fill';
+        $balance->comment           = $request->comment;
+        $balance->is_approved       = true;
+        $balance->customer_id       = $request->customer_id;
+
         $balance->save();
+
 
         return back();
     }
@@ -78,10 +84,12 @@ class CustomerBalanceController extends Controller
     public function approveBalance(Request $request)
     {
         $prequest = CustomerBalance::where('id', $request->id)->first();
+        $customer = $prequest->customer;
 
         if ($prequest->is_approved === 0) {
             $prequest->is_approved = 1;
             $prequest->save();
+            (new smsService())->depositConfirmationCustomer($customer->phone, $prequest);
         } else {
             $prequest->is_approved = 0;
             $prequest->save();
@@ -102,11 +110,12 @@ class CustomerBalanceController extends Controller
 
         $balance = new CustomerBalance;
 
-        $balance->amount    = $request->bank_payment;
-        $balance->full_name = $request->full_name;
-//        $balance->date        = $request->payment_date;
-        $balance->type        = 'fill';
-        $balance->customer_id = auth()->user()->id;
+        $balance->amount            = $request->bank_payment;
+        $balance->full_name         = $request->full_name;
+        $balance->date              = $request->payment_date ?: Carbon::now();
+        $balance->balance_fill_date = $request->payment_date ?: Carbon::now();
+        $balance->type              = 'fill';
+        $balance->customer_id       = auth()->user()->id;
         $balance->save();
 
 
@@ -117,13 +126,18 @@ class CustomerBalanceController extends Controller
                 'amount' => $balance->amount,
             ];
 
-
             Mail::to(config('carbiddata.email'))->send(new SampleMail($content));
 
+            $customer = Customer::where('id', auth()->user()->id)->first();
 
-            // foreach (['First Coder' => 'first-recipient@gmail.com', 'Second Coder' => 'second-recipient@gmail.com'] as $name => $recipient) {
-            //     Mail::to($recipient)->send(new MyTestEmail($name));
-            // }
+            // Send Sms To employees
+            $depositNumbers=MobileNumbers::where('type','new_deposit')->get();
+            foreach ($depositNumbers as $number) {
+                (new smsService())->deposit($number->number, $customer, $balance);
+            }
+            // send Sms To Customer
+            (new smsService())->newDepositCustomer($customer->phone, $balance);
+
 
             return redirect()->back()->with('success', 'Payment request received! We will confirm within 24 hours.');
         } catch (\Exception $e) {
@@ -170,7 +184,7 @@ class CustomerBalanceController extends Controller
             $balance->customer_id     = auth()->user()->id;
             $balance->car_id          = $request->car_id;
             $balance->carpayment_date = Carbon::now();
-            $balance->date = Carbon::now();
+            $balance->date            = Carbon::now();
             $balance->save();
 
             $car->save();
@@ -196,7 +210,26 @@ class CustomerBalanceController extends Controller
         return back()->with('error', 'Not enough deposit');
     }
 
-    public function updateBalance(Request $request) {}
+    public function updateBalance(Request $request)
+    {
+        $balance = CustomerBalance::find($request->balance_id);
+
+        $request->validate([
+            'bank_payment' => 'required|numeric|min:1',
+            'full_name'    => 'required|string|max:255',
+        ]);
+
+        $balance->amount            = $request->bank_payment;
+        $balance->full_name         = $request->full_name;
+        $balance->balance_fill_date = $request->transfer_date;
+        $balance->date              = $request->transfer_date;
+        $balance->type              = 'fill';
+        $balance->comment           = $request->comment;
+        $balance->customer_id       = $request->customerID;
+        $balance->save();
+
+        return back();
+    }
 
     public function deleteBalance(Request $request)
     {
@@ -209,6 +242,7 @@ class CustomerBalanceController extends Controller
     /**
      * Dynamic Search with HTMX when creating customer Balance payment in Admin dashboard
      */
+
     public function searchCustomerHtmx(Request $request)
     {
         if (!empty($request->search)) {
@@ -277,14 +311,13 @@ class CustomerBalanceController extends Controller
         }
 
 
-
         $balance              = new CustomerBalance();
         $balance->customer_id = $request->customer_id;
         $balance->car_id      = $request->car_id;
         // negative because fill and deduction has same column in database
         $balance->amount          = -$request->amount;
         $balance->carpayment_date = $request->payment_date;
-        $balance->date = $request->payment_date;
+        $balance->date            = $request->payment_date;
         $balance->comment         = $request->comment;
         $balance->type            = 'car_payment';
         $balance->is_approved     = 1;
@@ -294,7 +327,7 @@ class CustomerBalanceController extends Controller
         // if credit was granted also apply the credit payment
         $newCredit = (new CreditService())->creditPayment($car, $request, $balance);
 
-        (new CreditService())->reCalculateOnDeleteOrAdd($car, $newCredit);
+        (new CreditService())->reCalculateOnDeleteOrAdd($car);
 
 
         return back();
@@ -328,7 +361,7 @@ class CustomerBalanceController extends Controller
             return back()->with('error', 'You can not pay more than amount due');
         }
 
-        (new CreditService())->reCalculateOnUpdate($car, $payment, $request->amount, $request->comment,
+        (new CreditService())->reCalculateOnPaymentUpdate($car, $payment, $request->amount, $request->comment,
             $request->payment_date);
 
 
@@ -340,11 +373,7 @@ class CustomerBalanceController extends Controller
         $payment = CustomerBalance::find($request->id);
         $car     = Car::where('id', $payment->car_id)->first();
 
-
-
         $car->save();
-
-
         $payment->delete();
 
         (new CreditService())->reCalculateOnDeleteOrAdd($car);

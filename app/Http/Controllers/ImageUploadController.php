@@ -24,7 +24,6 @@ class ImageUploadController extends Controller
             }
         }
 
-
-        return redirect()->back()->with('success', 'Images uploaded successfully.');
+        return response()->json(['message' => 'Images uploaded successfully!']);
     }
 }

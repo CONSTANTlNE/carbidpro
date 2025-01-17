@@ -26,7 +26,6 @@
                       $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
                   }
 
-
 @endphp
 
 
@@ -80,12 +79,11 @@
                         <option value="-1" selected="">{{$calculatorStatics['Select Exit Port']}}</option>
                     </select>
 
-                    <input type="text" class="form-control" disabled value="Georgia">
                     <select class="form-select mb-2" id="AucCountrySelect">
                         <option value="-1" selected="">{!! $calculatorStatics['Select Country'] !!}</option>
-
-                            <option value="1">Georgia</option>
-
+                        @foreach ($countries as $country)
+                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                        @endforeach
                     </select>
 
                     <select class="form-select mb-2" id="AucPortCitySelect">
@@ -270,8 +268,6 @@
                                 `<option value="${location.id}">${location.name}</option>`
                             );
                         });
-
-
                     }
                 });
             });

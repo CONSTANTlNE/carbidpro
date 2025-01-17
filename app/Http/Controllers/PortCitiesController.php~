@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Countries;
+use App\Models\PortCity;
+use Illuminate\Http\Request;
+
+class PortCitiesController extends Controller
+{
+    public function index() {
+        $portcities = PortCity::all();
+        $countries = Countries::all();
+        return view('pages.Data.portcities', compact('portcities', 'countries'));
+    }
+
+    public function store(Request $request) {
+        $request->validate([
+            'country_id' => 'required|exists:countries,id',
+            'name' => 'required|string|max:255|min:1',
+            'price' => 'required|numeric',
+        ]);
+        $portcity = new PortCity();
+        $portcity->name = $request->name;
+        $portcity->price = $request->price;
+        $portcity->country_id = $request->country_id;
+        $portcity->save();
+        return back();
+    }
+
+    public function update(Request $request) {
+        $portcity = PortCity::find($request->id);
+        $portcity->name = $request->name;
+        $portcity->price = $request->price;
+        $portcity->country_id = $request->country_id;
+        $portcity->save();
+        return back();
+    }
+
+    public function delete(Request $request) {
+        $portcity = PortCity::find($request->id);
+        $portcity->delete();
+        return back();
+    }
+
+}

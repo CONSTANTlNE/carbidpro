@@ -1,0 +1,24 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\PortCity;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class PortCitiesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        PortCity::create([
+            'name' => 'Batumi',
+        ]);
+
+        PortCity::create([
+            'name' => 'Poti',
+        ]);
+    }
+}

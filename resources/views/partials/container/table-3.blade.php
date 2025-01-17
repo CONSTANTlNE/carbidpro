@@ -285,6 +285,7 @@
                 'Hapag-Eisa',
                 'Turkon-DTS',
                 'One net-Wilhelmsen',
+                'COSCO',
             ];
 
             // Initialize jQuery UI autocomplete

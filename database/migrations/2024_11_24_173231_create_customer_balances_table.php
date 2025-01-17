@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('customer_balances', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_balance_id')->nullable()->constrained('customer_balances')->onDelete('cascade');
             $table->string('amount')->nullable();
             $table->date('balance_fill_date')->nullable();
             $table->date('carpayment_date')->nullable();

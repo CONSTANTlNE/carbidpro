@@ -13,7 +13,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Customer extends Authenticatable implements HasMedia
 {
-    use HasFactory;
     use HasRoles;
     use SoftDeletes;
     use InteractsWithMedia;

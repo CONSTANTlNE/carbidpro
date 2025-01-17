@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\EloquentSortable\Sortable;
@@ -16,6 +17,8 @@ class Car extends Model implements HasMedia, Sortable
     use SortableTrait;
     use HasFactory;
     use InteractsWithMedia;
+    use SoftDeletes;
+
     public $sortable = ['customer', 'dispatcher', 'car_statuses'];  // Add other sortable columns as needed
 
     protected $guarded=[];
@@ -99,13 +102,23 @@ class Car extends Model implements HasMedia, Sortable
         return $this->hasMany(Credit::class);
     }
 
-
     /**
      * Check if credit is given for car and retrieve latest payment details
      */
     public function latestCredit(): HasOne
     {
         return $this->hasOne(Credit::class)->latestOfMany('issue_or_payment_date');
+    }
+
+    public function firstCredit(): HasOne
+    {
+        return $this->hasOne(Credit::class)->oldestOfMany('issue_or_payment_date');
+    }
+
+    // same as broker
+    public function dispatcher()
+    {
+        return $this->belongsTo(User::class, 'dispatch_id');
     }
 
 }

@@ -29,7 +29,7 @@
                     <i class="fa fa-money"></i>
                 </div>
                 <div class="header-title">
-                    <h1>Car Payments</h1>
+                    <h1>Payments For Cars</h1>
                 </div>
             </section>
             @if($errors->any())
@@ -305,7 +305,7 @@
                                             <th>CAR</th>
                                             <th>Customer</th>
                                             <th>Paid</th>
-                                            <th>Is Approved</th>
+{{--                                            <th>Is Approved</th>--}}
                                             <th>Action</th>
                                         </tr>
                                         </thead>
@@ -319,9 +319,9 @@
                                                 <td>{{ $payment_report->car->make_model_year }}</td>
                                                 <td>{{ $payment_report->customer->contact_name }}</td>
                                                 <td>${{ $payment_report->amount*-1 }}</td>
-                                                <td><span
-                                                            class="label-{{ $payment_report->is_approved == 1 ? 'custom' : 'danger' }} label label-default">{{ $payment_report->is_approved == 1 ? 'YES' : 'NO' }}</span>
-                                                </td>
+{{--                                                <td><span--}}
+{{--                                                            class="label-{{ $payment_report->is_approved == 1 ? 'custom' : 'danger' }} label label-default">{{ $payment_report->is_approved == 1 ? 'YES' : 'NO' }}</span>--}}
+{{--                                                </td>--}}
 
                                                 <td>
                                                     <button type="button" class="btn-edit-record btn btn-add btn-sm"

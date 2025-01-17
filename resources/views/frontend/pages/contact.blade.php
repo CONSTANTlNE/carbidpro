@@ -102,7 +102,7 @@
                             @endif
                             <form action="{{ route('sendEmail') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="honeypot">
+                                <input type="hidden" name="request">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <input type="text" name="fname" required

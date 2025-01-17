@@ -32,12 +32,13 @@ class calculatorController extends Controller
             Session::put('locale', 'en');
         }
 
-
+//        dd(auth()->user()->extra_for_team);
 
         $auctions = Auction::all();
         $loadtypes = LoadType::all();
-//        $countries = Country::all();
-        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr'));
+        $countries = Country::all();
+
+        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries'));
     }
 
     public function calculate(Request $request)
@@ -85,16 +86,18 @@ class calculatorController extends Controller
 
 
 
-            $extra_for_team = session()->get('auth')->extra_for_team;
+//            $extra_for_team = session()->get('auth')->extra_for_team;
+             $extra_for_team =   auth()->user()->extra_for_team;
 
-            if (session()->get('auth')->extra_for_team && session()->get('auth')->parent_of != 0) {
-                $parent_dealer = Customer::where('id', session()->get('auth')->parent_of)->first();
+
+            if (   auth()->user()->extra_for_team &&  auth()->user()->parent_of != 0) {
+                $parent_dealer = Customer::where('id', auth()->user()->parent_of->parent_of)->first();
 
                 $parent_extra = $parent_dealer->extra_for_team + $extra_for_team;
 
 
             } else {
-                $parent_extra = session()->get('auth')->extra_for_team;
+                $parent_extra = auth()->user()->extra_for_team;;
             }
 
             $result = $total_inside->price +

@@ -71,8 +71,10 @@
                                     margin: 0;
                                 }
                             </style>
-                            <form action="{{ route('car.store') }}" method="POST">
+                            <form action="{{ route('car.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                <input style="display: none" id="images2" type="file"  name="images2[]" multiple>
+
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="form-group">
@@ -87,7 +89,6 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
 
                                         <div class="form-group">
                                             <label>Broker</label>
@@ -250,9 +251,6 @@
                                 </div>
 
                                 <div class="container">
-
-
-
                                     <div x-data="$store.balanceAccountingStore" class="mt-4">
                                         <div class="d-flex" style="gap:10px">
                                             <p x-text="'Number of items: ' + balance_accounting.length"></p>
@@ -273,6 +271,11 @@
                                                     <input type="number" :name="`balance_accounting[${index}][value]`"
                                                         x-model.number="item.value" class="form-control"
                                                         placeholder="Enter item value">
+                                                </div>
+                                                  {{-- DATE--}}
+                                                <div style="display: none" class="col-md-4">
+                                                    <input type="date" :name="`balance_accounting[${index}][date]`"
+                                                           x-model="item.date" class="form-control"     x-init="item.date = item.date || '{{ now()->format('Y-m-d') }}'" >
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button type="button" class="btn btn-danger"
@@ -317,11 +320,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-
-
-
-
                                 </div>
 
                                 <div class="container mb-3">
@@ -435,6 +433,10 @@
         <script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>
 
         <script>
+
+
+
+
             document.addEventListener("DOMContentLoaded", function() {
                 // Register FilePond plugins
                 FilePond.registerPlugin(
@@ -445,7 +447,7 @@
 
                 // Turn input element into a pond
                 // Get the car_id from the input element
-                const inputElement = document.querySelector('input[type="file"]');
+                const inputElement = document.getElementById('filepond');
                 const carId = inputElement.getAttribute('data-car_id');
 
                 // Initialize FilePond with car_id passed in the process data
@@ -475,6 +477,29 @@
                     }
                 });
 
+
+               setTimeout( function() {
+                   document.querySelector('[name="images[]"]').addEventListener('change', function (event) {
+                       // Get the files selected in the filepond input
+                       const filepondFiles = event.target.files;
+
+                       // Get the hidden images2 input element
+                       const images2Input = document.getElementById('images2');
+
+                       // Create a new DataTransfer object to manage files
+                       const dataTransfer = new DataTransfer();
+
+                       // Add all files from filepond to the DataTransfer object
+                       for (let i = 0; i < filepondFiles.length; i++) {
+                           dataTransfer.items.add(filepondFiles[i]);
+                       }
+
+                       // Assign the files to the images2 input
+                       images2Input.files = dataTransfer.files;
+                   })
+               },300)
+
+
             });
         </script>
 
@@ -482,7 +507,7 @@
             // Ensure Alpine.js Reactive Store is initialized properly
             document.addEventListener('alpine:init', () => {
                 Alpine.store('balanceAccountingStore', {
-                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0]]), // Load existing data or default
+                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
 
 
                     addField() {
@@ -491,7 +516,8 @@
 
                         this.balance_accounting.push({
                             name: '',
-                            value: 0
+                            value: 0,
+                            date:''
                         });
                     },
 
@@ -541,7 +567,7 @@
                 'Fee amount',
                 'Insurance cost',
                 'Hybrid',
-                'STORAGE',
+                'Storage',
                 'TITLE',
                 'Sublot',
                 'Credit',

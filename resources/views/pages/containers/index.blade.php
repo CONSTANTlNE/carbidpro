@@ -63,7 +63,16 @@
         </div>
         <!-- Main content -->
         <section class="content">
+            @if($errors->any())
+                <div class="d-flex justify-content-center">
+                    @foreach($errors->all() as $error)
+                        <p class="text-danger" style="margin: 2px 0 2px 0;">{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="row">
+
                 <div class="col-lg-12 pinpin">
                     <div class="card lobicard" id="lobicard-custom-control" data-sortable="true">
 
@@ -97,12 +106,7 @@
                                                 </a>
                                             @endif
                                         @endforeach
-
-
-
-
                                     </div>
-
 
                                     <div>
                                         <form class="form-inline my-2 my-lg-0" method="GET">
@@ -125,6 +129,7 @@
                             @elseif($currentStatus == 'loading-pending')
                                 @include('partials.container.table-2', ['cars' => $groups])
                             @else
+                                {{--loaded-payments--}}
                                 @include('partials.container.table-3', ['cars' => $groups])
                             @endif
 

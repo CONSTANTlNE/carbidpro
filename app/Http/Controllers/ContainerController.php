@@ -10,10 +10,12 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\PortEmail;
+use App\Services\smsService;
 use Carbon\Carbon;
-use DB;
+
 use Illuminate\Http\Request;
 use App\Models\Car;
+use Illuminate\Support\Facades\DB;
 use Mail;
 
 class ContainerController extends Controller
@@ -32,6 +34,7 @@ class ContainerController extends Controller
 
     public function showStatus($slug, Request $request)
     {
+
         $containerStatus = ContainerStatus::where('slug', $slug)->first();
 
         if (auth()->user()->hasRole('Admin')) {
@@ -118,7 +121,8 @@ class ContainerController extends Controller
 
         } else {
 
-            $groupsQuery = ContainerGroup::with('cars')
+
+            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3); // Filter cars where container_status is 3
                 });
@@ -160,7 +164,9 @@ class ContainerController extends Controller
 
     }
 
-
+    /**
+     *  Create ContainerGroup record
+     */
     public function groupSelectedCars(Request $request)
     {
         // Validate the selected car IDs
@@ -315,6 +321,7 @@ class ContainerController extends Controller
     public function updateGroup(Request $request)
     {
         $container = ContainerGroup::findOrFail($request->group_id);
+
         $car_ids = DB::table('container_group_container')
             ->where('container_group_id', $request->group_id)
             ->pluck('car_id')
@@ -323,6 +330,12 @@ class ContainerController extends Controller
         if ($request->has('container')) {
             $container->container_id = $request->container;
             Car::whereIn('id', $car_ids)->update(['container_number' => $request->container]);
+            foreach ($car_ids as $car_id) {
+                $customer = Car::where('id', $car_id)->first()->customer;
+                if ($customer) {
+                    (new smsService())->carLoaded($customer->phone, Car::where('id', $car_id)->first(), $request->container);
+                }
+            }
         }
 
         if ($request->has('container_cost')) {

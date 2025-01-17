@@ -22,7 +22,7 @@ class SettingsSeeder extends Seeder
 
         $contact_address=Setting::create([
             'label'=>'Office address',
-            'key'=>'adress',
+            'key'=>'address',
             'value'=>"<p>N46 Alexander Kazbegi Ave .Tbilisi. Georgia </p>"
         ]);
 
@@ -36,6 +36,12 @@ class SettingsSeeder extends Seeder
             'label'=>'Telephone number',
             'key'=>'phone',
             'value'=>"<p>+1 8589998145</p>"
+        ]);
+
+        $about=Setting::create([
+            'label'=>'About',
+            'key'=>'about',
+            'value'=>"About Text"
         ]);
     }
 }

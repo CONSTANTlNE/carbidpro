@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('content');
             $table->text('date');
-            $table->boolean('is_active')->default(0);
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

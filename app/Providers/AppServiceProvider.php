@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Car;
+use App\Models\Customer;
 use App\Models\CustomerBalance;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -30,13 +32,23 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind the composer to a specific view
         View::composer(['partials.aside', 'partials.header'], function (BaseView $view) {
+            $balancecomposers = CustomerBalance::where('type', 'fill')
+                ->with('customer')
+                ->where('is_approved', 0)->get();
+            $deposits         = $balancecomposers->count();
 
-            $balancecomposers=CustomerBalance::where('type', 'fill')->where('is_approved', 0)->get();
-            $deposits=$balancecomposers->count();
-//            dd($deposits);
 
-            $view->with('balancecomposers', $balancecomposers)->with('deposits', $deposits);
+            $newcustomers   = Customer::where('is_active', 0)->get();
+            $customerscount = $newcustomers->count();
+            $archivedCount  = Car::onlyTrashed()->count();
 
+
+            $view
+                ->with('balancecomposers', $balancecomposers)
+                ->with('deposits', $deposits)
+                ->with('newcustomers', $newcustomers)
+                ->with('customerscount', $customerscount)
+                ->with('archivedCount', $archivedCount);
         });
     }
 }

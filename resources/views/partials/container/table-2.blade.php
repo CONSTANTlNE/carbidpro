@@ -48,10 +48,8 @@
                             <th style="width: 10%;">
                                 <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
                                     name="thc_agent" class="form-control thc_agent" id="thc_agent" required>
-
                                 <br>
                                 <br>
-
                                 <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                     class="form-control" name="container_cost" id="container_cost" required>
                             </th>

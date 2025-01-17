@@ -375,29 +375,30 @@ class CustomerController extends Controller
 
 
         if (route('customer.archivedcars') == url()->current()) {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
-                ->where('balance', 0)
+                ->where('amount_due', 0)
                 ->where($whereLabel,
                     $customer->id)
                 ->paginate(50)
                 ->withQueryString();
 
         } elseif (auth()->user()->hasRole('portmanager')) {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
                 ->paginate(50)
                 ->withQueryString();
         } else {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
-                ->where('balance_accounting', '!=', null)
+//                ->where('balance_accounting', '!=', null)
+                ->where('amount_due', '>', 0)
                 ->where($whereLabel,
                     $customer->id)
                 ->paginate(50)
@@ -520,8 +521,8 @@ class CustomerController extends Controller
 
         $payment_report = CustomerBalance::with('car')
             ->where('customer_id', auth()->user()->id)
-            ->where('is_approved',
-                1)->get();
+//            ->where('is_approved',1)
+            ->get();
 
         $balance = CustomerBalance::where('customer_id', $customer->id)
             ->where('is_approved', 1)
@@ -544,6 +545,7 @@ class CustomerController extends Controller
             exit('Spam detected');
         }
 
+
         $content = [
             'fname' => $request->fname,
             'lname' => $request->lname,
@@ -556,106 +558,6 @@ class CustomerController extends Controller
         Mail::to(config('carbiddata.email'))->send(new ContactMail($content));
 
         return redirect()->back()->with('success', 'Email sent');
-    }
-
-    public function generateInvoice(Request $request)
-    {
-        $car = Car::with('customer')->where('id', $request->car_id)->first();
-
-        $customer = new Buyer([
-            'name'          => $car->customer->company_name.' N '.$car->customer->personal_number,
-            'custom_fields' => [
-                'email' => $car->customer->email,
-            ],
-        ]);
-
-        $car_name = $car->make.' '.$car->model.' '.$car->year.' '.$car->vin;
-
-        if (session()->get('auth')->child_of <= 0 && !empty($car->balance_accounting[0]['name'])) {
-            $items = [];
-            // InvoiceItem::make($car_name)->pricePerUnit(session()->get('auth')->parent_of <= 0 ? $car->debit : $car->invoice_debit),
-
-            if (!empty($car->balance_accounting)) {
-                foreach ($car->balance_accounting as $balance_accounting) {
-                    $key_value = $balance_accounting['name'];
-                    if ($balance_accounting['name'] == 'Vehicle cost') {
-                        $key_value = $balance_accounting['name']." VIN: ".$car->vin;
-                    }
-
-                    $item = InvoiceItem::make(empty($key_value) ? 'undefined' : $key_value)->pricePerUnit($balance_accounting['value']);
-
-                    array_push($items, $item);
-                }
-            }
-
-
-            $originalBalance  = $car->debit - $car->recived;
-            $createdDate      = Carbon::parse($car->created_at);
-            $currentDate      = Carbon::now();
-            $differenceInDays = $createdDate->diffInDays($currentDate);
-            $percent          = $car->percent; // This should be in decimal form, i.e., 5% should be 0.05.
-
-            // Calculate the percentage amount.
-            if (isset($car->extra_price) && $car->extra_price > 0) {
-                $percentAmount = (int) $car->extra_price * ($percent / 100);
-            } else {
-                $percentAmount = (int) $originalBalance * ($percent / 100);
-            }
-
-            // Assuming 30 days for simplicity.
-            $days = 30;
-
-            // Calculate the daily charge.
-            $dailyCharge = (int) number_format($percentAmount, 2, '.', '') / $days;
-
-            // Calculate the new amount due based on the car's percentage
-            $newAmountDue = $dailyCharge * $differenceInDays;
-
-
-            $newTax = InvoiceItem::make('Financed fee')->pricePerUnit($newAmountDue);
-
-            array_push($items, $newTax);
-
-            $notes = [
-                'Amount due <strong>$'.$car->balance.'<strong>',
-            ];
-            $notes = implode("<br>", $notes);
-
-            if ($car->balance > 0) {
-                $invoice = Invoice::make()
-                    ->status(__('invoices::invoice.due'))
-                    ->serialNumberFormat('{SEQUENCE}/{SERIES}')
-                    ->logo(public_path('assets/logo.png'))
-                    ->buyer($customer)
-                    ->currencySymbol('$')
-                    ->currencyCode('USD')
-                    ->notes($notes)
-                    ->payUntilDays(0)
-                    ->addItems($items);
-            } else {
-                $invoice = Invoice::make()
-                    ->status(__('invoices::invoice.paid'))
-                    ->logo(public_path('assets/logo.png'))
-                    ->serialNumberFormat('{SEQUENCE}/{SERIES}')
-                    ->buyer($customer)
-                    ->currencySymbol('$')
-                    ->currencyCode('USD')
-                    ->payUntilDays(0)
-                    ->addItems($items);
-            }
-        } else {
-            $car_name = $car->make.' '.$car->model.' '.$car->year.' '.$car->vin;
-            $item     = InvoiceItem::make($car_name)->pricePerUnit(session()->get('auth')->child_of <= 0 ? $car->debit : $car->invoice_debit);
-            $invoice  = Invoice::make()
-                ->buyer($customer)
-                ->currencySymbol('$')
-                ->currencyCode('USD')
-                ->payUntilDays(0)
-                ->addItem($item);
-        }
-
-
-        return $invoice->stream();
     }
 
     public function showRegistrationForm()
@@ -675,6 +577,7 @@ class CustomerController extends Controller
     }
 
     // Dealer Registration and also Dealers can register their Sub Dealers adding their profit as 'extra_for_team'
+
     public function register(Request $request)
     {
         $current = session()->get('auth');

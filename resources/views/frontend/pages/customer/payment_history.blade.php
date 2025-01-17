@@ -2,25 +2,23 @@
 
 @php
     use Carbon\Carbon;
+//         Cache::forget('phistoryStaticsru');
+//         Cache::forget('phistoryStaticsen');
+
        $phistoryStatics=Cache::get('phistoryStatics'.session()->get('locale'));
 
-                 if($phistoryStatics===null){
-
+                 if($phistoryStatics===null) {
                      $data=[
                          'Date'=>$tr->translate('Date'),
-                         'Car list'=>$tr->translate('Car list'),
+                         'Payments'=>$tr->translate('Payments'),
                          'Amount'=>$tr->translate('Amount'),
                          'Full Name'=>$tr->translate('Full Name'),
                          'Approved'=>$tr->translate('Approved'),
-
                      ];
-
                      Cache::forever('phistoryStatics'.session()->get('locale'), $data);
-
+                     $phistoryStatics=Cache::get('phistoryStatics'.session()->get('locale'));
                  }
    //
-   //                  Cache::forget('phistoryStaticsru');
-   //                  Cache::forget('phistoryStaticsen');
 
 @endphp
 
@@ -48,7 +46,7 @@
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{{ Cache::get('phistoryStatics' . session()->get('locale'))['Car list'] }}</h2>
+                <h2 style="margin-top: 80px;padding: 0;">{{ $phistoryStatics['Payments'] }}</h2>
 
             </div>
         </div>
@@ -62,21 +60,21 @@
 
                     <thead>
                     <tr class="text-center">
-                        <th class="text-center">{{ Cache::get('phistoryStatics' . session()->get('locale'))['Date'] }}</th>
-                        <th class="text-center">{{ Cache::get('phistoryStatics' . session()->get('locale'))['Amount'] }}</th>
-                        <th class="text-center">{{ Cache::get('phistoryStatics' . session()->get('locale'))['Full Name'] }}</th>
-                        <th class="text-center">{{ Cache::get('phistoryStatics' . session()->get('locale'))['Approved'] }}</th>
+                        <th class="text-center">{{ $phistoryStatics['Date'] }}</th>
                         <th class="text-center">VIN</th>
+                        <th class="text-center">{{ $phistoryStatics['Amount'] }}</th>
+                        <th class="text-center">{{ $phistoryStatics['Full Name'] }}</th>
+                        <th class="text-center">{{ $phistoryStatics['Approved'] }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach ($payment_report as $report)
                         <tr style="background-color: {{ $report->type === 'fill' ? '#82f98261' : '#ff898b61' }} ">
-                            <td class="text-center">{{Carbon::parse($report->date)->format('d-m-Y'); }}</td>
+                            <td class="text-center">{{Carbon::parse($report->date)->format('d-m-Y') }}</td>
+                            <td class="text-center">{{$report->car?->vin }}</td>
                             <td class="text-center">${{ $report->amount }}</td>
                             <td class="text-center"> {{ $report->full_name }}</td>
                             <td class="text-center">{!! $report->is_approved == 1 ? '<span class="true">YES</span>' : '<span class="false">NO</span>' !!}</td>
-                            <td class="text-center">{{$report->car?->vin }}</td>
                         </tr>
                     @endforeach
                     </tbody>

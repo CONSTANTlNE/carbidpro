@@ -22,8 +22,8 @@
                 <li class="nav-item dropdown notifications-menu">
                     <a class="nav-link admin-notification" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="pe-7s-bell"></i>
-                        @if($balancecomposers)
-                        <span class="label bg-danger">{{$deposits}}</span>
+                        @if($deposits>0 || $customerscount>0)
+                        <span class="label bg-danger">{{$deposits+$customerscount}}</span>
                         @endif
                     </a>
                     <div class="dropdown-menu drop_drops custom_drop_scroll" tabindex="3" style="overflow: hidden; outline: none;">
@@ -34,6 +34,18 @@
                                         <p>
                                             <i class="fa fa-dot-circle-o color-red"></i>
                                            Deposit : {{$balancecomposer->customer->contact_name}} - {{$balancecomposer->amount}}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @endif
+                        @if($newcustomers)
+                            @foreach($newcustomers as $newcustomer)
+                                <a class="dropdown-item" href="#">
+                                    <div class="menues">
+                                        <p>
+                                            <i class="fa fa-dot-circle-o color-red"></i>
+                                           New Customer : {{$newcustomer->contact_name}}
                                         </p>
                                     </div>
                                 </a>

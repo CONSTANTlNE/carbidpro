@@ -72,6 +72,7 @@ return new class extends Migration {
             $table->dateTime('last_amount_update_date')->nullable();
             $table->enum('is_dispatch', ['no', 'yes'])->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('ready_for_pickup')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

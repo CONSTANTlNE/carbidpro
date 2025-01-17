@@ -58,6 +58,7 @@
 <div style="margin-top:30px;display: flex;flex-direction: column;gap: 30px;align-items: flex-end;">
 
     @if ($currentStatus == 'for-load')
+       {{--   Creates ContainerGroup--}}
         <form action="{{ route('container.selected') }}"
             class="form-inline my-2 my-lg-0 mt-5 mb-3" method="post">
             @csrf

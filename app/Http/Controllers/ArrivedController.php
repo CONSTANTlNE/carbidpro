@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\ContainerGroup;
 use App\Models\LoadType;
 use App\Models\Port;
+use App\Services\smsService;
 use Illuminate\Http\Request;
 
 class ArrivedController extends Controller
@@ -22,7 +23,7 @@ class ArrivedController extends Controller
 
             $groups = ContainerGroup::with('cars')->where('container_id', $request->input('search'))
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 3);  // Filter cars where container_status is 2
+                    $query->where('container_status', 3);
                 })
                 ->get();
         } else {
@@ -49,37 +50,7 @@ class ArrivedController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -126,6 +97,10 @@ class ArrivedController extends Controller
 
         if ($request->has('opened')) {
             $container->opened = $request->opened;
+            // Send sms for dealers
+            foreach($container->cars as $car){
+                (new smsService())->containerOpenedd($car->customer->phone,$car);
+            }
         }
 
         if ($request->has('open_payed')) {

@@ -20,7 +20,6 @@
                 <th>ID</th>
                 <th>CAR INFO</th>
                 <th>FROM-TO</th>
-
                 <th>Price</th>
                 <th>Carrier</th>
                 <th>Pickup & Delivery Dates</th>
@@ -33,7 +32,6 @@
         <tbody>
             @foreach ($cars as $car)
                 <tr>
-
                     <td>
                         {{ $car->id }}</td>
                     <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
@@ -168,7 +166,6 @@
 
                         </td>
                     </form>
-
                 </tr>
             @endforeach
 

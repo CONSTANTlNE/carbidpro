@@ -7,25 +7,32 @@ use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\calculatorController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContainerController;
+use App\Http\Controllers\CountriesController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LoadTypesController;
 use App\Http\Controllers\LocationsController;
 use App\Http\Controllers\CustomerBalanceController;
+use App\Http\Controllers\PortCitiesController;
 use App\Http\Controllers\PortEmailController;
 use App\Http\Controllers\PortsController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UserController;
 use App\Models\Credit;
 use App\Models\CustomerBalance;
 use App\Models\State;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
@@ -47,8 +54,7 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/contact', 'contact');
 });
 
-Route::get('/calculator', [calculatorController::class, 'index']);
-Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
+
 
 
 // Customers / Dealers Login-registration
@@ -84,6 +90,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Cars
     Route::controller(CarController::class)->group(function () {
         Route::get('/cars', 'index')->name('cars.index');
+        Route::get('/cars/archive', 'index')->name('cars.index.trashed');
         Route::get('/car/create', 'create')->name(name: 'car.create');
         Route::post('/car/create', 'store')->name(name: 'car.store');
         Route::get('/car/edit/{id}', 'edit')->name(name: 'car.edit');
@@ -93,16 +100,21 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/cars/status/{slug}', 'showStatus')->name(name: 'car.showStatus');
 //        Route::delete('/dashboard/car/{user}', 'destroy')->name('car.destroy');
         Route::post('/car/delete', 'destroy')->name('car.destroy');
+        Route::post('/car/delete/permanently', 'destroyPermanently')->name('car.destroy.permanently');
         Route::post('/calculate-shipping-cost', 'calculateShippingCost')->name('calculate.shipping.cost');
         Route::post('/fetch-locations', 'fetchLocations')->name('fetch.locations');
         Route::post('/fetch-ports', 'fetchPorts')->name('fetch.ports');
         Route::post('/fetch-from-states', 'fetchFromStates')->name('fetch.from.states');
+        Route::get('/ready-for-pickup', 'readyForPickup')->name('car.readyforpickup');
+        Route::get('/cars/archive/restore/{id}', 'restoreTrashed')->name('car.trashed.restore');
+
     });
 
     Route::post('/upload-images', [ImageUploadController::class, 'store'])->name('upload.images.spatie');
 
     // Containers
     Route::controller(ContainerController::class)->group(function () {
+        // Creates ContainerGroup
         Route::post('/container/group-create', 'groupSelectedCars')->name(name: 'container.selected');
         Route::post('/container/create', 'store')->name(name: 'container.store');
         Route::get('/container/edit/{id}', 'edit')->name(name: 'container.edit');
@@ -118,7 +130,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
     });
 
-    // Arrived ?? what this does ??
+
     Route::controller(ArrivedController::class)->group(function () {
         Route::get('/arrived/index', 'index')->name(name: 'arrived.index');
         Route::post('/arrived/container/{id}/save', 'update')->name(name: 'arrived.update');
@@ -196,6 +208,24 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/ports/update', 'update')->name('ports.update');
     });
 
+    // Countries
+    Route::controller(CountriesController::class)->group(function () {
+        Route::get('/countries', 'index')->name('countries.index');
+        Route::post('/countries/store', 'store')->name('countries.store');
+        Route::post('/countries/destroy', 'delete')->name('countries.delete');
+        Route::post('/countries/update', 'update')->name('countries.update');
+        Route::post('/countries/activate', 'activate')->name('countries.activate');
+    });
+
+    // PortCities
+    Route::controller(PortCitiesController::class)->group(function () {
+        Route::get('/portcities', 'index')->name('portcities.index');
+        Route::post('/portcities/store', 'store')->name('portcities.store');
+        Route::post('/portcities/destroy', 'delete')->name('portcities.delete');
+        Route::post('/portcities/update', 'update')->name('portcities.update');
+
+    });
+
     // Customers
     Route::controller(AdminController::class)->group(function () {
         Route::get('/customers', 'customerIndex')->name('customers.index');
@@ -210,8 +240,27 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/give.credit', 'giveCredit')->name('give.credit');
     });
 
+    // SMS
+    Route::controller(SmsController::Class)->group(function (){
 
-//    ======= Website Management Routes =======
+        Route::get('/sms/drafts','drafts')->name('sms.drafts');
+        Route::get('/sms/drafts/save','storeDraft')->name('sms.drafts.store');
+        Route::get('/sms/drafts/activate','activateDraft')->name('sms.drafts.activate');
+        Route::get('/sms/drafts/update','updateDraft')->name('sms.drafts.update');
+        Route::get('/sms/drafts/delete','deleteDraft')->name('sms.drafts.delete');
+        Route::get('/sms/invalids/clear','clearInvalids')->name('sms.invalid.clear');
+
+        Route::get('/sms/all','allsms')->name('sms.all');
+        Route::post('/sms/all/send','sendAll')->name('sms.send.all');
+        Route::post('/sms/recipient/send','sendRecipient')->name('sms.send.recipient');
+        Route::get('/sms/selected','selectedsms')->name('sms.selected');
+        Route::post('/sms/selected/send','sendSelected')->name('sms.send.selected');
+
+        Route::post('/sms/newdeposit/number/update','updateDepositNumber')->name('sms.deposit.number.update');
+
+    });
+
+    //    ======= Website Management Routes =======
     Route::controller(SliderController::class)->group(function () {
         Route::get('/sliders', 'index')->name('sliders.index');
         Route::post('/sliders/store', 'store')->name('sliders.store');
@@ -244,7 +293,9 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/announcements/update', 'update')->name('announcements.update');
         Route::post('/announcements/delete', 'delete')->name('announcements.delete');
     });
+
 });
+
 
 
 
@@ -276,6 +327,10 @@ Route::get('/savelocations', function () {
 // ====  Dealer dashboard  ROUTES  ====
 
 Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
+
+    Route::get('/calculator', [calculatorController::class, 'index'])->name('calculator.index');
+    Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
+
     Route::controller(CustomerController::class)->group(function () {
         Route::get('/record/{id}/table', 'getTableData')->name('record.table');
 
@@ -291,7 +346,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
         Route::get('/payment-history', 'paymentHistory')->name('customer.payment_history');
 
-        Route::post('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
+//        Route::post('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
 
         Route::get('/team-list', 'teamList')->name('customer.teamList');
 
@@ -307,13 +362,20 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
         Route::post('/add-invoice-price', 'addInvoicePrice')->name('customer.addInvoicePrice');
     });
-
     Route::controller(CustomerBalanceController::class)->group(function () {
         Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
         // Dealer pays for a particular car from General balance
         Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
     });
+
+    route::controller(InvoiceController::Class)->group(function (){
+        Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
+    });
+
 });
+
+
+
 
 
 
@@ -329,61 +391,21 @@ route::get('/logout', function () {
     session()->regenerateToken();
 });
 
-route::get('/credit', function () {
 
-
-    $car_id      = 4;
-    $customer_id = 1;
-
-    // first update old credit record
-    $oldrecord=Credit::where('car_id', $car_id)
-        ->where('customer_balance_id', 54)->first();
-    $oldrecord->paid_amount=500;
-    $oldrecord->issue_or_payment_date="2024-11-10";
-    $oldrecord->save();
-
-    // Update balance payment also
-    $balance2 = CustomerBalance::where('id', $oldrecord->customer_balance_id)->first();
-    $balance2->carpayment_date = $oldrecord->issue_or_payment_date;
-    $balance2->amount = -$oldrecord->paid_amount;
-    $balance2->save();
-
-
-
-    $credit = Credit::where('car_id', $car_id)
-        ->where('customer_id', $customer_id)
+route::get('/invoicetest', function () {
+  return  $credit = Credit::where('car_id', 9)
+        ->where('customer_id', 1)
         ->get();
-
-
-// ცალკე ვინახავ ძველ მონაცემს გარდა გააფდეითებულისა , ვუმატებ გააფდეითებულს ,
-// ვსორტავ issue_or_payment_date ით ,
-// ვშლი ყველა ძველ მონაცემს და ვატარებ შენახულ მონაცემებს ბაზაში
+});
 
 
 
-    $sortedCredit = $credit->sortBy('issue_or_payment_date')->values();
+route::get('/statustest', function () {
+//  return  (new \App\Services\smsService())->statusCheck('APGW-1AC259-116202560749PM980');
 
-    // sorting needed if payment date is changed
-    $creditAmount = $sortedCredit->first()['credit_amount'];
-
-    // Recalculate interests for each record
-    foreach ($sortedCredit as $index => $cr) {
-
-        if ($index >= 1) {
-
-            $paymentDate = Carbon::parse($cr['issue_or_payment_date']);
-            $creditDays = $paymentDate->diffInDays(Carbon::parse($sortedCredit[$index - 1]['issue_or_payment_date']));
-
-            $accruedPercent = $creditAmount * ($cr['monthly_percent'] * 12 / 365) * $creditDays;
-            $creditAmount += $accruedPercent - $cr['paid_amount'];
-
-
-            $cr->credit_amount = $creditAmount;
-            $cr->accrued_percent = $accruedPercent;
-            $cr->save();
-        }
-    }
+    return Cache::get('invalidPhones');
 
 });
+
 
 require __DIR__.'/auth.php';

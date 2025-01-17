@@ -13,6 +13,8 @@ class CustomerBalance extends Model
 
     protected $casts = [
         'carpayment_date' => 'datetime',
+        'date' => 'date',
+        'balance_fill_date' => 'date',
     ];
 
     public function customer()
@@ -24,7 +26,5 @@ class CustomerBalance extends Model
     {
         return $this->belongsTo(Car::class, 'car_id');
     }
-
-
 
 }

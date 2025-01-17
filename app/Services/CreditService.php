@@ -7,6 +7,7 @@ use App\Models\Credit;
 use App\Models\CustomerBalance;
 use App\Models\Setting;
 use Carbon\Carbon;
+use Dflydev\DotAccessData\Data;
 use Illuminate\Support\Facades\Cache;
 
 class CreditService
@@ -35,20 +36,21 @@ class CreditService
             ]);
 
 
-
-
             return $newCreditRecord;
         }
 
         return null;
     }
 
-    public function addNewAmountToCredit(object $car, string $amount)
+    // For Adding Single cost
+    public function addNewAmountToCredit(object $car, string $amount, $date = null, string $comment = null)
     {
-        if ($car->latestCredit || $car->secondLatestCredit->isNotEmpty()) {
+        // To ensure that the $car variable always holds the updated value from the database after performing any action  $car->refresh();
+        $car->refresh();
+        if ($car->latestCredit || $car->secondLatestCredit?->isNotEmpty()) {
             $dailyPercent = $car->latestCredit->monthly_percent * 12 / 365;
             // only admin can change or add payment date when creating payment
-            $paymentDate    = Carbon::now();
+            $paymentDate    = $date ? Carbon::parse($date) : Carbon::now();
             $creditDays     = $paymentDate->diffInDays(Carbon::parse($car->latestCredit->issue_or_payment_date));
             $accruedPercent = $car->latestCredit->credit_amount * $dailyPercent * $creditDays;
 
@@ -61,13 +63,11 @@ class CreditService
                 'accrued_percent'       => $accruedPercent,
                 'added_amount'          => $amount,
                 'credit_days'           => $creditDays,
-                'comment'               => 'Add Storage Fee',
+                'comment'               => $comment ?: 'Storage',
             ]);
 
             return $newCreditRecord;
         }
-
-
         return null;
     }
 
@@ -76,21 +76,19 @@ class CreditService
      */
     public function totalAccruedInterestTillToday($car_id)
     {
-
-
-        $car                       = Car::where('id', $car_id)
+        $car = Car::where('id', $car_id)
             ->with('latestCredit')
             ->first();
 
-        $lastcalcalcDate           = Carbon::parse($car->latestCredit?->issue_or_payment_date) ;
+        $lastcalcalcDate = Carbon::parse($car?->latestCredit?->issue_or_payment_date);
 
         $today                     = Carbon::now();
         $totaldaysFromLastCalcDays = $today->diffInDays($lastcalcalcDate);
-        $lastCreditAmount          = $car->latestCredit?->credit_amount;
-        $percent                   = $car->latestCredit?->monthly_percent;
-        $lastTotalAccruedPercent   = $car->credit->sum('accrued_percent');
+        $lastCreditAmount          = $car?->latestCredit?->credit_amount;
+        $percent                   = $car?->latestCredit?->monthly_percent;
+        $lastTotalAccruedPercent   = $car?->credit->sum('accrued_percent');
 
-        $accruedPercentTillToday   = $lastCreditAmount * ($percent * 12 / 365) * $totaldaysFromLastCalcDays + $lastTotalAccruedPercent;
+        $accruedPercentTillToday = $lastCreditAmount * ($percent * 12 / 365) * $totaldaysFromLastCalcDays + $lastTotalAccruedPercent;
 
         return $accruedPercentTillToday;
     }
@@ -100,21 +98,20 @@ class CreditService
      */
     public function totalAccruedInterestTillDate($car_id, $date)
     {
-        $car                       = Car::where('id', $car_id)
+        $car = Car::where('id', $car_id)
             ->with('latestCredit')
             ->first();
 
-        $lastcalcalcDate           = $car->latestCredit?->issue_or_payment_date;
+        $lastcalcalcDate           = $car?->latestCredit?->issue_or_payment_date;
         $today                     = Carbon::parse($date);
         $totaldaysFromLastCalcDays = $today->diffInDays($lastcalcalcDate);
-        $lastCreditAmount          = $car->latestCredit?->credit_amount;
-        $percent                   = $car->latestCredit?->monthly_percent;
-        $lastTotalAccruedPercent   = $car->credit->sum('accrued_percent');
+        $lastCreditAmount          = $car?->latestCredit?->credit_amount;
+        $percent                   = $car?->latestCredit?->monthly_percent;
+        $lastTotalAccruedPercent   = $car?->credit->sum('accrued_percent');
         $accruedPercentTillToday   = $lastCreditAmount * ($percent * 12 / 365) * $totaldaysFromLastCalcDays + $lastTotalAccruedPercent;
 
         return $accruedPercentTillToday;
     }
-
 
     /**
      *   Total Interest Till Today
@@ -124,12 +121,12 @@ class CreditService
         $car                       = Car::where('id', $car_id)
             ->with('latestCredit')
             ->first();
-        $lastcalcalcDate           = $car->latestCredit?->issue_or_payment_date;
+        $lastcalcalcDate           = $car?->latestCredit?->issue_or_payment_date;
         $today                     = Carbon::now();
         $totaldaysFromLastCalcDays = $today->diffInDays($lastcalcalcDate);
-        $lastCreditAmount          = $car->latestCredit?->credit_amount;
-        $percent                   = $car->latestCredit?->monthly_percent;
-        $lastTotalAccruedPercent   = $car->credit->sum('accrued_percent');
+        $lastCreditAmount          = $car?->latestCredit?->credit_amount;
+        $percent                   = $car?->latestCredit?->monthly_percent;
+        $lastTotalAccruedPercent   = $car?->credit->sum('accrued_percent');
         $accruedPercentTillToday   = $lastCreditAmount * ($percent * 12 / 365) * $totaldaysFromLastCalcDays;
 
         return $accruedPercentTillToday;
@@ -147,8 +144,14 @@ class CreditService
         return $totaldaysFromLastCalcDays;
     }
 
-    public function reCalculateOnUpdate(object $car, object $payment, $amount, $comment, $payment_date)
-    {
+    // if payemnt was updated
+    public function reCalculateOnPaymentUpdate(
+        object $car,
+        object $payment,
+        $amount = null,
+        $comment = null,
+        $payment_date = null,
+    ) {
         // first update old credit record
         $oldrecord                        = Credit::where('car_id', $car->id)
             ->where('customer_balance_id', $payment->id)->first();
@@ -201,7 +204,7 @@ class CreditService
 
                 $accruedPercent = $creditAmount * ($cr['monthly_percent'] * 12 / 365) * $creditDays;
 //                $creditAmount   += $accruedPercent - $cr['paid_amount'] +$sortedCredit[$index - 1]['added_amount'];
-                $creditAmount   += $accruedPercent - $cr['paid_amount'] + $cr->added_amount;
+                $creditAmount += $accruedPercent - $cr['paid_amount'] + $cr->added_amount;
 
                 $cr->credit_amount   = $creditAmount;
                 $cr->accrued_percent = $accruedPercent;
@@ -211,36 +214,67 @@ class CreditService
         }
     }
 
-    public function reCalculateOnDeleteOrAdd(object $car, object $newCredit = null)
+
+    // General Recalculation ???
+    public function reCalculateOnDeleteOrAdd(object $car, object $newCredit = null, $costs = null)
     {
         $credit = Credit::where('car_id', $car->id)
             ->where('customer_id', $car->customer_id)
             ->get();
 
 
-        $sortedCredit = $credit->sortBy('issue_or_payment_date')->values();
+        // Add new costs
+        if ($credit->isNotEmpty()) {
+            if ($costs !== null) {
+                $oldcosts=$credit->where('added_amount', '!=', 0);
+                $initialAmount=Credit::where('car_id', $car->id)->first();
 
-        // sorting needed if payment date is changed because interest recalculation
-        $creditAmount = $sortedCredit->first()['credit_amount'];
-        // Recalculate interests for each record
-        foreach ($sortedCredit as $index => $cr) {
-            if ($index >= 1) {
-                $paymentDate = Carbon::parse($cr['issue_or_payment_date']);
-                $creditDays  = $paymentDate->diffInDays(Carbon::parse($sortedCredit[$index - 1]['issue_or_payment_date']));
 
-                $accruedPercent = $creditAmount * ($cr['monthly_percent'] * 12 / 365) * $creditDays;
-//                $creditAmount   += $accruedPercent - $cr['paid_amount'] +$sortedCredit[$index - 1]['added_amount'];
-                $creditAmount   += $accruedPercent - $cr['paid_amount'] +$cr['added_amount'];
+                // First delete all costs before , because also amount might be changed and its easier this way
+                if($oldcosts){
+                    foreach($oldcosts as $oldcost){
+                        Credit::where('id', $oldcost->id)->delete();
+                    }
+                }
 
-                $cr->credit_amount   = $creditAmount;
-                $cr->accrued_percent = $accruedPercent;
-                $cr->credit_days     = $creditDays;
-                $cr->save();
-                $car->amount_due = round($creditAmount );
-                $car->save();
+                $newamount=0;
+                foreach ($costs as $cost) {
+                    if (carbon::parse($cost['date']) != carbon::parse($credit->first()['issue_or_payment_date'])) {
+                        $this->addNewAmountToCredit($car, $cost['value'], $cost['date'], $cost['name']);
+                    } else {
+                        $newamount += $cost['value'];
+                        $initialAmount->credit_amount =$newamount;
+                        $initialAmount->save();
+                    }
+                }
             }
         }
 
 
+        $sortedCredit =  Credit::where('car_id', $car->id)
+            ->where('customer_id', $car->customer_id)
+            ->get()->sortBy('issue_or_payment_date')->values();
+
+        // sorting needed if payment date is changed because interest recalculation
+        if ($sortedCredit->first() !== null) {
+            $creditAmount = $sortedCredit->first()['credit_amount'];
+            // Recalculate interests for each record
+            foreach ($sortedCredit as $index => $cr) {
+                if ($index >= 1) {
+                    $paymentDate = Carbon::parse($cr['issue_or_payment_date']);
+                    $creditDays  = $paymentDate->diffInDays(Carbon::parse($sortedCredit[$index - 1]['issue_or_payment_date']));
+
+                    $accruedPercent = $creditAmount * ($cr['monthly_percent'] * 12 / 365) * $creditDays;
+                    $creditAmount += $accruedPercent - $cr['paid_amount'] + $cr['added_amount'];
+
+                    $cr->credit_amount   = $creditAmount;
+                    $cr->accrued_percent = $accruedPercent;
+                    $cr->credit_days     = $creditDays;
+                    $cr->save();
+                    $car->amount_due = round($creditAmount);
+                    $car->save();
+                }
+            }
+        }
     }
 }
