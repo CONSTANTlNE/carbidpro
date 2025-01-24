@@ -190,7 +190,8 @@ class CarController extends Controller
         $locations       = Location::all();
         $shipping_prices = ShippingPrice::all();
         $customers       = Customer::get();
-        $dispatchers     = User::where('role', 'Dispatch')->get();
+        $dispatchers = User::role('Dispatch')->get();
+
         $car_status      = CarStatus::with('cars')->get();
 
 
@@ -297,17 +298,14 @@ class CarController extends Controller
         // if payed amount is indicated during the creation, also create relevant record in customer_balance
         if ($request->input('payed') > 0) {
             // at the same time create balance fill and deduct record and deduction record
-            $balance              = new CustomerBalance();
-            $balance->customer_id = $request->input('customer_id');
-            $balance->amount      = $request->input('payed');
-            $balance->type        = 'fill';
-            $balance->save();
 
             $balance              = new CustomerBalance();
             $balance->customer_id = $request->input('customer_id');
             $balance->amount      = -$request->input('payed');
             $balance->type        = 'car_payment';
             $balance->is_approved = true;
+            $balance->date=Carbon::now();
+            $balance->carpayment_date=Carbon::now();
             $balance->car_id      = $car->id;
             $balance->save();
         }
@@ -504,7 +502,9 @@ class CarController extends Controller
         $car->warehouse          = $request->input('warehouse');
         $car->comment            = $request->input('comment');
         $car->balance            = $request->input('balance');
-        $car->payed              = $request->input('payed');
+        if ($request->filled('payed')) {
+            $car->payed = $request->input('payed');
+        }
         $car->total_cost         = $request->input('total_cost');
         $car->car_status_id      = $request->input('status');
 
@@ -527,6 +527,7 @@ class CarController extends Controller
 
     public function listUpdate(Request $request)
     {
+
         $car = Car::with('CarStatus')->findOrFail($request->id);
 
         if ($request->has('warehouse')) {
@@ -551,41 +552,6 @@ class CarController extends Controller
             $car->pickup_dates = $request->pickup_dates;
         }
 
-        if ($request->has('storage')) {
-            $car->storage = $request->storage;
-        }
-
-        if ($request->has('cost') > 0) {
-            $array = json_decode($car->balance_accounting, true);
-
-            $storageValue = $request->cost;
-            $newElement   = [
-                "name"  => "Storage",
-                "value" => $storageValue,
-                'date'  => now()->format('Y-m-d'),
-            ];
-
-            // Append the new element to the array
-            $array[] = $newElement;
-
-            // Encode the array back into JSON
-            $updatedJsonString = json_encode($array);
-
-
-            // Output the updated JSON
-            $car->balance_accounting = $updatedJsonString;
-            $car->storage_cost       = $request->cost;
-
-            $car->amount_due = $car->amount_due + $request->cost;
-
-            //  add storage amount to credit amount (applied only if credit is granted)
-            $newCredit = (new CreditService())->addNewAmountToCredit($car, $request->cost);
-
-            (new CreditService())->reCalculateOnDeleteOrAdd($car);
-
-
-            $car->total_cost = $car->total_cost + $request->cost;
-        }
 
         if ($request->has('title_delivery')) {
             $car->title_delivery = $request->title_delivery;
@@ -633,6 +599,44 @@ class CarController extends Controller
         }
 
         $car->save();
+
+        if ($request->has('storage')) {
+
+            $car->storage = $request->storage;
+            $car->save();
+
+        }
+
+        if ($request->has('cost') && $request->cost > 0) {
+
+
+            $array = json_decode($car->balance_accounting, true);
+
+            $storageValue = $request->cost;
+            $newElement   = [
+                "name"  => "Storage",
+                "value" => $storageValue,
+                'date'  => now()->format('Y-m-d'),
+            ];
+
+            // Append the new element to the array
+            $array[] = $newElement;
+
+            // Encode the array back into JSON
+            $updatedJsonString = json_encode($array);
+
+            // Output the updated JSON
+            $car->balance_accounting = $updatedJsonString;
+            $car->storage_cost       = $request->cost;
+            $car->amount_due = $car->amount_due + $request->cost;
+            $car->total_cost = $car->total_cost + $request->cost;
+            $car->save();
+            //  add storage amount to credit amount (applied only if credit is granted)
+            $newCredit = (new CreditService())->addNewAmountToCredit($car, $request->cost);
+
+            (new CreditService())->reCalculateOnDeleteOrAdd($car);
+        }
+
 
 
         $carstatus = CarStatus::where('id', $car->status)->first();

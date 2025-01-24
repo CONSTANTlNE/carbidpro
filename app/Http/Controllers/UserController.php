@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -14,16 +15,8 @@ class UserController extends Controller
     public function index()
     {
         $users = User::get(); // Adjust the query to suit your admin access logic
-        return view('pages.users.index', compact('users'));
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $roles = Role::all();
+        return view('pages.users.index', compact('users', 'roles'));
     }
 
     /**
@@ -35,7 +28,6 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'role' => 'required|in:Admin,Editor,Dispatch',
             'password' => 'required|confirmed|min:6',
         ]);
 
@@ -48,6 +40,8 @@ class UserController extends Controller
             'role' => $request->role,
             'password' => Hash::make($request->password), // Hash the password
         ]);
+
+        $user->assignRole($request->role);
 
         // Return success response
         return response()->json([
@@ -79,14 +73,13 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id, // Ensure the email is unique, except for this user
-            'role' => 'required|in:Admin,Editor,Dispatch,Loader,Finance,Terminal Agent', // Ensure role is one of the predefined roles
             'password' => 'nullable|confirmed|min:6', // Validate password and confirmation, but it's optional (nullable)
         ]);
 
         // Update the user's information
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        $user->role = $request->input('role');
+        $user->assignRole($request->role);
 
         // If a password is provided, hash and update it
         if ($request->filled('password')) {

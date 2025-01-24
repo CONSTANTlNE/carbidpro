@@ -5,8 +5,9 @@
     @push('css')
     @endpush
 @section('body-class', 'hold-transition sidebar-mini')
-
+{{--@dd(auth()->user());--}}
 <!--preloader-->
+
 <div id="preloader">
     <div id="status"></div>
 </div>

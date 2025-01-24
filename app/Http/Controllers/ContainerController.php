@@ -98,7 +98,7 @@ class ContainerController extends Controller
 
         } elseif ($slug == 'loading-pending') {
 
-            $groupsQuery = ContainerGroup::with('cars')
+            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 2); // Filter cars where container_status is 2
                 });
@@ -294,7 +294,8 @@ class ContainerController extends Controller
 
     public function listUpdate(Request $request)
     {
-        $car = Car::with('statusRelation')->findOrFail($request->carid);
+//        $car = Car::with('statusRelation')->findOrFail($request->carid);
+        $car = Car::findOrFail($request->carid);
 
         if ($request->has('title')) {
             $car->title = $request->title;

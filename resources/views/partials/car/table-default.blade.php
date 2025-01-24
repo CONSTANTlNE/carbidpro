@@ -68,7 +68,8 @@ use Carbon\Carbon  ;
                     <strong>All Cost:</strong><br>
                     {{ $car->total_cost }}<br>
                     <strong>Amount due:</strong><br>
-                    {{ round($car->amount_due+round( ((new CreditService())->totalAccruedInterestTillToday($car->id))) ) }}
+{{--                    {{ round($car->amount_due+round( ((new CreditService())->totalAccruedInterestTillToday($car->id))) ) }}--}}
+                    {{ round($car->amount_due+round( ((new CreditService())->totalInterestFromLastCalc($car->id))) ) }}
                 </td>
 
                 <td class="text-center">

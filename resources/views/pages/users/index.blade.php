@@ -5,9 +5,9 @@
 @section('body-class', 'hold-transition sidebar-mini')
 
 <!--preloader-->
-<div id="preloader">
-    <div id="status"></div>
-</div>
+{{--<div id="preloader">--}}
+{{--    <div id="status"></div>--}}
+{{--</div>--}}
 
 <!-- Site wrapper -->
 <div class="wrapper">
@@ -60,8 +60,9 @@
                                             <tr>
                                                 <td>{{ $user->name }}</td>
                                                 <td>{{ $user->email }}</td>
-                                                <td><span
-                                                        class="label-custom label label-default">{{ $user->role }}</span>
+                                                <td>
+                                                    <span
+                                                        class="label-custom label label-default">{{ $user->getRoleNames()->first() }}</span>
                                                 </td>
                                                 <td>
                                                     {{ $user->created_at }}
@@ -79,7 +80,6 @@
                                                 </td>
                                             </tr>
                                         @endforeach
-
                                     </tbody>
                                 </table>
                             </div>
@@ -108,13 +108,13 @@
                                             <!-- Text input for User Name -->
                                             <div class="col-md-6 form-group">
                                                 <label class="control-label">Name</label>
-                                                <input type="text" id="name" name="name"
+                                                <input type="text" id="name" name="name" value="{{old('name')}}"
                                                     placeholder="User Name" class="form-control" required>
                                             </div>
                                             <!-- Text input for Status -->
                                             <div class="col-md-6 form-group">
                                                 <label class="control-label">Email</label>
-                                                <input type="email" id="email" name="email" placeholder="email"
+                                                <input type="email" id="email" name="email" placeholder="email" value="{{old('email')}}"
                                                     class="form-control">
                                             </div>
 
@@ -150,13 +150,9 @@
                                             <div class="col-md-6 form-group">
                                                 <label class="control-label">Role</label>
                                                 <select id="userRole" name="role" class="form-control">
-                                                    <option value="Admin">Admin</option>
-                                                    <option value="Editor">Editor</option>
-                                                    <option value="Dispatch">Dispatch</option>
-                                                    <option value="Loader">Loader</option>
-                                                    <option value="Finance">Finance</option>
-                                                    <option value="Terminal Agent">Terminal Agent</option>
-                                                    
+                                                    @foreach($roles as $role)
+                                                        <option value="{{$role->name}}">{{ $role->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-12 form-group user-form-group">
@@ -180,9 +176,7 @@
 
             <!-- /.modal -->
 
-            <!-- Modal -->
-            <!-- User Modal1 -->
-            <!-- Add New User Modal -->
+            <!-- Update User Modal -->
             <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -228,12 +222,9 @@
                                     <div class="col-md-6 form-group">
                                         <label class="control-label">Role</label>
                                         <select id="add_role" name="role" class="form-control" required>
-                                            <option value="Admin">Admin</option>
-                                            <option value="Editor">Editor</option>
-                                            <option value="Dispatch">Dispatch</option>
-                                            <option value="Loader">Loader</option>
-                                            <option value="Finance">Finance</option>
-                                            <option value="Terminal_Agent">Terminal Agent</option>
+                                            @foreach($roles as $role)
+                                                <option value="{{$role->name}}">{{ $role->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 

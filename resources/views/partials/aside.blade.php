@@ -19,6 +19,7 @@
                 </li>
             @endrole
             @hasanyrole('Admin|Developer')
+
                 <li class="treeview active {{request()->routeIs('cars.index') || request()->routeIs('carpayment.index') ? 'active' : ''}}">
                     <a href="#">
                         <i class="fa fa-automobile"></i></i><span>Cars</span>
@@ -27,6 +28,12 @@
                         </span>
                     </a>
                     <ul class="treeview-menu">
+                        <li class="{{ Route::is('car.create') ? 'active' : '' }}">
+                            <a href="{{ route('car.create') }}">
+                                <span>Add Car</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                        </li>
                         <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
                             <a href="{{ route('cars.index') }}">
                                 <span>Current Cars</span>
@@ -91,6 +98,10 @@
                             <a href="{{ route('customers.index') }}">
                                 <span>Customers</span>
                                 <span class="pull-right-container"></span>
+                                @if($customerscount>0)
+                                    <span style="background: red!important;color: white!important"
+                                          class="pull-right badge">{{$customerscount}}</span>
+                                @endif
                             </a>
                         </li>
                     </ul>

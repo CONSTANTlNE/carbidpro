@@ -1,15 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    @push('css')
-    @endpush
-    @section('body-class', 'hold-transition sidebar-mini')
 
-    <!--preloader-->
-    {{--<div id="preloader">--}}
-    {{--    <div id="status"></div>--}}
-    {{--</div>--}}
-
-    <!-- Site wrapper -->
     <div class="wrapper">
         @include('partials.header')
         <!-- =============================================== -->
@@ -27,6 +18,17 @@
                     <h1>Deposit Requests</h1>
                 </div>
             </section>
+            @if($errors->any())
+                <div style="padding: 5px!important;"
+                     class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-25" role="alert">
+                    @foreach($errors->all() as $error)
+                        <p>{{$error}}</p>
+                    @endforeach
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            @endif
             <!-- Main content -->
             <section class="content">
                 <div class="row">
@@ -41,12 +43,15 @@
                                         </a>
                                     </div>
 
-                                    <form style="display: flex!important;" class="ml-3 " action="{{route('customer.balance.index')}}">
+                                    <form style="display: flex!important;" class="ml-3 "
+                                          action="{{route('customer.balance.index')}}">
                                         <input type="text" name="search" class="form-control" value="">
-                                        <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search</button>
+                                        <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
+                                        </button>
                                     </form>
 
-                                    <a href="{{route('customer.balance.index')}}" style="color: white;max-width: 50px" type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
+                                    <a href="{{route('customer.balance.index')}}" style="color: white;max-width: 50px"
+                                       type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">All
                                     </a>
 
                                 </div>
@@ -71,32 +76,38 @@
                                                               method="post">
                                                             <input type="hidden" name="customer_id" id="customerID">
                                                             @csrf
-                                                                <div class="row">
-                                                                    <div class="col-md-6 form-group text-center">
-                                                                        <label  class="text-center" >Customer</label>
-                                                                        <input autocomplete="off" id="customerName"  type="text" onfocus="btn= document.getElementById('searchmodalbtn').click()">
-                                                                    </div>
-                                                                    <div class="col-md-6 form-group text-center">
-                                                                        <label  class="text-center" >Transfer Date</label>
-                                                                        <input autocomplete="off"  type="date" name="transfer_date" id="">
-                                                                    </div>
-
-                                                                </div>
                                                             <div class="row">
                                                                 <div class="col-md-6 form-group text-center">
-                                                                    <label  class="text-center" >Full Name</label>
-                                                                    <input autocomplete="off" id="" name="full_name" type="text" >
+                                                                    <label class="text-center">Customer</label>
+                                                                    <input autocomplete="off" id="customerName"
+                                                                           type="text"
+                                                                           onfocus="btn= document.getElementById('searchmodalbtn').click()">
                                                                 </div>
                                                                 <div class="col-md-6 form-group text-center">
-                                                                    <label  class="text-center" >Amount</label>
-                                                                    <input autocomplete="off" type="text" name="bank_payment" id="">
+                                                                    <label class="text-center">Transfer Date</label>
+                                                                    <input autocomplete="off" type="date"
+                                                                           name="transfer_date" id="">
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6 form-group text-center">
+                                                                    <label class="text-center">Full Name</label>
+                                                                    <input autocomplete="off" id="" name="full_name"
+                                                                           type="text">
+                                                                </div>
+                                                                <div class="col-md-6 form-group text-center">
+                                                                    <label class="text-center">Amount</label>
+                                                                    <input autocomplete="off" type="text"
+                                                                           name="bank_payment" id="">
                                                                 </div>
 
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-md-12 form-group text-center">
-                                                                    <label  class="text-center" >Comment</label>
-                                                                    <textarea   name="comment" id="" class="w-100" rows="5" ></textarea>
+                                                                    <label class="text-center">Comment</label>
+                                                                    <textarea name="comment" id="" class="w-100"
+                                                                              rows="5"></textarea>
                                                                 </div>
                                                             </div>
                                                             <div>
@@ -121,7 +132,7 @@
                                     </div>
                                 </div>
                                 {{-- Search Customer Modal--}}
-                                <a id="searchmodalbtn" data-toggle="modal" data-target="#searchmodal" ></a>
+                                <a id="searchmodalbtn" data-toggle="modal" data-target="#searchmodal"></a>
                                 <div class="modal fade" id="searchmodal" tabindex="-1"
                                      role="dialog" style="display: none;" aria-hidden="true">
                                     <div class="modal-dialog modal-lg">
@@ -153,17 +164,18 @@
                                                                                name="search"
                                                                                placeholder="Search Customer">
                                                                     </div>
-                                                                    <div id="searchtarget" class="text-center mt-3">   </div>
+                                                                    <div id="searchtarget"
+                                                                         class="text-center mt-3"></div>
 
-                                                                        <div>
-                                                                            <div class="d-flex justify-content-center mt-3">
-                                                                                <button id="closeSearch" type="button"
-                                                                                        data-dismiss="modal"
-                                                                                        class="btn btn-danger btn-sm mr-2">
-                                                                                    Close Search
-                                                                                </button>
-                                                                            </div>
+                                                                    <div>
+                                                                        <div class="d-flex justify-content-center mt-3">
+                                                                            <button id="closeSearch" type="button"
+                                                                                    data-dismiss="modal"
+                                                                                    class="btn btn-danger btn-sm mr-2">
+                                                                                Close Search
+                                                                            </button>
                                                                         </div>
+                                                                    </div>
                                                                 </div>
                                                             </fieldset>
                                                         </form>
@@ -199,7 +211,6 @@
                                                 <td>{{ $prequest->amount }}</td>
                                                 <td>{{ $prequest->full_name }}</td>
                                                 <td>{{ $prequest->customer->company_name }}</td>
-
                                                 <td>{{ $prequest->customer->contact_name }}</td>
                                                 <td>
                                                     <form action="{{route('customer.balance.approve')}}" method="post">
@@ -210,63 +221,73 @@
                                                                 Approved
                                                             </button>
                                                         @else
-                                                            <button class="btn btn-danger btn-rounded w-md m-b-5">Needs
-                                                                Approval
-                                                            </button
+                                                            <button class="btn btn-danger btn-rounded w-md m-b-5">
+                                                                Needs Approval
+                                                            </button>
                                                         @endif
                                                     </form>
                                                 </td>
                                                 <td>
                                                     {{--Edit Modal--}}
                                                     <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
-                                                            data-target="#update{{$index}}"><i class="fa fa-pencil"></i>
+                                                            data-target="#update{{$index}}">
+                                                        <i class="fa fa-pencil"></i>
                                                     </button>
                                                     <div class="modal fade" id="update{{$index}}" tabindex="-1"
-                                                         role="dialog" style="display: none;" aria-hidden="true">
+                                                         role="dialog" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header modal-header-primary">
-                                                                    <h3> Edit Payment Request {{$prequest->amount}}</h3>
+                                                                    <h3>Edit Payment Request {{$prequest->amount}}</h3>
                                                                     <button type="button" class="close"
-                                                                            data-dismiss="modal"
-                                                                            aria-hidden="true">×
+                                                                            data-dismiss="modal" aria-hidden="true">×
                                                                     </button>
                                                                 </div>
-                                                                <div class="modal-body">
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <form class="form-horizontal"
-                                                                                  action="{{route('customer.balance.update')}}"
-                                                                                  method="post">
-                                                                                <input type="hidden" name="customer_id" id="customerID">
-                                                                                <input type="hidden" name="customerID" value="{{$prequest->customer->id}}">
-                                                                                <input type="hidden" name="balance_id" value="{{$prequest->id}}">
+                                                                <form action="{{route('customer.balance.update')}}"
+                                                                      method="post">
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-12">
+                                                                                <input type="hidden" name="customer_id"
+                                                                                       id="customerID">
+                                                                                <input type="hidden" name="customerID"
+                                                                                       value="{{$prequest->customer->id}}">
+                                                                                <input type="hidden" name="balance_id"
+                                                                                       value="{{$prequest->id}}">
                                                                                 @csrf
                                                                                 <div class="row">
                                                                                     <div class="col-md-6 form-group text-center">
-                                                                                        <label  class="text-center" >Customer</label>
-                                                                                        <input disabled autocomplete="off" id="customerName" value="{{$prequest->customer->contact_name}}"  type="text" onfocus="btn= document.getElementById('searchmodalbtn').click()">
+                                                                                        <label class="text-center">Transfer
+                                                                                            Date</label>
+                                                                                        <input autocomplete="off"
+                                                                                               value="{{ $prequest->balance_fill_date?->format('Y-m-d') }}"
+                                                                                               type="date"
+                                                                                               name="transfer_date">
                                                                                     </div>
-                                                                                    <div class="col-md-6 form-group text-center">
-                                                                                        <label  class="text-center" >Transfer Date</label>
-                                                                                        <input autocomplete="off"   value="{{ $prequest->balance_fill_date?->format('Y-m-d') }}"  type="date" name="transfer_date" id="">
-                                                                                    </div>
-
                                                                                 </div>
                                                                                 <div class="row">
                                                                                     <div class="col-md-6 form-group text-center">
-                                                                                        <label  class="text-center" >Full Name</label>
-                                                                                        <input autocomplete="off" value="{{$prequest->full_name}}"  id="" name="full_name" type="text" >
+                                                                                        <label class="text-center">Full
+                                                                                            Name</label>
+                                                                                        <input autocomplete="off"
+                                                                                               value="{{$prequest->full_name}}"
+                                                                                               name="full_name"
+                                                                                               type="text">
                                                                                     </div>
                                                                                     <div class="col-md-6 form-group text-center">
-                                                                                        <label  class="text-center" >Amount</label>
-                                                                                        <input autocomplete="off" value="{{$prequest->amount}}" type="text" name="bank_payment" id="">
+                                                                                        <label class="text-center">Amount</label>
+                                                                                        <input autocomplete="off"
+                                                                                               value="{{$prequest->amount}}"
+                                                                                               type="text"
+                                                                                               name="bank_payment">
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="row">
                                                                                     <div class="col-md-12 form-group text-center">
-                                                                                        <label  class="text-center" >Comment</label>
-                                                                                        <textarea   name="comment" id="" class="w-100" rows="5" >{{$prequest->comment}}</textarea>
+                                                                                        <label class="text-center">Comment</label>
+                                                                                        <textarea name="comment"
+                                                                                                  class="w-100"
+                                                                                                  rows="5">{{$prequest->comment}}</textarea>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div>
@@ -276,41 +297,34 @@
                                                                                                 class="btn btn-danger btn-sm mr-2">
                                                                                             Close
                                                                                         </button>
-
-                                                                                        <button
+                                                                                        <button type="submit"
                                                                                                 class="btn btn-success btn-sm mr-2">
                                                                                             Save
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
-                                                                            </form>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-
+                                                                </form>
                                                             </div>
-                                                            <!-- /.modal-content -->
                                                         </div>
-                                                        <!-- /.modal-dialog -->
                                                     </div>
 
                                                     {{--Delete Modal--}}
                                                     <button type="button" class="btn btn-danger btn-sm"
-                                                            data-toggle="modal"
-                                                            data-target="#customer2{{$index}}"><i
-                                                                class="fa fa-trash-o"></i>
+                                                            data-toggle="modal" data-target="#customer2{{$index}}">
+                                                        <i class="fa fa-trash-o"></i>
                                                     </button>
                                                     <div class="modal fade" id="customer2{{$index}}" tabindex="-1"
-                                                         role="dialog" style="display: none;" aria-hidden="true">
+                                                         role="dialog" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header modal-header-primary">
-                                                                    <h3><i class="fa fa-user m-r-5"></i>
-                                                                        Delete Payment?
+                                                                    <h3><i class="fa fa-user m-r-5"></i>Delete Payment?
                                                                     </h3>
                                                                     <button type="button" class="close"
-                                                                            data-dismiss="modal"
-                                                                            aria-hidden="true">×
+                                                                            data-dismiss="modal" aria-hidden="true">×
                                                                     </button>
                                                                 </div>
                                                                 <div class="modal-body">
@@ -324,7 +338,6 @@
                                                                                        value="{{$prequest->id}}">
                                                                                 <fieldset>
                                                                                     <div class="col-md-12 form-group user-form-group">
-
                                                                                         <div class="d-flex justify-content-center mt-3">
                                                                                             <button type="button"
                                                                                                     data-dismiss="modal"
@@ -343,14 +356,12 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <!-- /.modal-content -->
                                                         </div>
-                                                        <!-- /.modal-dialog -->
                                                     </div>
                                                 </td>
+
                                             </tr>
                                         @endforeach
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -370,4 +381,5 @@
 
 
     </div>
+
 @endsection

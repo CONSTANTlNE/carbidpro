@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-lg-12">
-        <div class="d-flex mt-4 justify-content-between flex-column flex-md-row">
+        <div class="d-flex mt-4 justify-content-between align-middle flex-column flex-md-row">
             <ul style="padding-left: 0">
                 <li  class="tabs__item ">
                     <a href="{{ route('customer.dashboard') }}"
@@ -25,7 +25,7 @@
             </ul>
 
 
-            <div style="width: max-content;background: #F2F2F2" class="p-3">
+            <div style="width: max-content;background: #F2F2F2;" class="p-3 align-self-center">
                 @if($pending)
                     <p style="color:blue; word-wrap: break-word;word-break: break-word;font-size: 14px"
                        class="text-center mt-3">
@@ -37,26 +37,28 @@
                     @csrf
                     <div style="text-align: right ">
 
-                        <div class="d-flex justify-content-between text-center gap-2">
-                            <div>
+                        <div class="d-flex flex-column flex-md-row justify-content-between text-center gap-2" >
+                            <div >
                                 <label style="font-size: 14px"
                                        for="bank_payment"> {{Cache::get('dashboardStatics' . session()->get('locale'))['Transferred Amount']}} </label>
-                                <input style="max-width: 70px;" class="mb-2" id="bank_payment" type="text"
+                                <br class="hideBr">
+                                <input style="width: 200px;" class="mb-2" id="bank_payment" type="text"
                                        name="bank_payment">
                             </div>
                             <div>
-                                <span style="font-size: 14px">Pending:</span>
+                                <span  style="font-size: 14px">Pending:</span>
                                 <span style="color: blue;font-size: 14px"> ${{ $pending }} </span>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex flex-column flex-md-row justify-content-between text-center gap-2 mt-2">
                             <div>
                                 <label style="font-size: 14px" for="full_name">{{Cache::get('dashboardStatics' . session()->get('locale'))['Sender']}}
                                     ({{Cache::get('dashboardStatics' . session()->get('locale'))['Full Name']}})</label>
-                                <input style="max-width: 70px;margin-left: 7px" id="full_name" type="text" name="full_name">
+                                <br class="hideBr">
+                                <input style="width: 200px;margin-left: 7px" id="full_name" type="text" name="full_name">
                             </div>
                             @if(session()->get('locale')==='en')
-                            <button  style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;margin-right: 10px">
+                            <button  style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;">
                                 {{Cache::get('dashboardStatics' . session()->get('locale'))['Submit']}}
                             </button>
                             @endif

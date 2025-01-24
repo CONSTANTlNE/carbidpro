@@ -9,9 +9,9 @@
 @section('body-class', 'hold-transition sidebar-mini')
 
 <!--preloader-->
-<div id="preloader">
-    <div id="status"></div>
-</div>
+{{--<div id="preloader">--}}
+{{--    <div id="status"></div>--}}
+{{--</div>--}}
 
 <!-- Site wrapper -->
 <div class="wrapper">

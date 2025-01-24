@@ -23,7 +23,6 @@ class Car extends Model implements HasMedia, Sortable
 
     protected $guarded=[];
 
-
     // Example of a relationship, assuming you have a 'ports' table for 'to_port_id'
 
 

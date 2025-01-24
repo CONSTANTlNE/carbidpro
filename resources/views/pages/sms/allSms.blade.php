@@ -52,7 +52,7 @@
                                             <input class="form-control w-100" type="text" name="name[]" value=""
                                                    placeholder="Employee name">
                                         </td>
-                                        <td><input class="form-control w-100" type="text" name="number[]" value=""
+                                        <td><input class="form-control w-100" type="text" name="numbers[]" value=""
                                                    placeholder="Employee number"></td>
                                         <td>
                                             <button class="btn btn-danger" type="button" onclick="removeRow(this)">

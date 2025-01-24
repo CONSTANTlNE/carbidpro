@@ -83,6 +83,7 @@ class CustomerBalanceController extends Controller
      */
     public function approveBalance(Request $request)
     {
+//        dd($request);
         $prequest = CustomerBalance::where('id', $request->id)->first();
         $customer = $prequest->customer;
 
@@ -131,7 +132,7 @@ class CustomerBalanceController extends Controller
             $customer = Customer::where('id', auth()->user()->id)->first();
 
             // Send Sms To employees
-            $depositNumbers=MobileNumbers::where('type','new_deposit')->get();
+            $depositNumbers = MobileNumbers::where('type', 'new_deposit')->get();
             foreach ($depositNumbers as $number) {
                 (new smsService())->deposit($number->number, $customer, $balance);
             }
@@ -217,6 +218,7 @@ class CustomerBalanceController extends Controller
         $request->validate([
             'bank_payment' => 'required|numeric|min:1',
             'full_name'    => 'required|string|max:255',
+            'comment'=>'nullable|string',
         ]);
 
         $balance->amount            = $request->bank_payment;
@@ -225,7 +227,6 @@ class CustomerBalanceController extends Controller
         $balance->date              = $request->transfer_date;
         $balance->type              = 'fill';
         $balance->comment           = $request->comment;
-        $balance->customer_id       = $request->customerID;
         $balance->save();
 
         return back();
@@ -270,14 +271,34 @@ class CustomerBalanceController extends Controller
 
     // ============ Car Payments by Admin ===============
 
-    public function carPaymentIndex()
+    public function carPaymentIndex(Request $request)
     {
-        $payment_reports = CustomerBalance::with(['car', 'customer'])
-            ->where('type', 'car_payment')
-            ->orderBy('created_at', 'desc')->get(); // Adjust the query to suit your admin access logic
-        $cars            = Car::all();
-        $customers       = Customer::all();
-        $deposit         = CustomerBalance::where('is_approved', 1)->sum('amount');
+        if ($request->has('search') && !empty($request->search)) {
+            $payment_reports = CustomerBalance::with(['car', 'customer'])
+                ->where('type', 'car_payment')
+                ->where(function ($query) use ($request) {
+                    $query
+                        ->where('full_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('amount', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('car', function ($carQuery) use ($request) {
+                            $carQuery->where('vin', 'like', '%' . $request->search . '%')
+                                ->orWhere('make_model_year', 'like', '%' . $request->search . '%');
+                        });
+                })
+                ->orderBy('created_at', 'desc')
+                ->get(); // Ensure you call ->get() here to execute the query.
+        } else {
+            $payment_reports = CustomerBalance::with(['car', 'customer'])
+                ->where('type', 'car_payment')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+
+
+        $cars      = Car::all();
+        $customers = Customer::all();
+        $deposit   = CustomerBalance::where('is_approved', 1)->sum('amount');
 
         return view('pages.payment-report.index', compact('payment_reports', 'cars', 'customers', 'deposit'));
     }
@@ -397,9 +418,9 @@ class CustomerBalanceController extends Controller
                 ->with([
                     'credit' => function ($query) {
                         $query
-                            ->orderBy('issue_or_payment_date', 'asc')
-                            ->selectRaw('car_id, SUM(accrued_percent) as total_accrued_percent')
-                            ->groupBy('car_id');
+                            ->selectRaw('car_id, MAX(issue_or_payment_date) as latest_issue_date, SUM(accrued_percent) as total_accrued_percent')
+                            ->groupBy('car_id')
+                            ->orderBy('latest_issue_date', 'asc');
                     },
                 ])->get();
         } else {

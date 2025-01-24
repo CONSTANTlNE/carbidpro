@@ -91,7 +91,7 @@
                             </div>
                             <div class="display-flex cs-mb5 space-between flex-wrap">
                                 <div class="cs-invoice_left cs-width_8">
-                                    <b class="cs-primary_color">Seller:</b>
+                                    <b class="cs-primary_color">Company:</b>
                                     <p>
                                         CarBidPro LLC
                                         <br>
@@ -101,7 +101,7 @@
                                     </p>
                                 </div>
                                 <div class="cs-invoice_right">
-                                    <b class="cs-primary_color">Buyer:</b>
+                                    <b class="cs-primary_color">Customer:</b>
                                     <p>
                                         Name: <span
                                                 contenteditable="true" style="background: yellow" class="backgrounds">{{ $customer->company_name ?: $user->contact_name }}</span>

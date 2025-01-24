@@ -233,6 +233,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/customers/activate', 'customerActivate')->name('customer.activate');
         Route::post('/customers/destroy', 'delete')->name('customers.delete');
         Route::post('/customers/update', 'update')->name('customers.update');
+        Route::post('/customers/auto/login', 'autoLogin')->name('customers.autologin');
     });
 
     // Credit

@@ -63,62 +63,65 @@
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Company Name</label>
                                                             <input name="company_name" required type="text"
-                                                                   placeholder="" class="form-control">
+                                                                   placeholder="" class="form-control" value="{{old('company_name')}}">
                                                         </div>
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Company/Personal ID</label>
                                                             <input name="personal_number" required type="text"
                                                                    placeholder=""
-                                                                   class="form-control">
+                                                                   class="form-control" value="{{old('personal_number')}}">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Contact Person</label>
                                                             <input name="contact_name" required type="text"
-                                                                   placeholder="" class="form-control">
+                                                                   placeholder="" class="form-control" value="{{old('contact_name')}}">
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Phone</label>
-                                                            <input name="phone" required type="text" placeholder=""
+                                                            <input name="phone" required type="text" placeholder="" value="{{old('phone')}}"
                                                                    class="form-control">
                                                         </div>
                                                         <!-- Text input-->
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Email</label>
                                                             <input name="email" required type="text" placeholder=""
-                                                                   class="form-control">
+                                                                   class="form-control" value="{{old('email')}}">
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Car purchase per Month</label>
                                                             <select name="number_of_cars" id="" class="form-control">
-                                                                <option value="10">10</option>
-                                                                <option value="20">20</option>
-                                                                <option value="50">50</option>
-                                                                <option value="100">100 +</option>
+                                                                <option {{old('number_of_cars')==10 ? 'selected' : ''}} value="10">10</option>
+                                                                <option {{old('number_of_cars')==20 ? 'selected' : ''}} value="20">20</option>
+                                                                <option {{old('number_of_cars')==50 ? 'selected' : ''}} value="50">50</option>
+                                                                <option {{old('number_of_cars')==100 ? 'selected' : ''}} value="100">100 +</option>
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class="row">
+
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Extra For Calculator</label>
                                                             <input name="extra_for_team" required type="text"
                                                                    placeholder=""
-                                                                   class="form-control">
+                                                                   class="form-control" value="{{old('extra_for_team')}}">
                                                         </div>
 
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">password</label>
                                                             <input name="password" required type="text" placeholder=""
-                                                                   class="form-control">
+                                                                   class="form-control" >
                                                         </div>
+
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">confirm password</label>
                                                             <input name="password_confirmation" required type="text"
                                                                    placeholder=""
                                                                    class="form-control">
                                                         </div>
+
                                                     </div>
                                                     <div class="row">
 
@@ -177,7 +180,7 @@
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Main Dealer</th>
-                                        <th>Password</th>
+                                        <th>Login</th>
                                         <th>Status</th>
                                         <th>Crated At</th>
                                         <th>Crated Action</th>
@@ -191,7 +194,13 @@
                                             <td>{{$customer->phone}}</td>
                                             <td>{{$customer->email}}</td>
                                             <td>{{$customers->where('id',$customer->child_of)->first()?->contact_name}}</td>
-                                            <td>{{$customer->unhashed_password}}</td>
+                                            <td>
+                                                <form action="{{route('customers.autologin')}}" method="post" target="_blank">
+                                                    @csrf
+                                                    <input type="hidden" name="customer_id" value="{{$customer->id}}">
+                                                    <button class="btn btn-primary">Login</button>
+                                                </form>
+                                            </td>
                                             <td>
                                                 <form action="{{route('customer.activate')}}" method="post" novalidate>
                                                     @csrf

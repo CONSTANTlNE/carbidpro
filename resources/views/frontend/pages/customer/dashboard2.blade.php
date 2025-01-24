@@ -6,6 +6,7 @@
     use Illuminate\Support\Facades\Session;
     use Carbon\Carbon    ;
 
+
 $creditService = new CreditService();
 
 //             Cache::forget('dashboardStatics'.session()->get('locale'));
@@ -49,6 +50,8 @@ $creditService = new CreditService();
 //          dd(auth()->user());
 @endphp
 
+{{--@dd(auth()->user());--}}
+
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 @endpush
@@ -67,6 +70,26 @@ $creditService = new CreditService();
             td {
                 padding: 7px;
             }
+
+
+
+            .hideBr{
+                display: none;
+            }
+
+            @media only screen and (max-width: 400px) {
+               .hideBr{
+                   display: block;
+               }
+
+                #bank_payment{
+                  width: 250px!important;
+                }
+
+                #full_name{
+                    width: 250px!important;                }
+            }
+
         </style>
     @endpush
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
@@ -84,6 +107,7 @@ $creditService = new CreditService();
 
     <div class="container">
 
+{{--        PAYMENT AND NAV LINKS FOR DEALER--}}
         @include('frontend.components.customer-nav-links')
 
         <div class="row justify-content-center">
@@ -144,6 +168,7 @@ $creditService = new CreditService();
                                 <td class="text-center">
                                     <div class="d-flex flex-column text-center gap-2">
                                         <div>
+                                            VIN:
                                             <a style="color: #1a7fca;font-size: 15px;" target="_blank"
                                                href="{{route('customer.car-info', $car->vin)}}"> {!! $car->getMedia()->first() ? '📷 ' . $car->vin : $car->vin !!}
                                             </a>
@@ -154,28 +179,29 @@ $creditService = new CreditService();
                                         </div>
 
                                         <div class="d-flex justify-content-center align-items-middle gap-2">
-                                            <a style="color: #1a7fca;font-size: 15px; " target="_blank"
-                                               @if($car->groups->first()?->thc_agent==='MAERSK')
-                                                   href="{{'https://www.maersk.com/tracking/' . $car->groups->first()?->container_id}}"
-                                               @endif
-                                               @if($car->groups->first()?->thc_agent==='Hapag-Eisa')
-                                                   href="{{'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container=' . $car->groups->first()?->container_id}}
-                                                " {{$car->groups->first()?->container_id}}
-                                               @endif
-                                               @if($car->groups->first()?->thc_agent==='COSCO')
-                                                   href="{{'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number=' . $car->groups->first()?->container_id}}
-                                                " {{$car->groups->first()?->container_id}}
-                                               @endif
-                                               @if($car->groups->first()?->thc_agent==='Turkon-DTS')
-                                                   href="{{'https://my.turkon.com/container-tracking'}}
-                                                " {{$car->groups->first()?->container_id}}
-                                               @endif
-                                               @if($car->groups->first()?->thc_agent==='One net-Wilhelmsen')
-                                                   href="{{'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking' }}
-                                                " {{$car->groups->first()?->container_id}}
-                                                    @endif
-                                            >{{$car->groups->first()?->container_id}}</a>
                                             @if($car->groups->first())
+                                                CONTAINER :
+                                                <a style="color: #1a7fca;font-size: 15px; " target="_blank"
+                                                   @if($car->groups->first()?->thc_agent==='MAERSK')
+                                                       href="{{'https://www.maersk.com/tracking/' . $car->groups->first()?->container_id}}"
+                                                   @endif
+                                                   @if($car->groups->first()?->thc_agent==='Hapag-Eisa')
+                                                       href="{{'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container=' . $car->groups->first()?->container_id}}
+                                                " {{$car->groups->first()?->container_id}}
+                                                   @endif
+                                                   @if($car->groups->first()?->thc_agent==='COSCO')
+                                                       href="{{'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number=' . $car->groups->first()?->container_id}}
+                                                " {{$car->groups->first()?->container_id}}
+                                                   @endif
+                                                   @if($car->groups->first()?->thc_agent==='Turkon-DTS')
+                                                       href="{{'https://my.turkon.com/container-tracking'}}
+                                                " {{$car->groups->first()?->container_id}}
+                                                   @endif
+                                                   @if($car->groups->first()?->thc_agent==='One net-Wilhelmsen')
+                                                       href="{{'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking' }}
+                                                " {{$car->groups->first()?->container_id}}
+                                                        @endif
+                                                >{{$car->groups->first()?->container_id}}</a>
                                                 <span style="cursor: pointer;" class="p-cursor"
                                                       onclick="navigator.clipboard.writeText('{{ $car->groups->first()->container_id}}')">
                                               <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
@@ -317,100 +343,106 @@ $creditService = new CreditService();
                                                 </button>
                                             @endif
                                             {{--Credit modal--}}
-                                            <div class="modal fade " id="creditinfomodal{{$key}}" tabindex="-1"
-                                                 role="dialog"
-                                                 aria-hidden="true">
-                                                <div class="modal-dialog modal-lg" role="document">
-                                                    <div class="modal-content ">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Issue Date :
-                                                                {{$car->firstCredit->issue_or_payment_date->format('d-m-Y')}}
-                                                                :
-                                                                {{ $car->firstCredit->credit_amount }} $
-                                                            </h5>
+                                            @if($car->firstCredit)
+                                                <div class="modal fade " id="creditinfomodal{{$key}}" tabindex="-1"
+                                                     role="dialog"
+                                                     aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content ">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Issue Date :
+                                                                    {{$car->firstCredit->issue_or_payment_date->format('d-m-Y')}}
+                                                                    :
+                                                                    {{ $car->firstCredit->credit_amount }} $
+                                                                </h5>
 
-                                                            {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
-                                                            <button type="button" class="close" data-dismiss="modal"
-                                                                    aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body p-0 "
-                                                             style="overflow-x: auto; width: 100%;">
-                                                            <table style="margin: auto">
-                                                                <thead>
-                                                                <tr>
-                                                                    <th class="p-1 text-center"
-                                                                        style="min-width: 100px!important;">Date
-                                                                    </th>
-                                                                    <th class="p-1 text-center" style="width: 100px">
-                                                                        Begin Amount due
-                                                                    </th>
-                                                                    <th class="p-1 text-center">Added Amount</th>
-                                                                    <th class="p-1 text-center" style="width: 80px">
-                                                                        Credit Days
-                                                                    </th>
-                                                                    <th class="p-1 text-center" style="width: 100px">
-                                                                        Credit Fee
-                                                                    </th>
-                                                                    <th class="p-1 text-center" style="width: 100px">
-                                                                        Total Amount
-                                                                    </th>
-                                                                    <th class="p-1 text-center" style="width: 60px">Paid
-                                                                        Amount
-                                                                    </th>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                @foreach($car->credit as $index2=> $credit)
-                                                                    <tr>
-                                                                        @if($credit->added_amount!==null)
-                                                                            <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
-                                                                        @elseif($index2-1>=0)
-                                                                            <td style="min-width: 100px"
-                                                                                class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}</td>
-                                                                        @endif
-                                                                        @if($index2-1>=0)
-                                                                            <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>
-                                                                        @endif
-                                                                        <td class="p-1 text-center"
-                                                                            style="width:min-content!important">
-                                                                            {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
-                                                                        </td>
-                                                                        <td class="p-1 text-center">{{$credit->credit_days}}</td>
-                                                                        <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}}</td>
-                                                                        @if($index2-1>=0)
-                                                                            <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}}</td>
-                                                                        @endif
-                                                                        <td class="p-1 text-center"
-                                                                            style="width: 60px!important">{{$credit->paid_amount}}</td>
-                                                                    </tr>
-                                                                @endforeach
-
-                                                                <tr style="background: #f2f2f2">
-                                                                    <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
-                                                                    <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
-                                                                    <td></td>
-                                                                    <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                                    <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                            <div class="d-flex justify-content-center gap-3 mt-3">
-                                                                <p>Amount Due Till
-                                                                    Today: {{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</p>
+                                                                {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                        aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                        <div class="modal-footer justify-content-center">
-                                                            <button type="button" class="btn btn-danger"
-                                                                    data-dismiss="modal">Close
-                                                            </button>
+                                                            <div class="modal-body p-0 "
+                                                                 style="overflow-x: auto; width: 100%;">
+                                                                <table style="margin: auto">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th class="p-1 text-center"
+                                                                            style="min-width: 100px!important;">Date
+                                                                        </th>
+                                                                        <th class="p-1 text-center"
+                                                                            style="width: 100px">
+                                                                            Begin Amount due
+                                                                        </th>
+                                                                        <th class="p-1 text-center">Added Amount</th>
+                                                                        <th class="p-1 text-center" style="width: 80px">
+                                                                            Credit Days
+                                                                        </th>
+                                                                        <th class="p-1 text-center"
+                                                                            style="width: 100px">
+                                                                            Credit Fee
+                                                                        </th>
+                                                                        <th class="p-1 text-center"
+                                                                            style="width: 100px">
+                                                                            Total Amount
+                                                                        </th>
+                                                                        <th class="p-1 text-center" style="width: 60px">
+                                                                            Paid
+                                                                            Amount
+                                                                        </th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    @foreach($car->credit as $index2=> $credit)
+                                                                        <tr>
+                                                                            @if($credit->added_amount!==null)
+                                                                                <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                                            @elseif($index2-1>=0)
+                                                                                <td style="min-width: 100px"
+                                                                                    class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                                            @endif
+                                                                            @if($index2-1>=0)
+                                                                                <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>
+                                                                            @endif
+                                                                            <td class="p-1 text-center"
+                                                                                style="width:min-content!important">
+                                                                                {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
+                                                                            </td>
+                                                                            <td class="p-1 text-center">{{$credit->credit_days}}</td>
+                                                                            <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}}</td>
+                                                                            @if($index2-1>=0)
+                                                                                <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}}</td>
+                                                                            @endif
+                                                                            <td class="p-1 text-center"
+                                                                                style="width: 60px!important">{{$credit->paid_amount}}</td>
+                                                                        </tr>
+                                                                    @endforeach
+
+                                                                    <tr style="background: #f2f2f2">
+                                                                        <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
+                                                                        <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
+                                                                        <td></td>
+                                                                        <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
+                                                                        <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <div class="d-flex justify-content-center gap-3 mt-3">
+                                                                    <p>Amount Due Till
+                                                                        Today: {{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer justify-content-center">
+                                                                <button type="button" class="btn btn-danger"
+                                                                        data-dismiss="modal">Close
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         </div>
                                         {{--Invoice--}}
                                         {{--                                        <a target="_blank" href="{{route('customer.generate_invoice', ['car_id'=>$car->id])}}">--}}

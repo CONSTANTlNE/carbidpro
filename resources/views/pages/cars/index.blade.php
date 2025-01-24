@@ -153,7 +153,6 @@
                                 @else
                                     @include('partials.car.table-default')
                                 @endif
-
                             </div>
                         </div>
                     </div>

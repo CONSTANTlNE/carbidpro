@@ -138,7 +138,7 @@ class AdminController extends Controller
         Auth::guard('customer')->login($customer);
 
         Session::put('auth', $customer);
-
+        
 
         return to_route('customer.dashboard');
 
