@@ -25,17 +25,44 @@ use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UserController;
-use App\Models\Credit;
-use App\Models\CustomerBalance;
+use App\Models\Customer;
 use App\Models\State;
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
+
+
+Route::get('/oldversionlogin', function ( Illuminate\Http\Request $request) {
+
+    $token = $request->get('token');
+    $signature = $request->get('signature');
+
+    $sharedSecret = env('CARBID_SECRET');
+    $expectedSignature = hash_hmac('sha256', $token, $sharedSecret);
+
+    if (!hash_equals($expectedSignature, $signature)) {
+        return  response()->json(['error' => 'Invalid signature']);
+    }
+
+    $payload = json_decode(base64_decode($token), true);
+
+    if (isset($payload['id'] ,$payload['timestamp'])) {
+        $user = Customer::where('id', $payload['id'])
+            ->first();
+
+        if ($user) {
+            Auth::guard('customer')->login($user);
+            Session::put('auth', $user);
+            return redirect('/dashboard/main');
+        }
+    }
+
+    return  response()->json(['error' => 'User Not Found']);
+
+});
 
 
 Route::get('/lang/{locale}', function ($locale) {
@@ -45,7 +72,7 @@ Route::get('/lang/{locale}', function ($locale) {
 })->name('set-locale');
 
 
-// FRONTEND ROUTES No Auth
+// FRONTEND Website ROUTES No Auth
 Route::controller(HomeController::class)->group(function () {
     Route::get('/',  'index')->name('home');
     Route::get('/about',  'about');
@@ -53,9 +80,6 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/announcements',  'announcements');
     Route::get('/contact', 'contact');
 });
-
-
-
 
 // Customers / Dealers Login-registration
 Route::prefix('dealer')->group(function () {
@@ -71,20 +95,20 @@ Route::prefix('dealer')->group(function () {
     });
 });
 
-
 // =======  ADMIN ROUTES  ========
 Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Dasboard Analitics
+    Route::controller(AdminController::class)->group(function () {
+        Route::get('/', 'adminIndex')->name('dashboard');
+    });
 
     // Users
     Route::controller(UserController::class)->group(function () {
         Route::get('/users', 'index')->name('users.index');
-        Route::post('/users', 'store')->name('users.store');
-        Route::post('/users/{user}', 'update')->name('users.update');
-        Route::delete('/users/{user}', 'destroy')->name('users.destroy');
+        Route::post('/users/store', 'store')->name('users.store');
+        Route::post('/users/update', 'update')->name('users.update');
+        Route::post('/users/delete', 'delete')->name('users.destroy');
     });
 
     // Cars
@@ -129,7 +153,6 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
         Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
     });
-
 
     Route::controller(ArrivedController::class)->group(function () {
         Route::get('/arrived/index', 'index')->name(name: 'arrived.index');
@@ -229,6 +252,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Customers
     Route::controller(AdminController::class)->group(function () {
         Route::get('/customers', 'customerIndex')->name('customers.index');
+        Route::get('/archived-customers', 'customerIndex')->name('customers.archived');
+        Route::get('/archived-customers/restore/{id}', 'restore')->name('customers.restore');
 //        Route::post('/customers/store', 'store')->name('customers.store');
         Route::post('/customers/activate', 'customerActivate')->name('customer.activate');
         Route::post('/customers/destroy', 'delete')->name('customers.delete');
@@ -295,13 +320,170 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/announcements/delete', 'delete')->name('announcements.delete');
     });
 
+    // Manual upload of customers and users OF/From old app
+    route::get('/uploadolddata', function () {
+
+        $csrfExpiration = config('session.lifetime') * 60;
+        return view('uploadcustomers',compact('csrfExpiration'));
+
+    });
+    route::post('/uploadcustomers', function (Request $request) {
+
+        $storedFile = $request->file->store('public');
+        $filePath = storage_path('app/' . $storedFile);
+        $jsonContents = file_get_contents($filePath);
+        $data = json_decode($jsonContents, true); // Use `true` to get an associative array
+
+
+//
+//    foreach ($data[2]['data'] as $customer){
+//
+//        Customer::create([
+//            'id'=>$customer['id'],
+//            'company_name'=>$customer['company_name'],
+//            'contact_name'=>$customer['contact_name'],
+//            'email'=>$customer['email'],
+//            'phone'=>$customer['phone'],
+//            'is_active'=>$customer['is_active'],
+//            'number_of_cars'=>$customer['number_of_cars'],
+//            'password'=>$customer['password'],
+//            'child_of'=>$customer['parent_of'],
+//            'personal_number'=>$customer['personal_number'],
+//            'extra_for_team'=>$customer['extra_for_team'],
+//            'username'=>$customer['username'],
+//            'created_at'=>$customer['created_at'],
+//            'updated_at'=>$customer['updated_at'],
+//            'deleted_at'=>$customer['deleted_at'],
+//            'image'=>$customer['image'],
+//        ]);
+//    }
+
+
+
+        return view('testfile',compact('data'));
+
+    })->name('customer.upload');
+    route::post('/uploadusers', function (Request $request) {
+
+        $storedFile = $request->file->store('public');
+        $filePath = storage_path('app/' . $storedFile);
+        $jsonContents = file_get_contents($filePath);
+        $data = json_decode($jsonContents, true); // Use `true` to get an associative array
+
+        dd($data[2]['data']);
+
+//
+//    foreach ($data[2]['data'] as $customer){
+//
+//        Customer::create([
+//            'id'=>$customer['id'],
+//            'company_name'=>$customer['company_name'],
+//            'contact_name'=>$customer['contact_name'],
+//            'email'=>$customer['email'],
+//            'phone'=>$customer['phone'],
+//            'is_active'=>$customer['is_active'],
+//            'number_of_cars'=>$customer['number_of_cars'],
+//            'password'=>$customer['password'],
+//            'child_of'=>$customer['parent_of'],
+//            'personal_number'=>$customer['personal_number'],
+//            'extra_for_team'=>$customer['extra_for_team'],
+//            'username'=>$customer['username'],
+//            'created_at'=>$customer['created_at'],
+//            'updated_at'=>$customer['updated_at'],
+//            'deleted_at'=>$customer['deleted_at'],
+//            'image'=>$customer['image'],
+//        ]);
+//    }
+
+        unlink($filePath);
+
+        return view('testfile',compact('data'));
+
+    })->name('user.upload');
+
+});
+
+// ====  Dealer dashboard  ROUTES  ====
+Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
+
+    Route::get('/calculator', [calculatorController::class, 'index'])->name('calculator.index');
+    Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
+
+    Route::controller(CustomerController::class)->group(function () {
+
+        Route::get('/record/{id}/table', 'getTableData')->name('record.table');
+
+        Route::get('/main', 'showDashboard')->name('customer.dashboard');
+
+        Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
+
+        Route::get('/car-info/{vin}', 'showCar')->name('customer.car-info');
+
+        Route::post('/save-release', 'saveRelease')->name('saveRelease');
+
+        Route::get('/payment-registration', 'showPaymentRequest')->name('customer.payment_registration');
+
+        Route::get('/payment-history', 'paymentHistory')->name('customer.payment_history');
+
+        Route::get('/team-list', 'teamList')->name('customer.teamList');
+
+        Route::get('/add-team', 'addTeam')->name('customer.addTeam');
+
+        Route::get('/team-edit/{id}', 'teamEdit')->name('customer.teamEdit');
+
+        Route::post('/team-update/{id}', 'teamUpdate')->name('customer.teamUpdate');
+
+        Route::post('/team-remove/{id}', 'removeTeam')->name('customer.removeTeam');
+
+        Route::post('/car-assing-team', 'addTeamToCar')->name('customer.addTeamToCar');
+
+        Route::post('/add-invoice-price', 'addInvoicePrice')->name('customer.addInvoicePrice');
+    });
+
+    Route::controller(CustomerBalanceController::class)->group(function () {
+        Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
+        // Dealer pays for a particular car from General balance
+        Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
+    });
+
+    route::controller(InvoiceController::Class)->group(function (){
+        Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
+    });
+
+});
+
+// Old Website Authorization
+
+Route::middleware('auth')->group(function () {
+    Route::get('/generate-link', function (Request $request) {
+        if ($request->has('customer_id')){
+            $user = $request->get('customer_id');
+        } else{
+            $user = auth()->user()->id;
+        }
+
+        // Generate token
+        $payload = [
+            'id' => $user,
+            'timestamp' => now()->timestamp
+        ];
+
+        $sharedSecret = env('CARBID_SECRET'); // A shared key between both apps
+        $token = base64_encode(json_encode($payload)); // Base64 encode for easy transmission
+        $signature = hash_hmac('sha256', $token, $sharedSecret); // Sign the token
+
+        $oldSite = 'https://carbidpro.com/oldversionlogin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
+
+        return  redirect()->to($oldSite);
+
+    })->name('generate.link');
 });
 
 
 
 
-// SEED STATES
 
+// SEED STATES needed before DB:seed
 Route::get('/savelocations', function () {
     $state_api = Illuminate\Support\Facades\Http::get('https://gist.githubusercontent.com/mshafrir/2646763/raw/8b0dbb93521f5d6889502305335104218454c2bf/states_hash.json');
 
@@ -325,66 +507,11 @@ Route::get('/savelocations', function () {
 })->name('st');
 
 
-// ====  Dealer dashboard  ROUTES  ====
-
-Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
-
-    Route::get('/calculator', [calculatorController::class, 'index'])->name('calculator.index');
-    Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
-
-    Route::controller(CustomerController::class)->group(function () {
-        Route::get('/record/{id}/table', 'getTableData')->name('record.table');
-
-        Route::get('/main', 'showDashboard')->name('customer.dashboard');
-
-        Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
-
-        Route::get('/car-info/{vin}', 'showCar')->name('customer.car-info');
-
-        Route::post('/save-release', 'saveRelease')->name('saveRelease');
-
-        Route::get('/payment-registration', 'showPaymentRequest')->name('customer.payment_registration');
-
-        Route::get('/payment-history', 'paymentHistory')->name('customer.payment_history');
-
-//        Route::post('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
-
-        Route::get('/team-list', 'teamList')->name('customer.teamList');
-
-        Route::get('/add-team', 'addTeam')->name('customer.addTeam');
-
-        Route::get('/team-edit/{id}', 'teamEdit')->name('customer.teamEdit');
-
-        Route::post('/team-update/{id}', 'teamUpdate')->name('customer.teamUpdate');
-
-        Route::post('/team-remove/{id}', 'removeTeam')->name('customer.removeTeam');
-
-        Route::post('/car-assing-team', 'addTeamToCar')->name('customer.addTeamToCar');
-
-        Route::post('/add-invoice-price', 'addInvoicePrice')->name('customer.addInvoicePrice');
-    });
-    Route::controller(CustomerBalanceController::class)->group(function () {
-        Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
-        // Dealer pays for a particular car from General balance
-        Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
-    });
-
-    route::controller(InvoiceController::Class)->group(function (){
-        Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
-    });
-
-});
-
-
-
-
-
-
-
 
 // TEST ROUTES
 
 route::get('/logout', function () {
+
     Auth::guard('web')->logout();
 
     session()->invalidate();
@@ -393,20 +520,6 @@ route::get('/logout', function () {
 });
 
 
-route::get('/invoicetest', function () {
-  return  $credit = Credit::where('car_id', 9)
-        ->where('customer_id', 1)
-        ->get();
-});
-
-
-
-route::get('/statustest', function () {
-//  return  (new \App\Services\smsService())->statusCheck('APGW-1AC259-116202560749PM980');
-
-    return Cache::get('invalidPhones');
-
-});
 
 
 require __DIR__.'/auth.php';

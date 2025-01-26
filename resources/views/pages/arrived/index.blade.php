@@ -1,4 +1,11 @@
 @extends('layouts.app')
+@php
+
+    use App\Services\CreditService;use Carbon\Carbon;
+
+    $creditService=new CreditService();
+
+@endphp
 @section('content')
     @push('css')
         <style>
@@ -99,7 +106,7 @@
                                         <table id="dataTableExample1"
                                                class="table table-bordered table-striped table-hover">
                                             <thead class="back_table_color">
-                                            <tr class="info">
+                                            <tr class="info text-center">
                                                 <th>ID</th>
                                                 <th>Container #</th>
                                                 <th>Line + Agent THC</th>
@@ -149,15 +156,16 @@
                                                                             <table id="dataTableExample1"
                                                                                    class="table table-bordered table-striped table-hover">
                                                                                 <thead class="back_table_color">
-                                                                                <tr class="info">
-                                                                                    <th>ID</th>
-                                                                                    <th>CAR INFO</th>
-                                                                                    <th>Owner</th>
-                                                                                    <th>Car Photo</th>
-                                                                                    <th>Bll OF Loading</th>
-                                                                                    <th>Ready For Pickup</th>
-                                                                                    <th>Remark</th>
-                                                                                    <th>Action</th>
+                                                                                <tr class="info text-center">
+                                                                                    <th style="vertical-align: middle">ID</th>
+                                                                                    <th style="vertical-align: middle">CAR INFO</th>
+                                                                                    <th class="text-center">Amount Due</th>
+                                                                                    <th style="vertical-align: middle">Owner</th>
+                                                                                    <th style="vertical-align: middle">Car Photo</th>
+                                                                                    <th style="vertical-align: middle">Bll OF Loading</th>
+                                                                                    <th style="vertical-align: middle">Ready For Pickup</th>
+                                                                                    <th style="vertical-align: middle">Remark</th>
+                                                                                    <th style="vertical-align: middle">Action</th>
                                                                                 </tr>
                                                                                 </thead>
 
@@ -165,10 +173,12 @@
                                                                                 <tbody>
 
                                                                                 @foreach ($cargroup->cars as $car)
+{{--                                                                                    @dd($car->latestCredit)--}}
                                                                                     <div class="car-wrapper">
                                                                                         <tr class="info">
                                                                                             <td>{{ $car->id }}
                                                                                             </td>
+
                                                                                             <td>
 
                                                                                                 <div>
@@ -183,6 +193,13 @@
                                                                                                          alt="copy"
                                                                                                          class="copy">
                                                                                                 </div>
+                                                                                            </td>
+                                                                                            <td class="text-center" style="vertical-align: middle">
+                                                                                                @if($car->latestCredit)
+                                                                                                    <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
+                                                                                                @else
+                                                                                                    <span style="color:red">${{round( $car->amount_due) }}</span>
+                                                                                                @endif
                                                                                             </td>
                                                                                             <td>
                                                                                                 {{ $car->vehicle_owner_name }}
@@ -307,6 +324,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
+
                                                     <td>{{ $cargroup->thc_agent }}</td>
                                                     <td>
                                                         <input type="date"

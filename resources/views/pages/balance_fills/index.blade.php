@@ -29,6 +29,16 @@
                     </button>
                 </div>
             @endif
+            @if(session()->has('error'))
+                <div style="padding: 5px!important;"
+                     class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-25" role="alert">
+                    <p>{{session()->get('error')}}</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            @endif
+
             <!-- Main content -->
             <section class="content">
                 <div class="row">
@@ -188,7 +198,7 @@
 
 
                                 {{-- Payments Data--}}
-                                <div class="table-responsive">
+                                <div  style="max-height: 600px; overflow:auto">
                                     <table id="dataTableExample1"
                                            class="table table-bordered table-striped table-hover">
                                         <thead class="back_table_color">

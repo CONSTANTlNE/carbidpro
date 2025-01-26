@@ -27,7 +27,7 @@ class ArrivedController extends Controller
                 })
                 ->get();
         } else {
-            $groups = ContainerGroup::with('cars')
+            $groups = ContainerGroup::with('cars.credit')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3);  // Filter cars where container_status is 2
                 })

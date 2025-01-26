@@ -100,7 +100,7 @@
                                     </li>
                                     <li><span style="color: black!important;">Fuel : </span> {{ $car->type_of_fuel}}
                                     </li>
-                                    <li><span style="color: black!important;">Key :  </span> {{ $car->key}}</li>
+                                    <li><span style="color: black!important;">Title :</span> {{ $car->title}} </li>
                                 </ul>
                             </div>
                         </div>
@@ -112,7 +112,6 @@
                                     <li><span style="color: black!important;">Auction :</span> {{ $car->Auction->name}}
                                     </li>
                                     <li><span style="color: black!important;">LOT :</span> {{ $car->lot}} </li>
-                                    <li><span style="color: black!important;">Title :</span> {{ $car->title}} </li>
                                 </ul>
                             </div>
                         </div>
@@ -123,13 +122,13 @@
                             <div class="ft-project-overview-list-item ul-li-block">
                                 <ul>
                                     <li>
-                                        <span style="color: black!important;">Container : {{ $car->groups->first()?->container_id}}</span>
+                                        <span style="color: black!important;">Container : {{ $car->groups->first()?->container_id ? $car->groups->first()?->container_id : 'N/A'}}</span>
                                     </li>
                                     <li>
-                                        <span style="color: black!important;">Loading Date : {{ $car->groups->first()?->thc_agent}}</span>
+                                        <span style="color: black!important;">Shipping Line :  {{ $car->groups->first()?->thc_agent ? $car->groups->first()?->thc_agent : 'N/A'}}</span>
                                     </li>
                                     <li>
-                                        <span style="color: black!important;">Shipping Line :  {{ $car->groups->first()?->thc_agent}}</span>
+                                        <span style="color: black!important;">ETA : {{$car->groups->first()?->arrival_time? Carbon::parse($car->groups->first()?->arrival_time)->format('d-m-Y'): 'N/A'}}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -137,14 +136,12 @@
                         <div class="col-lg-5">
                             <div class="ft-project-overview-list-item ul-li-block">
                                 <ul>
+
                                     <li>
-                                        <span style="color: black!important;">ETA : {{$car->groups->first()?->arrival_time? Carbon::parse($car->groups->first()?->arrival_time)->format('d-m-Y'): 'No Date Available'}}</span>
+                                        <span style="color: black!important;">Open Date (est) : {{ $car->groups->first()?->est_open_date ? Carbon::parse($car->groups->first()?->est_open_date)->format('d-m-Y') : 'N/A'}}</span>
                                     </li>
                                     <li>
-                                        <span style="color: black!important;">Open Date : {{ $car->groups->first()?->est_open_date ? Carbon::parse($car->groups->first()?->est_open_date)->format('d-m-Y') : 'No Date Available'}}</span>
-                                    </li>
-                                    <li>
-                                        <span style="color: black!important;">Terminal  : {{ $car->groups->first()?->terminal}}</span>
+                                        <span style="color: black!important;">Terminal  : {{ $car->groups->first()?->terminal ? $car->groups->first()?->terminal : 'N/A'}}</span>
                                     </li>
                                 </ul>
                             </div>

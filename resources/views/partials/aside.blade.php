@@ -80,21 +80,21 @@
                     </ul>
                 </li>
 
-                <li class="treeview">
+                <li class="treeview {{request()->routeIs('users.index') || request()->routeIs('customers.index') || request()->routeIs('customers.archived') ? 'active' : ''}}"   >
                     <a href="#">
                         <i class="fa fa-user-circle"></i><span>Users</span>
                         <span class="pull-right-container">
                         <i class="fa fa-angle-left float-right"></i>
                         </span>
                     </a>
-                    <ul class="treeview-menu">
-                        <li class="">
+                    <ul class="treeview-menu ">
+                        <li class="{{request()->routeIs('users.index') ? 'active' : ''}}">
                             <a href="{{ route('users.index') }}" >
                                 <span>User</span>
                                 <span class="pull-right-container"></span>
                             </a>
                         </li>
-                        <li>
+                        <li class="{{ Route::is('customers.index') ? 'active' : ''}}">
                             <a href="{{ route('customers.index') }}">
                                 <span>Customers</span>
                                 <span class="pull-right-container"></span>
@@ -102,6 +102,13 @@
                                     <span style="background: red!important;color: white!important"
                                           class="pull-right badge">{{$customerscount}}</span>
                                 @endif
+                            </a>
+                        </li>
+
+                        <li class="{{request()->routeIs('customers.archived') ? 'active' : ''}}">
+                            <a href="{{ route('customers.archived',['archive' => 'archive'] ) }}">
+                                <span>Archived Customers</span>
+                                <span class="pull-right-container"></span>
                             </a>
                         </li>
                     </ul>
@@ -157,6 +164,10 @@
                             </a>
                             <a href="{{ route('sms.selected') }}">
                                 <span>Select Recipient</span>
+                                <span class="pull-right-container"></span>
+                            </a>
+                            <a href="{{ route('sms.drafts') }}">
+                                <span>Drafts</span>
                                 <span class="pull-right-container"></span>
                             </a>
                         </li>

@@ -473,7 +473,7 @@ class CarController extends Controller
 
 //       dd($request->all());
 
-        // Handle balance_accounting array
+        //  if new costs were added recalculate credit
         if ($request->has('balance_accounting')) {
             $costs = $request->input('balance_accounting');
             (new CreditService())->reCalculateOnDeleteOrAdd($car, null, $costs);
@@ -659,9 +659,11 @@ class CarController extends Controller
             } else {
                 $car->delete();
             }
+            return back();
         }
 
-        return back();
+        return back()->with('error', 'Car not found');
+
     }
 
 
@@ -675,7 +677,7 @@ class CarController extends Controller
 
         if ($car->ready_for_pickup == 0) {
             $car->ready_for_pickup = 1;
-            (new smsService())->readuForPickup($number, $car);
+            (new smsService())->readyForPickup($number, $car);
         } else {
             $car->ready_for_pickup = 0;
         }
@@ -690,9 +692,10 @@ class CarController extends Controller
         $car = Car::onlyTrashed()->find($id);
         if ($car) {
             $car->restore();
+            return back();
         }
+        return back()->with('error', 'Car not found');
 
-        return back();
     }
 
 }

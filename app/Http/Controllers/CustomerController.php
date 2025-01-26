@@ -101,9 +101,7 @@ class CustomerController extends Controller
     {
         Auth::guard('customer')->logout();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
+        Session::forget('auth');
 
         return to_route('home');
     }
@@ -375,7 +373,7 @@ class CustomerController extends Controller
 
 
         if (route('customer.archivedcars') == url()->current()) {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','media','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
@@ -386,14 +384,14 @@ class CustomerController extends Controller
                 ->withQueryString();
 
         } elseif (auth()->user()->hasRole('portmanager')) {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','media','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
                 ->paginate(50)
                 ->withQueryString();
         } else {
-            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','credit' => function ($query) {
+            $cars = Car::with(['state', 'toPort', 'payments','latestCredit','firstCredit','groups','media','credit' => function ($query) {
                 $query->orderBy('issue_or_payment_date', 'asc');
             }])
                 ->where('is_active', 1)
@@ -414,6 +412,8 @@ class CustomerController extends Controller
             ->sum('amount');
 
         $teams = Customer::where('child_of', $customer->id)->get();
+
+//        $totalAmountDue=Car::
 
         return view('frontend.pages.customer.dashboard2',
             compact('tr', 'customer', 'teams', 'cars', 'balance', 'pending'));

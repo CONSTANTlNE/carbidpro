@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\RegisterMail;
+use App\Models\Car;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +14,23 @@ use Illuminate\Support\Facades\Session;
 
 class AdminController extends Controller
 {
+
+    public function adminIndex(){
+
+        $totalCustomers = Customer::where('is_active', 1)->count();
+        $totalCars = Car::where('is_active', 1)->count();
+        $totalCarsPaid = Car::where('amount_due', 0)->count();
+        $totalCarsDue = Car::where('amount_due', '!=', 0)->count();
+
+
+        $totalDeposits =  number_format(CustomerBalance::where('type', 'fill')->sum('amount'), 0, '.', ',');
+        $totalAmountDue = number_format(Car::where('amount_due', '!=', 0)->sum('amount_due'), 0, '.', ',');
+        $totalSpent = number_format(CustomerBalance::where('type', 'car_payment')->sum('amount')*-1, 0, '.', ',');  ;
+
+
+        return view('dashboard', compact('totalCustomers', 'totalCars', 'totalCarsPaid', 'totalCarsDue', 'totalDeposits', 'totalAmountDue', 'totalSpent'));
+    }
+
     public function customerIndex(Request $request)
     {
         $perpage = $request->input('perpage', 50);
@@ -22,30 +41,41 @@ class AdminController extends Controller
 
         if ($request->has('search')) {
             $search    = $request->input('search');
-            $customers = Customer::where('contact_name', 'like', '%'.$search.'%')
-                ->orWhere('company_name', 'like', '%'.$search.'%')
-                ->orWhere('email', 'like', '%'.$search.'%')
-                ->orWhere('phone', 'like', '%'.$search.'%')
-                ->paginate($perpage)->withQueryString();
 
-            $trashed = Customer::onlyTrashed()
-                ->where(function ($query) use ($search) {
-                    $query->where('contact_name', 'like', '%'.$search.'%')
-                        ->orWhere('company_name', 'like', '%'.$search.'%')
-                        ->orWhere('email', 'like', '%'.$search.'%')
-                        ->orWhere('phone', 'like', '%'.$search.'%');
-                })
-                ->paginate($perpage)
-                ->withQueryString();
+            if ($request->has('archive')){
+                $customers = Customer::onlyTrashed()
+                    ->where(function ($query) use ($search) {
+                        $query->where('contact_name', 'like', '%' . $search . '%')
+                            ->orWhere('company_name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%')
+                            ->orWhere('phone', 'like', '%' . $search . '%');
+                    })
+                    ->paginate($perpage)
+                    ->withQueryString();
+            } else{
+                $customers = Customer::where('contact_name', 'like', '%'.$search.'%')
+                    ->orWhere('company_name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%')
+                    ->orWhere('phone', 'like', '%'.$search.'%')
+                    ->paginate($perpage)->withQueryString();
+            }
 
             $count        = $customers->total();
 
-            $trashedCount = $trashed->total();
-
-            return view('pages.customers', compact('customers', 'count', 'trashed', 'trashedCount'));
+            return view('pages.customers', compact('customers', 'count'));
         }
 
-        $customers    = Customer::paginate($perpage)->withQueryString();
+
+
+
+        if ($request->has('archive')){
+
+            $customers    = Customer::onlyTrashed()->paginate($perpage)->withQueryString();
+
+        } else {
+            $customers    = Customer::paginate($perpage)->withQueryString();
+
+        }
         $trashed      = Customer::onlyTrashed()->paginate($perpage)->withQueryString();
 //        dd($trashed);
         $count        = $customers->total();
@@ -61,8 +91,8 @@ class AdminController extends Controller
             'id' => 'required|exists:customers,id',
         ]);
 
-
         $customer = Customer::find($request->id);
+
         if (!$customer) {
             return back()->with('error', 'Customer not found');
         }
@@ -82,10 +112,29 @@ class AdminController extends Controller
 
     public function delete(Request $request)
     {
-        $customer = Customer::find($request->id);
-        $customer->delete();
 
-        return back();
+        $customer = Customer::withTrashed()->find($request->id);
+
+        if ($customer) {
+            if ($customer->trashed()) {
+                $customer->forceDelete();
+            } else {
+                $customer->delete();
+            }
+            return back();
+        }
+        return back()->with('error', 'Customer not found');
+
+    }
+
+    public function restore($id){
+
+        $customer = Customer::onlyTrashed()->find($id);
+        if ($customer) {
+            $customer->restore();
+            return back();
+        }
+        return back()->with('error', 'Customer not found');
     }
 
     public function update(Request $request)

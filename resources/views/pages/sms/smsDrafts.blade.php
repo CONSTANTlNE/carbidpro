@@ -11,16 +11,7 @@
         <link href="{{asset('assets/plugins/modals/component.css')}}" rel="stylesheet"/>
     @endpush
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-{{--        <section class="content-header">--}}
-{{--                        <div class="header-icon">--}}
-{{--                            <i class="fa fa-mobile"></i>--}}
-{{--                        </div>--}}
-{{--                        <div class="header-title">--}}
-{{--                            <h1>SMS Drafts</h1>--}}
-{{--                        </div>--}}
-{{--        </section>--}}
-        <!-- Main content -->
+
         @if($errors->any())
             <div style="padding: 5px!important;" class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-25" role="alert">
                 @foreach($errors->all() as $error)

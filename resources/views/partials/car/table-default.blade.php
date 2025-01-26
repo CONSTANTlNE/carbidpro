@@ -68,8 +68,11 @@ use Carbon\Carbon  ;
                     <strong>All Cost:</strong><br>
                     {{ $car->total_cost }}<br>
                     <strong>Amount due:</strong><br>
-{{--                    {{ round($car->amount_due+round( ((new CreditService())->totalAccruedInterestTillToday($car->id))) ) }}--}}
-                    {{ round($car->amount_due+round( ((new CreditService())->totalInterestFromLastCalc($car->id))) ) }}
+                    @if($car->latestCredit)
+                        <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
+                    @else
+                        <span style="color:red">${{round( $car->amount_due) }}</span>
+                    @endif
                 </td>
 
                 <td class="text-center">
@@ -86,66 +89,8 @@ use Carbon\Carbon  ;
                             Give Credit
                         </button>
                     @endif
-                    {{--Credit modal--}}
-                    <div class="modal fade" id="creditmodal{{$index}}" tabindex="-1" role="dialog"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable" role="document">
-                            <div class="modal-content">
-                                <section>
-                                    <form action="{{route('give.credit')}}" method="post">
-                                        @csrf
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Give Credit</h5>
-                                            <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-md-4 form-group">
-                                                    <label class="control-label">Amount:</label>
-                                                    <input type="hidden" name="amount" value="{{ $car->amount_due}}">
-                                                    <input type="hidden" name="car_id" value="{{ $car->id}}">
-                                                    <input type="hidden" name="customer_id"
-                                                           value="{{ $car->customer->id}}">
-                                                    <input type="text" disabled
-                                                           value="{{ $car->amount_due}}" class="form-control">
-                                                </div>
 
-                                                <div class="col-md-4 form-group">
-                                                    <label class="control-label">Monthly %</label>
-                                                    <input required name="percent" type="number" min="1" placeholder=""
-                                                           class="form-control" value="4">
-                                                </div>
-
-                                                <div class="col-md-4 form-group">
-                                                    <label class="control-label">Issue Date</label>
-                                                    <input min="{{ $car->created_at->format('Y-m-d') }}" required
-                                                           name="issue_date" type="date" placeholder="Invoice Date"
-                                                           class="form-control" value="{{ now()->format('Y-m-d') }}">
-                                                </div>
-
-                                                <div class="col-md-12 form-group">
-                                                    <label class="control-label">Comment</label>
-                                                    <input name="comment" type="text" placeholder="Comment"
-                                                           class="form-control">
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer justify-content-center">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close
-                                            </button>
-                                            <button class="btn green_btn custom_grreen2">Save changes
-                                            </button>
-                                        </div>
-                                    </form>
-                                </section>
-                            </div>
-                        </div>
-                    </div>
-                    {{--Credit Info--}}
+                    {{--Credit Info Button--}}
                     @if($car->latestCredit)
                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                 data-target="#creditinfomodal{{$index}}">
@@ -235,7 +180,6 @@ use Carbon\Carbon  ;
                         </div>
                     </div>
 
-
                     {{--Delete Button--}}
                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                             data-target="#deleteCarModal{{$index}}" data-car-id="{{ $car->id }}">
@@ -285,36 +229,8 @@ use Carbon\Carbon  ;
                     <br>
                     <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
                 </td>
-                {{--                </form>--}}
             </tr>
         @endforeach
         </tbody>
     </table>
-</div>
-<!-- Delete Car Modal -->
-<div class="modal fade" id="deleteCarModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header modal-header-primary">
-                <h3><i class="fa fa-user m-r-5"></i> Delete Car</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this Car?</p>
-                <form id="deleteCarForm">
-                    @csrf <!-- CSRF token for security -->
-                    <input type="hidden" id="deleteCarId" name="car_id">
-                    <!-- Hidden field to hold the user ID -->
-                    <div class="form-group user-form-group">
-                        <div class="float-right">
-                            <button type="button" class="btn btn-danger btn-sm"
-                                    data-dismiss="modal">NO
-                            </button>
-                            <button type="submit" class="btn btn-add btn-sm">YES</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>

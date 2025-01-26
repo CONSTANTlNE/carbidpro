@@ -127,7 +127,7 @@
                                 @csrf
                                 <div class="form-group">
                                     <label>Message (To All Customers)</label>
-                                    <textarea name="message" id="" class="w-100" rows="10"></textarea>
+                                    <textarea name="message" id="" class="w-100" rows="10">{{old('message')}}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-add"><i class="fa fa-check"></i> send

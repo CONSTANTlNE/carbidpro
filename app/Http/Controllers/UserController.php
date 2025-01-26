@@ -14,8 +14,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::get(); // Adjust the query to suit your admin access logic
+        $users = User::with('roles')->get(); // Adjust the query to suit your admin access logic
         $roles = Role::all();
+
         return view('pages.users.index', compact('users', 'roles'));
     }
 
@@ -26,43 +27,23 @@ class UserController extends Controller
     {
         // Validate request data
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
             'password' => 'required|confirmed|min:6',
         ]);
 
 
-
         // Create the new user
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'role'     => $request->role,
             'password' => Hash::make($request->password), // Hash the password
         ]);
 
         $user->assignRole($request->role);
 
-        // Return success response
-        return response()->json([
-            'message' => 'User added successfully!',
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return back()->with('success', 'User created successfully!');
     }
 
     /**
@@ -71,13 +52,15 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id, // Ensure the email is unique, except for this user
-            'password' => 'nullable|confirmed|min:6', // Validate password and confirmation, but it's optional (nullable)
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email,'.$user->id,
+            // Ensure the email is unique, except for this user
+            'password' => 'nullable|confirmed|min:6',
+            // Validate password and confirmation, but it's optional (nullable)
         ]);
 
         // Update the user's information
-        $user->name = $request->input('name');
+        $user->name  = $request->input('name');
         $user->email = $request->input('email');
         $user->assignRole($request->role);
 
@@ -90,22 +73,18 @@ class UserController extends Controller
         $user->save();
 
         // Return a success response (this is for AJAX; adjust as necessary)
-        return response()->json([
-            'message' => 'User updated successfully!',
-        ]);
+        return back()->with('success', 'User updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function delete(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $user = User::findOrFail($id);
+        $user = User::findOrFail($request->user_id);
         $user->delete();
 
-        // Return success response
-        return response()->json([
-            'message' => 'User deleted successfully!',
-        ]);
+
+        return back()->with('success', 'User deleted successfully!');
     }
 }

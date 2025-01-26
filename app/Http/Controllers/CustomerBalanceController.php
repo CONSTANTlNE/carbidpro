@@ -81,6 +81,7 @@ class CustomerBalanceController extends Controller
     /**
      * Approve a payment request (general amount like filling balance)
      */
+
     public function approveBalance(Request $request)
     {
 //        dd($request);
@@ -163,13 +164,16 @@ class CustomerBalanceController extends Controller
 
         $car = car::find($request->car_id);
 
-//        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car->id));
-        $accruedPercent = round((new CreditService())->totalInterestFromLastCalc($car->id));
-
-//        dd(round($car->amount_due + $accruedPercent) < $request->amount);
-
-        if (round($car->amount_due + $accruedPercent) < $request->amount) {
-            return back()->with('error', 'You can not pay more than amount due');
+        // Return error message if Payment is more that total amount Due
+        if ($car->credit->isNotEmpty()) {
+            $accruedPercent = round((new CreditService())->totalInterestFromLastCalc($car->id));
+            if (round($car->credit->last()->credit_amount + $accruedPercent) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
+        } else {
+            if (round($car->amount_due) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
         }
 
 
@@ -177,7 +181,7 @@ class CustomerBalanceController extends Controller
             ->where('is_approved', 1)
             ->sum('amount');
 
-        if ($deposit > $request->amount) {
+        if ($deposit >= $request->amount) {
             $balance                  = new CustomerBalance;
             $balance->amount          = -$request->amount;
             $balance->is_approved     = true;
@@ -218,7 +222,7 @@ class CustomerBalanceController extends Controller
         $request->validate([
             'bank_payment' => 'required|numeric|min:1',
             'full_name'    => 'required|string|max:255',
-            'comment'=>'nullable|string',
+            'comment'      => 'nullable|string',
         ]);
 
         $balance->amount            = $request->bank_payment;
@@ -235,6 +239,15 @@ class CustomerBalanceController extends Controller
     public function deleteBalance(Request $request)
     {
         $payment = CustomerBalance::find($request->id);
+
+        $currentDeposit = CustomerBalance::where('customer_id', $payment->customer_id)
+            ->where('is_approved', 1)
+            ->sum('amount');
+
+        if ($payment->amount > $currentDeposit) {
+            return back()->with('error', 'Requested amount ' . $payment->amount . ' is already spent on cars , Maximum amount to be deleted is ' . $currentDeposit);
+        }
+
         $payment->delete();
 
         return back();
@@ -274,26 +287,34 @@ class CustomerBalanceController extends Controller
     public function carPaymentIndex(Request $request)
     {
         if ($request->has('search') && !empty($request->search)) {
-            $payment_reports = CustomerBalance::with(['car', 'customer'])
+            $payment_reports = CustomerBalance::with([
+                'car' => function ($query) {
+                    $query->withTrashed();
+                }, 'customer',
+            ])
                 ->where('type', 'car_payment')
                 ->where(function ($query) use ($request) {
                     $query
-                        ->where('full_name', 'like', '%' . $request->search . '%')
-                        ->orWhere('amount', 'like', '%' . $request->search . '%')
+                        ->where('full_name', 'like', '%'.$request->search.'%')
+                        ->orWhere('amount', 'like', '%'.$request->search.'%')
                         ->orWhereHas('car', function ($carQuery) use ($request) {
-                            $carQuery->where('vin', 'like', '%' . $request->search . '%')
-                                ->orWhere('make_model_year', 'like', '%' . $request->search . '%');
+                            $carQuery
+                                ->where('vin', 'like', '%'.$request->search.'%')
+                                ->orWhere('make_model_year', 'like', '%'.$request->search.'%');
                         });
                 })
                 ->orderBy('created_at', 'desc')
                 ->get(); // Ensure you call ->get() here to execute the query.
         } else {
-            $payment_reports = CustomerBalance::with(['car', 'customer'])
+            $payment_reports = CustomerBalance::with([
+                'car' => function ($query) {
+                    $query->withTrashed();
+                }, 'customer',
+            ])
                 ->where('type', 'car_payment')
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
-
 
 
         $cars      = Car::all();
@@ -317,41 +338,48 @@ class CustomerBalanceController extends Controller
             ->where('id', $request->car_id)
             ->first();
 
+
+        // Return error message if Payment is more that total amount Due
+        if ($car->credit->isNotEmpty()) {
+            $accruedPercent = round((new CreditService())->totalInterestFromLastCalc($car->id));
+            if (round($car->credit->last()->credit_amount + $accruedPercent) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
+        } else {
+            if (round($car->amount_due) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
+        }
+
+
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
             ->where('is_approved', 1)
             ->sum('amount');
 
         if ($deposit < $request->amount) {
-            return back()->with('error', 'Not enough deposit');
+            $balance              = new CustomerBalance();
+            $balance->customer_id = $request->customer_id;
+            $balance->car_id      = $request->car_id;
+            // negative because fill and deduction has same column in database
+            $balance->amount          = -$request->amount;
+            $balance->carpayment_date = $request->payment_date;
+            $balance->date            = $request->payment_date;
+            $balance->comment         = $request->comment;
+            $balance->type            = 'car_payment';
+            $balance->is_approved     = 1;
+            $balance->save();
+
+
+            // if credit was granted also apply the credit payment
+            $newCredit = (new CreditService())->creditPayment($car, $request, $balance);
+
+            (new CreditService())->reCalculateOnDeleteOrAdd($car);
+
+
+            return back();
         }
 
-        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car->id));
-
-        if ($car->amount_due + $accruedPercent < $request->amount) {
-            return back()->with('error', 'You can not pay more than amount due');
-        }
-
-
-        $balance              = new CustomerBalance();
-        $balance->customer_id = $request->customer_id;
-        $balance->car_id      = $request->car_id;
-        // negative because fill and deduction has same column in database
-        $balance->amount          = -$request->amount;
-        $balance->carpayment_date = $request->payment_date;
-        $balance->date            = $request->payment_date;
-        $balance->comment         = $request->comment;
-        $balance->type            = 'car_payment';
-        $balance->is_approved     = 1;
-        $balance->save();
-
-
-        // if credit was granted also apply the credit payment
-        $newCredit = (new CreditService())->creditPayment($car, $request, $balance);
-
-        (new CreditService())->reCalculateOnDeleteOrAdd($car);
-
-
-        return back();
+        return back()->with('error', 'Not enough deposit');
     }
 
     public function carPaymentUpdate(Request $request)
@@ -367,9 +395,12 @@ class CustomerBalanceController extends Controller
 
         $payment = CustomerBalance::find($request->payment_id);
 
+
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
-            ->where('is_approved', 1)
-            ->sum('amount');
+                ->where('is_approved', 1)
+                ->sum('amount') + ($payment->amount * -1);
+
+//        dd($deposit);
 
         if ($deposit < $request->amount) {
             return back()->with('error', 'Not enough deposit');
@@ -393,6 +424,11 @@ class CustomerBalanceController extends Controller
     {
         $payment = CustomerBalance::find($request->id);
         $car     = Car::where('id', $payment->car_id)->first();
+
+        $creditrecord = Credit::where('customer_balance_id', $payment->id)->first();
+        if ($creditrecord) {
+            $creditrecord->delete();
+        }
 
         $car->save();
         $payment->delete();

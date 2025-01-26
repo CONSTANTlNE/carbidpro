@@ -6,7 +6,7 @@
     use Illuminate\Support\Facades\Session;
     use Carbon\Carbon    ;
 
-
+//@dd(auth()->user());
 $creditService = new CreditService();
 
 //             Cache::forget('dashboardStatics'.session()->get('locale'));
@@ -63,31 +63,31 @@ $creditService = new CreditService();
                 max-width: 1700px;
             }
 
-            table, th, td {
-                border: 1px solid;
-            }
+            /*table, th, td {*/
+            /*    border: 1px solid;*/
+            /*}*/
 
             td {
                 padding: 7px;
             }
 
 
-
-            .hideBr{
+            .hideBr {
                 display: none;
             }
 
             @media only screen and (max-width: 400px) {
-               .hideBr{
-                   display: block;
-               }
-
-                #bank_payment{
-                  width: 250px!important;
+                .hideBr {
+                    display: block;
                 }
 
-                #full_name{
-                    width: 250px!important;                }
+                #bank_payment {
+                    width: 250px !important;
+                }
+
+                #full_name {
+                    width: 250px !important;
+                }
             }
 
         </style>
@@ -107,18 +107,14 @@ $creditService = new CreditService();
 
     <div class="container">
 
-{{--        PAYMENT AND NAV LINKS FOR DEALER--}}
+        {{--PAYMENT AND NAV LINKS FOR DEALER--}}
         @include('frontend.components.customer-nav-links')
 
         <div class="row justify-content-center">
             <div class="col-lg-12">
                 <br>
-                {{--                <div class="d-flex justify-content-center mb-3">--}}
-                {{--                    <input class="text-center" style="width: 250px" type="text" name="search" id="search"--}}
-                {{--                           placeholder="{{Cache::get('dashboardStatics'.session()->get('locale'))['Search placeholder']}}">--}}
-                {{--                </div>--}}
                 <div style="overflow-x: auto; width: 100%;">
-                    <table id="myTable" class="display m-auto">
+                    <table id="myTable" class="display m-auto compact">
                         <thead>
                         <tr class="text-center">
                             <th class="text-center">{{$dashboardStatics['Date']}}</th>
@@ -129,7 +125,7 @@ $creditService = new CreditService();
                                 <th class="text-center">{{$dashboardStatics['Release car to']}}</th>
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
-                                @if (session()->get('auth')->parent_of <= 0)
+                                @if (session()->get('auth')->child_of <= 0)
                                     <th class="text-center">{{$dashboardStatics['Add Team']}}</th>
                                 @else
                                     <th></th>
@@ -144,7 +140,37 @@ $creditService = new CreditService();
                         </tr>
                         </thead>
                         <tbody>
+                        @php
+                            $totalAmountDue = 0;
+                        @endphp
+
                         @foreach ($cars as $key => $car)
+                            {{--Calculate Total Amount Due--}}
+                            @if($car->latestCredit)
+                                @foreach($car->credit as $index3=> $credit)
+                                    @if($index3 === count($car->credit) - 1)
+                                        @if(Carbon::parse($credit->issue_or_payment_date)==Carbon::today())
+                                            @php
+                                                $totalAmountDue = $totalAmountDue + round($credit->credit_amount)
+                                            @endphp
+                                        @else
+                                            @php
+                                                $totalAmountDue = $totalAmountDue + round($credit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
+                                            @endphp
+                                        @endif
+                                    @endif
+                                @endforeach
+                            @else
+                                @php
+                                    $totalAmountDue = $totalAmountDue + round( $car->amount_due)
+                                @endphp
+                            @endif
+                            @if($loop->last)
+                                <div class="w-100 d-flex justify-content-center">
+                                    <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>
+                                </div>
+                            @endif
+
                             @php
                                 $createdDate = \Carbon\Carbon::parse($car->created_at);
                                 $currentDate = \Carbon\Carbon::now();
@@ -157,27 +183,27 @@ $creditService = new CreditService();
                                 }
                             @endphp
                             <tr style="background-color: {{ $color }}" class="text-center">
-                                <td style="font-size: 12px;min-width: 90px"
+                                <td style="font-size: 14px;min-width: 90px"
                                     class="text-center">
                                     {{ $car->created_at->format('d-m-Y') }}
                                     <span>Days:  {{ $car->created_at->diffInDays(now())}}</span>
                                 </td>
                                 <td class="text-center">{{ $car->make_model_year }}</td>
                                 {{-- Car VIN AND CONTAINER --}}
-
                                 <td class="text-center">
                                     <div class="d-flex flex-column text-center gap-2">
-                                        <div>
+                                        <div class="d-flex justify-content-center align-items-middle gap-2">
+                                            <span class="d-flex align-middle">{{$car->media->isNotEmpty() ? '📷' : ''}}</span>
                                             VIN:
                                             <a style="color: #1a7fca;font-size: 15px;" target="_blank"
-                                               href="{{route('customer.car-info', $car->vin)}}"> {!! $car->getMedia()->first() ? '📷 ' . $car->vin : $car->vin !!}
+                                               href="{{route('customer.car-info', $car->vin)}}">
+                                                {{ $car->vin}}
                                             </a>
                                             <span style="cursor: pointer;" class="p-cursor"
                                                   onclick="navigator.clipboard.writeText('{{ $car->vin }}')">
                                               <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
                                             </span>
                                         </div>
-
                                         <div class="d-flex justify-content-center align-items-middle gap-2">
                                             @if($car->groups->first())
                                                 CONTAINER :
@@ -238,26 +264,29 @@ $creditService = new CreditService();
                                                 @csrf
                                                 <li
                                                         class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_user">
-                                                    <input class="release_to form-control" name="vehicle_owner_name"
+                                                    <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} class="release_to form-control"
+                                                           name="vehicle_owner_name"
                                                            placeholder="Full name"
                                                            required value="{{ $car->vehicle_owner_name }}">
-                                                    <input type="hidden" class="car_id" name="car_id"
+                                                    <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} type="hidden"
+                                                           class="car_id" name="car_id"
                                                            required value="{{ $car->id }}">
                                                 </li>
 
-                                                <li
-                                                        class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_id">
-                                                    <input class="id_number form-control" name="owner_id_number"
+                                                <li class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_id">
+                                                    <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} class="id_number form-control"
+                                                           name="owner_id_number"
                                                            required placeholder="ID Number"
                                                            value="{{ $car->owner_id_number }}">
                                                 </li>
 
-                                                <li
-                                                        class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_phone">
-                                                    <input class="release_phone form-control" name="owner_phone_number"
+                                                <li class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_phone">
+                                                    <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} class="release_phone form-control"
+                                                           name="owner_phone_number"
                                                            placeholder="Phone"
                                                            required value="{{ $car->owner_phone_number }}">
                                                 </li>
+
                                                 <li class="my-cars__td-relase-car-to-inputs-item">
                                                     <button
                                                             onclick="document.getElementById('release_to_{{ $car->id }}').style.display = 'none';"
@@ -265,9 +294,12 @@ $creditService = new CreditService();
                                                             class="btn btn-primary save-release-information"
                                                             data-behavior="save-release-information">cancel
                                                     </button>
-                                                    <button class="btn btn-primary save-release-information"
-                                                            data-behavior="save-release-information">Save
-                                                    </button>
+                                                    @if($car->created_at->diffInDays(now())<5)
+
+                                                        <button class="btn btn-primary save-release-information"
+                                                                data-behavior="save-release-information">Save
+                                                        </button>
+                                                    @endif
                                                 </li>
                                             </form>
                                         </ul>
@@ -275,7 +307,7 @@ $creditService = new CreditService();
                                 @endif
                                 {{-- Add Team--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
-                                    @if (session()->get('auth')->parent_of <= 0)
+                                    @if (session()->get('auth')->child_of <= 0)
                                         <td style="min-width: 150px" class="text-center">
                                             <form action="{{route('customer.addTeamToCar')}}" method="post">
                                                 @csrf
@@ -298,30 +330,37 @@ $creditService = new CreditService();
                                     @endif
                                 @endif
                                 {{-- Payments Column--}}
-                                @if (session()->get('auth')->parent_of <= 0)
+                                @if (session()->get('auth')->child_of <= 0)
                                     @if (!auth()->user()->hasRole('portmanager'))
                                         <td style="text-align: left">
-                                            <div style="font-size: 15px;width: 150px;margin-bottom: 10px ">
+                                            {{-- Total Cost incl interest if credit granted--}}
+                                            <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
                                                 <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Total Cost']}} :</span>
-                                                <span style="color:blue">${{ $car->total_cost }}</span>
-                                            </div>
-                                            <div style="font-size: 15px;width: 150px;margin-bottom: 10px ">
-                                                <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Received']}} :</span>
-                                                <span style="color:green">${{ $car->payments->sum('amount')*-1 }}</span>
-                                            </div>
-                                            <div style="font-size: 15px;width: 150px ">
-                                                <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}} :</span>
                                                 @if($car->latestCredit)
                                                     @foreach($car->credit as $index3=> $credit)
-
                                                         @if($index3 === count($car->credit) - 1)
                                                             @if(Carbon::parse($credit->issue_or_payment_date)==Carbon::today())
-                                                                <span style="color: red ">{{round($credit->credit_amount)}}</span>
+                                                                <span style="color:blue">{{round($car->total_cost)}}</span>
                                                             @else
-                                                                <span style="color: red ">{{ round($credit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
+                                                                <span style="color:blue">{{ round($car->total_cost+$creditService->totalAccruedInterestTillToday($car->id))}}</span>
                                                             @endif
                                                         @endif
                                                     @endforeach
+                                                @else
+                                                    <span style="color:blue">${{ $car->total_cost }}</span>
+                                                @endif
+                                            </div>
+                                            {{-- Total Received on car--}}
+                                            <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
+                                                <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Received']}} :</span>
+                                                <span style="color:green">${{ $car->payments->sum('amount')*-1 }}</span>
+                                            </div>
+                                            {{-- Amount Due on car--}}
+                                            <div style="font-size: 15px;width: 150px ">
+
+                                                <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}} :</span>
+                                                @if($car->latestCredit)
+                                                    <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
                                                 @else
                                                     <span style="color:red">${{round( $car->amount_due) }}</span>
                                                 @endif
@@ -355,8 +394,6 @@ $creditService = new CreditService();
                                                                     :
                                                                     {{ $car->firstCredit->credit_amount }} $
                                                                 </h5>
-
-                                                                {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -417,10 +454,9 @@ $creditService = new CreditService();
                                                                                 style="width: 60px!important">{{$credit->paid_amount}}</td>
                                                                         </tr>
                                                                     @endforeach
-
                                                                     <tr style="background: #f2f2f2">
                                                                         <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
-                                                                        <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
+                                                                        <td class="p-1  text-center">{{round($credit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</td>
                                                                         <td></td>
                                                                         <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
                                                                         <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
@@ -445,12 +481,6 @@ $creditService = new CreditService();
                                             @endif
                                         </div>
                                         {{--Invoice--}}
-                                        {{--                                        <a target="_blank" href="{{route('customer.generate_invoice', ['car_id'=>$car->id])}}">--}}
-                                        {{--                                            <button class="mb-1"--}}
-                                        {{--                                                    style="width: 67%; border: none;border-radius: 5px;background: #e2304e;color: white">--}}
-                                        {{--                                                {{$dashboardStatics['Invoice']}}--}}
-                                        {{--                                            </button>--}}
-                                        {{--                                        </a>--}}
                                         <form target="_blank" action="{{route('customer.generate_invoice')}}"
                                               method="get">
 
@@ -478,58 +508,12 @@ $creditService = new CreditService();
                                     </td>
                                 @endif
                             </tr>
-
-                            <!-- Add PRice To Invoice ?? -->
-                            <div class="modal fade" id="exampleModal{{ $key }}" tabindex="-1" role="dialog"
-                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Send Invoice</h5>
-                                            <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="{{ route('customer.addInvoicePrice') }}" method="POST">
-                                                @csrf
-                                                <input type="hidden" value="{{ $car->id }}" name="car_id">
-
-                                                <div class="form-group">
-                                                    <label for="">All Cost</label>
-                                                    <input type="number" class="form-control" name="invoice_debit"
-                                                           value="">
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="">Recived</label>
-
-                                                    <input type="number" class="form-control" name="invoice_received"
-                                                           value="">
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="">Amount due</label>
-                                                    <input type="number" class="form-control" name="invoice_balance"
-                                                           value="">
-                                                </div>
-
-                                                <button type="submit" class="btn btn-success mt-2">Send</button>
-
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                         </tbody>
                     </table>
+                    <div class="w-100 d-flex justify-content-center">
+                        <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>
+                    </div>
                 </div>
                 <br>
 
@@ -541,7 +525,6 @@ $creditService = new CreditService();
         <script>
             let table = new DataTable('#myTable', {
                 order: [[0, 'desc']]
-
             });
 
             document.getElementById('myTable_wrapper').children[0].style.width = '100%';

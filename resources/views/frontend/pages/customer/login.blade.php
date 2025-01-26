@@ -74,8 +74,15 @@
 
                         <div class="form-group mb-3">
                             <label for="password">{{ Cache::get('loginStatics' . session()->get('locale'))['Password'] }}</label>
-                            <input type="password" class="form-control" id="password" name="password"
-                                placeholder="{{ Cache::get('loginStatics' . session()->get('locale'))['Enter your password'] }}" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="{{ Cache::get('loginStatics' . session()->get('locale'))['Enter your password'] }}" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fa fa-eye"></i> <!-- Font Awesome eye icon -->
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mb-3">
@@ -97,4 +104,18 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle the eye icon
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    </script>
 @endsection

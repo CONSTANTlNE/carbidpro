@@ -81,6 +81,7 @@ class smsService
             'from'       => 'CARBIDPRO',
             'route'      => 'smsc',
         ]);
+
     }
 
     public function containerOpenedd(string $number, $car)
@@ -125,8 +126,9 @@ class smsService
         ]);
     }
 
-    public function readuForPickup(string $number, $car)
+    public function readyForPickup(string $number, $car)
     {
+
         $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
             'username'   => $this->username,
             'password'   => $this->password,

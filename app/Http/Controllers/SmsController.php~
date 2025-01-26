@@ -65,12 +65,11 @@ class SmsController extends Controller
 
     public function sendSelected(Request $request){
 
-
-      $request->validate([
-          'message'=>'required|string',
-          'phone'=>'required|array',
-          'phone.*'=>'required|string|regex:/^5\d{8}$/',
-      ]);
+        dd($request->all());
+//      $request->validate([
+//          'message'=>'required|string'
+//          ''
+//      ])
 
         foreach ($request->customers as $customer){
             $number=$customer['phone'];
