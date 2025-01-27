@@ -659,6 +659,7 @@ class CustomerController extends Controller
                     $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
                 }
             }
+
             $customer->extra_expenses = json_encode($extraExpenseArray);
 
             $customer->save();

@@ -387,7 +387,6 @@
         </div>
 
 
-        <input type="hidden" id="deposit">
         @include('partials.footer')
 
 

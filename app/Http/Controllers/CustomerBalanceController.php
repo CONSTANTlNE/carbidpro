@@ -356,7 +356,7 @@ class CustomerBalanceController extends Controller
             ->where('is_approved', 1)
             ->sum('amount');
 
-        if ($deposit < $request->amount) {
+        if ($deposit >= $request->amount) {
             $balance              = new CustomerBalance();
             $balance->customer_id = $request->customer_id;
             $balance->car_id      = $request->car_id;
@@ -457,7 +457,7 @@ class CustomerBalanceController extends Controller
                             ->selectRaw('car_id, MAX(issue_or_payment_date) as latest_issue_date, SUM(accrued_percent) as total_accrued_percent')
                             ->groupBy('car_id')
                             ->orderBy('latest_issue_date', 'asc');
-                    },
+                    }, 'latestCredit',
                 ])->get();
         } else {
             $cars = collect();

@@ -47,7 +47,19 @@
                     style="text-align: center">
                 <td style="cursor: pointer" class="mr-1 border">{{$car->make_model_year}}</td>
                 <td style="cursor: pointer" class="mr-1 border">{{$car->vin}}</td>
-                <td style="cursor: pointer" class="mr-1 border">{{$car->amount_due}}</td>
+                <td style="cursor: pointer" class="mr-1 border">
+
+                    @if($car->latestCredit)
+
+                            {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}
+
+                    @else
+
+                            {{$car->amount_due }}
+
+                    @endif
+
+                </td>
             </tr>
         @endforeach
         </tbody>

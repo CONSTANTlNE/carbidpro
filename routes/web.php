@@ -10,6 +10,7 @@ use App\Http\Controllers\ContainerController;
 use App\Http\Controllers\CountriesController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ExtraexpenceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\InvoiceController;
@@ -320,6 +321,10 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/announcements/delete', 'delete')->name('announcements.delete');
     });
 
+    Route::controller(ExtraexpenceController::class)->group(function () {
+        route::get('/htmx/get/expenses', 'htmxGetExtraExpense')->name('htmx.get.extraexpense');
+    });
+
     // Manual upload of customers and users OF/From old app
     route::get('/uploadolddata', function () {
 
@@ -335,28 +340,28 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         $data = json_decode($jsonContents, true); // Use `true` to get an associative array
 
 
-//
-//    foreach ($data[2]['data'] as $customer){
-//
-//        Customer::create([
-//            'id'=>$customer['id'],
-//            'company_name'=>$customer['company_name'],
-//            'contact_name'=>$customer['contact_name'],
-//            'email'=>$customer['email'],
-//            'phone'=>$customer['phone'],
-//            'is_active'=>$customer['is_active'],
-//            'number_of_cars'=>$customer['number_of_cars'],
-//            'password'=>$customer['password'],
-//            'child_of'=>$customer['parent_of'],
-//            'personal_number'=>$customer['personal_number'],
-//            'extra_for_team'=>$customer['extra_for_team'],
-//            'username'=>$customer['username'],
-//            'created_at'=>$customer['created_at'],
-//            'updated_at'=>$customer['updated_at'],
-//            'deleted_at'=>$customer['deleted_at'],
-//            'image'=>$customer['image'],
-//        ]);
-//    }
+
+    foreach ($data[2]['data'] as $customer){
+
+        Customer::create([
+            'id'=>$customer['id'],
+            'company_name'=>$customer['company_name'],
+            'contact_name'=>$customer['contact_name'],
+            'email'=>$customer['email'],
+            'phone'=>$customer['phone'],
+            'is_active'=>$customer['is_active'],
+            'number_of_cars'=>$customer['number_of_cars'],
+            'password'=>$customer['password'],
+            'child_of'=>$customer['parent_of'],
+            'personal_number'=>$customer['personal_number'],
+            'extra_for_team'=>$customer['extra_for_team'],
+            'username'=>$customer['username'],
+            'created_at'=>$customer['created_at'],
+            'updated_at'=>$customer['updated_at'],
+            'deleted_at'=>$customer['deleted_at'],
+            'image'=>$customer['image'],
+        ]);
+    }
 
 
 

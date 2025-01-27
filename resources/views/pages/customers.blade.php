@@ -1,5 +1,11 @@
 @extends('layouts.app')
+@php
+    use App\Services\CreditService;
+    use Carbon\Carbon;
 
+    $creditService=new CreditService();
+
+@endphp
 
 
 @section('customers')
@@ -29,6 +35,8 @@
                 </button>
             </div>
         @endif
+
+
         <section style="margin-left: 15px" class="content">
             <div class="row">
                 <div class="col-lg-12 pinpin">
@@ -115,7 +123,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="row">
+                                                    <div class="row border-bottom">
 
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Extra For Calculator</label>
@@ -139,9 +147,20 @@
                                                         </div>
 
                                                     </div>
+                                                    <p style="font-weight: bolder" class="text-center mt-3">Extra
+                                                        Expenses</p>
                                                     <div class="row">
-
+                                                        @foreach($extraexpences as $extraexpence)
+                                                            <div class="col-md-4 form-group">
+                                                                <label class="control-label">{{$extraexpence->name}}</label>
+                                                                <input name="{{$extraexpence->name}}" type="text"
+                                                                       placeholder=""
+                                                                       class="form-control"
+                                                                       value="{{old($extraexpence->name)}}">
+                                                            </div>
+                                                        @endforeach
                                                     </div>
+
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-danger" data-dismiss="modal">
@@ -155,7 +174,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{--End Auction Create Modal--}}
+
 
                                 {{-- Per Page--}}
                                 <form action="{{route('customers.index')}}">
@@ -211,9 +230,12 @@
                                     <tr class="info text-center">
                                         <th>Company Name</th>
                                         <th>Contact Person</th>
+                                        <th>Amount Due</th>
+                                        <th>Deposit</th>
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Main Dealer</th>
+                                        <th>Extra</th>
                                         <th>Login</th>
                                         <th>Status</th>
                                         <th>Crated At</th>
@@ -228,9 +250,40 @@
                                         <tr class="text-center">
                                             <td>{{$customer->company_name}}</td>
                                             <td>{{$customer->contact_name}}</td>
+                                            <td>
+                                                @php
+                                                    $totalAmountDue = 0;
+                                                @endphp
+                                                @foreach ($customer->cars as $key => $car)
+                                                    {{--Calculate Total Amount Due--}}
+                                                    @if($car->latestCredit)
+                                                        @php
+                                                            $totalAmountDue += round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
+                                                        @endphp
+                                                    @else
+                                                        @php
+                                                            $totalAmountDue += round( $car->amount_due)
+                                                        @endphp
+                                                    @endif
+                                                    @if($loop->last)
+                                                        <div class="w-100 d-flex justify-content-center">
+                                                            <p class="btn btn-danger">{{$totalAmountDue}} $</p>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @if($customer->balances->isNotEmpty())
+                                                    <div class="w-100 d-flex justify-content-center">
+                                                        <p class="btn btn-success"> {{$customer->balances->sum('amount')}}
+                                                            $</p>
+                                                    </div>
+                                                @endif
+                                            </td>
                                             <td>{{$customer->phone}}</td>
                                             <td>{{$customer->email}}</td>
                                             <td>{{$customers->where('id',$customer->child_of)->first()?->contact_name}}</td>
+                                            <td>{{$customer->extra_for_team}}</td>
                                             <td>
                                                 <form action="{{route('customers.autologin')}}" method="post"
                                                       target="_blank">
@@ -272,6 +325,7 @@
                                                 <td>{{$customer->deleted_at?->format('d-m-Y')}}</td>
                                             @endif
                                             <td>
+
                                                 {{--Edit Modal--}}
                                                 <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
                                                         data-target="#update{{$index}}"><i class="fa fa-pencil"></i>
@@ -286,7 +340,7 @@
                                                                         aria-hidden="true">×
                                                                 </button>
                                                             </div>
-                                                            <form action="{{route('customers.update', )}}"
+                                                            <form action="{{route('customers.update' )}}"
                                                                   method="post">
                                                                 @csrf
                                                                 <input type="hidden" name="id"
@@ -355,7 +409,7 @@
                                                                             </select>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="row">
+                                                                    <div class="row border-bottom">
                                                                         <div class="col-md-4 form-group">
                                                                             <label class="control-label">Extra For
                                                                                 Calculator</label>
@@ -372,8 +426,26 @@
                                                                         </div>
 
                                                                     </div>
+                                                                    <p style="font-weight: bolder"
+                                                                       class="text-center mt-3">Extra
+                                                                        Expenses</p>
                                                                     <div class="row">
-
+                                                                        @php
+                                                                            $customerextraexpense = json_decode($customer->extra_expenses, true);
+                                                                        @endphp
+                                                                        @foreach($extraexpences as $index10 => $extraexpence)
+                                                                            <div class="col-md-4 form-group">
+                                                                                <label class="control-label">{{$extraexpence->name}}</label>
+                                                                                <input name="{{$extraexpence->name}}"
+                                                                                       type="text"
+                                                                                       placeholder=""
+                                                                                       class="form-control"
+                                                                                       @if($customer->extra_expenses != null)
+                                                                                           value="{{array_key_exists($extraexpence->name,$customerextraexpense)?$customerextraexpense[$extraexpence->name]:''}}"
+                                                                                       @endif
+                                                                                >
+                                                                            </div>
+                                                                        @endforeach
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer justify-content-center">
@@ -475,5 +547,4 @@
         </section>
         <!-- /.content -->
     </div>
-
 @endsection

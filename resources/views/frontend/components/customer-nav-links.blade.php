@@ -3,7 +3,7 @@
         <div class="d-flex mt-4 justify-content-between align-middle flex-column flex-md-row">
             <ul style="padding-left: 0">
                 <li class="tabs__item ">
-                    <form action="{{route('generate.link')}}" target="_blank">
+                    <form class="m-auto" action="{{route('generate.link')}}" target="_blank">
                         <input type="hidden" name="customer_id" value="{{auth()->user()->id}}">
                         <button style="all: unset;cursor: pointer"
                                 class="m-auto m-md-0 ">
@@ -100,7 +100,7 @@
     <p class="alert alert-danger mb-0">{{ session('error') }}</p>
     @endsession
     @if($errors->any())
-        <ul>
+        <ul style="all: unset">
             @foreach($errors->all() as $error)
                 <li class="alert alert-danger mb-2">{{$error}}</li>
             @endforeach

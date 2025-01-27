@@ -58,6 +58,132 @@
                                         </a>
 
                                     </div>
+                                    {{-- Add Carpayment Modal--}}
+                                    <div class="modal fade" id="addModal" tabindex="-1"
+                                         role="dialog" style="display: none;" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header modal-header-primary">
+                                                    <h3><i class="fa fa-user m-r-5"></i>
+                                                        Add Car Payment
+                                                    </h3>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-hidden="true">×
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <form class="form-horizontal"
+                                                                  action="{{route('carpayment.store')}}"
+                                                                  method="post">
+                                                                @csrf
+
+                                                                <div class="row">
+
+                                                                    <div class="col-md-4 form-group text-center">
+                                                                        <input autocomplete="off" type="hidden"
+                                                                               name="customer_id"
+                                                                               id="customerID">
+                                                                        <label class="text-center">Customer</label>
+                                                                        <input required autocomplete="off" id="customerName"
+                                                                               name="full_name"
+                                                                               type="text"
+                                                                               onfocus="document.getElementById('searchmodalbtn').click()">
+                                                                    </div>
+                                                                    <div class="col-md-8 form-group text-center">
+                                                                        <input autocomplete="off" type="hidden"
+                                                                               name="car_id" id="carID">
+                                                                        <label class="text-center">Make / Model</label>
+                                                                        <input required autocomplete="off"
+                                                                               style="width: 100%" type="text" id="carName"
+                                                                               onfocus="
+                                                                if(document.getElementById('customerID').value !== '') {
+                                                                    document.getElementById('searchCarBtn').click();
+                                                                }
+                                                                "
+                                                                        >
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row justify-content-center mb-4">
+                                                                    <div class="col-md-6 form-group text-center">
+                                                                        <label class="text-center">Date</label>
+                                                                        <input type="hidden" name="car_id2" id="carID2">
+                                                                        <input type="hidden" name="due2" id="due2">
+                                                                        <input id="payment_date" required disabled
+                                                                               autocomplete="off" name="payment_date"
+                                                                               type="date"
+                                                                               hx-trigger="change"
+                                                                               hx-get="{{route('car.calculate.percenttilldate')}}"
+                                                                               hx-target="#percenttarget"
+                                                                               hx-include="#carID2,#due2"
+                                                                        >
+                                                                    </div>
+                                                                    <div id="percenttarget"></div>
+                                                                </div>
+
+                                                                <div class="row justify-content-center">
+                                                                    <div class="col-md-3 form-group text-center">
+                                                                        <label class="text-center">Deposit</label>
+                                                                        <input style="max-width:150px;text-align: center"
+                                                                               disabled id="deposit" type="text">
+                                                                    </div>
+                                                                    <div class="col-md-3 form-group text-center">
+                                                                        <label class="text-center">Amount due</label>
+                                                                        <input style="max-width:150px;text-align: center"
+                                                                               disabled id="due" type="text">
+                                                                    </div>
+{{--                                                                    <div class="col-md-3 form-group text-center">--}}
+{{--                                                                        <label class="text-center">--}}
+{{--                                                                            Accrued Percent--}}
+
+{{--                                                                            <span style="font-size: 8px">(till today)</span>--}}
+{{--                                                                        </label>--}}
+{{--                                                                        <input style="max-width:150px;text-align: center"--}}
+{{--                                                                               disabled id="total_percent" type="text">--}}
+{{--                                                                    </div>--}}
+{{--                                                                    <div class="col-md-3 form-group text-center">--}}
+{{--                                                                        <label class="text-center">Total Due</label>--}}
+{{--                                                                        <input style="max-width:150px;text-align: center"--}}
+{{--                                                                               id="totaldue" disabled type="text">--}}
+{{--                                                                    </div>--}}
+                                                                </div>
+                                                                <div class="row justify-content-center">
+                                                                    <div class="col-md-4 form-group text-center">
+                                                                        <label class="text-center">Amount</label>
+                                                                        <input style="max-width:150px;text-align: center"
+                                                                               required autocomplete="off" name="amount"
+                                                                               type="text">
+                                                                    </div>
+                                                                    <div class="col-md-8 form-group text-center">
+                                                                        <label class="text-center">Comment</label>
+                                                                        <input style="width: 100%;text-align: center"
+                                                                               autocomplete="off" name="comment"
+                                                                               type="text">
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="d-flex justify-content-center mt-3">
+                                                                        <button type="button"
+                                                                                data-dismiss="modal"
+                                                                                class="btn btn-danger btn-sm mr-2">
+                                                                            Close
+                                                                        </button>
+
+                                                                        <button
+                                                                                class="btn btn-success btn-sm mr-2">
+                                                                            Save
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <form style="display: flex!important;" class="ml-3 " action="{{route('carpayment.index')}}">
                                         <input type="text" name="search" class="form-control" value="">
@@ -68,132 +194,7 @@
                                     </a>
 
                                 </div>
-                                {{-- Add Carpayment Modal--}}
-                                <div class="modal fade" id="addModal" tabindex="-1"
-                                     role="dialog" style="display: none;" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header modal-header-primary">
-                                                <h3><i class="fa fa-user m-r-5"></i>
-                                                    Add Car Payment
-                                                </h3>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                        aria-hidden="true">×
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <form class="form-horizontal"
-                                                              action="{{route('carpayment.store')}}"
-                                                              method="post">
-                                                            @csrf
 
-                                                            <div class="row">
-
-                                                                <div class="col-md-4 form-group text-center">
-                                                                    <input autocomplete="off" type="hidden"
-                                                                           name="customer_id"
-                                                                           id="customerID">
-                                                                    <label class="text-center">Customer</label>
-                                                                    <input required autocomplete="off" id="customerName"
-                                                                           name="full_name"
-                                                                           type="text"
-                                                                           onfocus="document.getElementById('searchmodalbtn').click()">
-                                                                </div>
-                                                                <div class="col-md-8 form-group text-center">
-                                                                    <input autocomplete="off" type="hidden"
-                                                                           name="car_id" id="carID">
-                                                                    <label class="text-center">Make / Model</label>
-                                                                    <input required autocomplete="off"
-                                                                           style="width: 100%" type="text" id="carName"
-                                                                           onfocus="
-                                                                if(document.getElementById('customerID').value !== '') {
-                                                                    document.getElementById('searchCarBtn').click();
-                                                                }
-                                                                "
-                                                                    >
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row justify-content-center mb-4">
-                                                                <div class="col-md-6 form-group text-center">
-                                                                    <label class="text-center">Date</label>
-                                                                    <input type="hidden" name="car_id2" id="carID2">
-                                                                    <input type="hidden" name="due2" id="due2">
-                                                                    <input id="payment_date" required disabled
-                                                                           autocomplete="off" name="payment_date"
-                                                                           type="date"
-                                                                           hx-trigger="change"
-                                                                           hx-get="{{route('car.calculate.percenttilldate')}}"
-                                                                           hx-target="#percenttarget"
-                                                                           hx-include="#carID2,#due2"
-                                                                    >
-                                                                </div>
-                                                                <div id="percenttarget"></div>
-                                                            </div>
-
-                                                            <div class="row justify-content-center">
-                                                                <div class="col-md-3 form-group text-center">
-                                                                    <label class="text-center">Deposit</label>
-                                                                    <input style="max-width:150px;text-align: center"
-                                                                           disabled id="deposit" type="text">
-                                                                </div>
-                                                                <div class="col-md-3 form-group text-center">
-                                                                    <label class="text-center">Amount due</label>
-                                                                    <input style="max-width:150px;text-align: center"
-                                                                           disabled id="due" type="text">
-                                                                </div>
-                                                                <div class="col-md-3 form-group text-center">
-                                                                    <label class="text-center">
-                                                                        Accrued Percent
-
-                                                                        <span style="font-size: 8px">(till today)</span>
-                                                                    </label>
-                                                                    <input style="max-width:150px;text-align: center"
-                                                                           disabled id="total_percent" type="text">
-                                                                </div>
-                                                                <div class="col-md-3 form-group text-center">
-                                                                    <label class="text-center">Total Due</label>
-                                                                    <input style="max-width:150px;text-align: center"
-                                                                           id="totaldue" disabled type="text">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row justify-content-center">
-                                                                <div class="col-md-4 form-group text-center">
-                                                                    <label class="text-center">Amount</label>
-                                                                    <input style="max-width:150px;text-align: center"
-                                                                           required autocomplete="off" name="amount"
-                                                                           type="text">
-                                                                </div>
-                                                                <div class="col-md-8 form-group text-center">
-                                                                    <label class="text-center">Comment</label>
-                                                                    <input style="width: 100%;text-align: center"
-                                                                            autocomplete="off" name="comment"
-                                                                           type="text">
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <div class="d-flex justify-content-center mt-3">
-                                                                    <button type="button"
-                                                                            data-dismiss="modal"
-                                                                            class="btn btn-danger btn-sm mr-2">
-                                                                        Close
-                                                                    </button>
-
-                                                                    <button
-                                                                            class="btn btn-success btn-sm mr-2">
-                                                                        Save
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 {{-- Search Customer Modal--}}
                                 <a id="searchmodalbtn" data-toggle="modal" data-target="#searchCustomer"></a>

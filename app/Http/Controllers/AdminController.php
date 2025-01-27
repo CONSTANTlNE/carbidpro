@@ -6,6 +6,7 @@ use App\Mail\RegisterMail;
 use App\Models\Car;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Models\Extraexpence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -34,6 +35,7 @@ class AdminController extends Controller
     public function customerIndex(Request $request)
     {
         $perpage = $request->input('perpage', 50);
+        $extraexpences=Extraexpence::all();
 
         if ($request->has('auction') && $request->auction === 'all') {
             return to_route('locations.index');
@@ -43,7 +45,7 @@ class AdminController extends Controller
             $search    = $request->input('search');
 
             if ($request->has('archive')){
-                $customers = Customer::onlyTrashed()
+                $customers = Customer::onlyTrashed()->with('cars.latestCredit', 'cars.credit', 'balances')
                     ->where(function ($query) use ($search) {
                         $query->where('contact_name', 'like', '%' . $search . '%')
                             ->orWhere('company_name', 'like', '%' . $search . '%')
@@ -53,7 +55,9 @@ class AdminController extends Controller
                     ->paginate($perpage)
                     ->withQueryString();
             } else{
-                $customers = Customer::where('contact_name', 'like', '%'.$search.'%')
+
+                $customers = Customer::with('cars.latestCredit', 'cars.credit', 'balances')
+                ->where('contact_name', 'like', '%'.$search.'%')
                     ->orWhere('company_name', 'like', '%'.$search.'%')
                     ->orWhere('email', 'like', '%'.$search.'%')
                     ->orWhere('phone', 'like', '%'.$search.'%')
@@ -62,7 +66,7 @@ class AdminController extends Controller
 
             $count        = $customers->total();
 
-            return view('pages.customers', compact('customers', 'count'));
+            return view('pages.customers', compact('customers', 'count','extraexpences'));
         }
 
 
@@ -70,19 +74,23 @@ class AdminController extends Controller
 
         if ($request->has('archive')){
 
-            $customers    = Customer::onlyTrashed()->paginate($perpage)->withQueryString();
+            $customers    = Customer::onlyTrashed()
+                ->with('cars.latestCredit', 'cars.credit', 'balances')
+                ->paginate($perpage)->withQueryString();
 
         } else {
-            $customers    = Customer::paginate($perpage)->withQueryString();
+
+            $customers    = Customer::with('cars.latestCredit', 'cars.credit', 'balances')
+            ->paginate($perpage)->withQueryString();
 
         }
+
         $trashed      = Customer::onlyTrashed()->paginate($perpage)->withQueryString();
-//        dd($trashed);
         $count        = $customers->total();
         $trashedCount = $trashed->total();
 
 
-        return view('pages.customers', compact('customers', 'customers', 'count', 'trashed', 'trashedCount'));
+        return view('pages.customers', compact('extraexpences','customers', 'count', 'trashed', 'trashedCount'));
     }
 
     public function customerActivate(Request $request)
@@ -140,8 +148,9 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         $customer = Customer::find($request->id);
+        $extraexpenses=Extraexpence::all();
 
-//        dd($request->email !== $customer->email);
+
 
         $request->validate([
             'number_of_cars' => 'required', // Add more validation rules as needed
@@ -158,7 +167,6 @@ class AdminController extends Controller
 
         $customer->contact_name    = $request->input('contact_name');
         $customer->personal_number = $request->input('personal_number');
-
         $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
         $customer->phone          = $request->input('phone');
         if ($request->email !== $customer->email) {
@@ -173,6 +181,15 @@ class AdminController extends Controller
         }
         $customer->number_of_cars = $request->input('number_of_cars');
         $customer->is_active      = 1;
+
+        $extraExpenseArray=[];
+        foreach ($extraexpenses as $extraexpense) {
+
+            if($request->has($extraexpense->name)) {
+                $extraExpenseArray[$extraexpense->name]=$request->input($extraexpense->name);
+            }
+        }
+        $customer->extra_expenses = json_encode($extraExpenseArray);
 
         $customer->save();
 

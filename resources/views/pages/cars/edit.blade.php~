@@ -241,7 +241,6 @@
                                                             <input name="{{$extraexpence->name}}"
                                                                    type="text"
                                                                    placeholder=""
-                                                                   disabled
                                                                    class="form-control"
                                                                    @if($selectedcustomer->extra_expenses != null)
                                                                        value="{{array_key_exists($extraexpence->name,$customerextraexpense)?$customerextraexpense[$extraexpence->name]:''}}"

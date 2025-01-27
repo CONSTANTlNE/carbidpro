@@ -79,7 +79,10 @@
                                     <div class="row">
                                         <div class="form-group">
                                             <label>Dealer</label>
-                                            <select autocomplete="nope" name="customer_id" class="form-control" id="customer_id" required>
+                                            <select
+                                                    hx-get="{{route('htmx.get.extraexpense')}}"
+                                                    hx-target="#extraexpense"
+                                                    autocomplete="nope" name="customer_id" class="form-control" id="customer_id" required>
                                                 <option value=""></option>
                                                 @foreach ($customers as $customer)
                                                     <option value="{{ $customer->id }}"
@@ -241,6 +244,10 @@
                                                 </div>
 
                                             </div>
+                                            {{--Extra Expenses inserted via HTMX on customer select change--}}
+                                            <div class="row mt-3" id="extraexpense">
+
+                                            </div>
                                         </div>
 
 
@@ -286,7 +293,7 @@
                                         </template>
 
                                         <!-- Add Button -->
-                                        <button type="button" class="btn btn-primary mt-3" @click="addField">Add
+                                        <button  type="button" class="btn btn-primary mt-3" @click="addField">Add
                                             Another Item</button>
 
                                         <div x-data="{

@@ -72,13 +72,15 @@ class SmsController extends Controller
           'phone.*'=>'required|string|regex:/^5\d{8}$/',
       ]);
 
-        foreach ($request->customers as $customer){
-            $number=$customer['phone'];
+
+
+        foreach ($request->phone as $number){
+
             (new smsService())->info($number,$request->message);
         }
 
 
-        return view('pages.sms.selectedSms');
+        return back();
 
     }
 

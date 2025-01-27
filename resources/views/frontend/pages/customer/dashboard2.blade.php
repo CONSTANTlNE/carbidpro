@@ -147,19 +147,9 @@ $creditService = new CreditService();
                         @foreach ($cars as $key => $car)
                             {{--Calculate Total Amount Due--}}
                             @if($car->latestCredit)
-                                @foreach($car->credit as $index3=> $credit)
-                                    @if($index3 === count($car->credit) - 1)
-                                        @if(Carbon::parse($credit->issue_or_payment_date)==Carbon::today())
-                                            @php
-                                                $totalAmountDue = $totalAmountDue + round($credit->credit_amount)
-                                            @endphp
-                                        @else
-                                            @php
-                                                $totalAmountDue = $totalAmountDue + round($credit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
-                                            @endphp
-                                        @endif
-                                    @endif
-                                @endforeach
+                                @php
+                                    $totalAmountDue = $totalAmountDue +  round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
+                                @endphp
                             @else
                                 @php
                                     $totalAmountDue = $totalAmountDue + round( $car->amount_due)
@@ -511,12 +501,8 @@ $creditService = new CreditService();
                         @endforeach
                         </tbody>
                     </table>
-                    <div class="w-100 d-flex justify-content-center">
-                        <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>
-                    </div>
                 </div>
                 <br>
-
             </div>
         </div>
     </div>

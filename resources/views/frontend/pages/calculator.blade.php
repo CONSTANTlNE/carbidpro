@@ -3,36 +3,36 @@
 
 @php
 
-//                      Cache::forget('calculatorStaticsen');
-//                      Cache::forget('calculatorStaticsru');
+    //                      Cache::forget('calculatorStaticsen');
+    //                      Cache::forget('calculatorStaticsru');
 
-        $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
+            $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
 
-                  if($calculatorStatics===null){
+                      if($calculatorStatics===null){
 
-                      $data=[
-                          'Name'=>$tr->translate('Name'),
-                          'Calculator'=>$tr->translate('Calculator'),
-                          'Select Auction'=>$tr->translate('Select Auction'),
-                          'Select Location'=>$tr->translate('Select Location'),
-                          'Select Country'=>$tr->translate('Select Country'),
-                          'Select Exit Port'=>$tr->translate('Select Exit Port'),
-                          'Select Port/City'=>$tr->translate('Select Port/City'),
-                          'Calculate'=>$tr->translate('Calculate'),
-                          'GROUND RATE'=>$tr->translate('GROUND RATE'),
-                          'TOTAL'=>$tr->translate('TOTAL'),
-                          ];
-                      Cache::forever('calculatorStatics'.session()->get('locale'), $data);
-                      $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
-                  }
+                          $data=[
+                              'Name'=>$tr->translate('Name'),
+                              'Calculator'=>$tr->translate('Calculator'),
+                              'Select Auction'=>$tr->translate('Select Auction'),
+                              'Select Location'=>$tr->translate('Select Location'),
+                              'Select Country'=>$tr->translate('Select Country'),
+                              'Select Exit Port'=>$tr->translate('Select Exit Port'),
+                              'Select Port/City'=>$tr->translate('Select Port/City'),
+                              'Calculate'=>$tr->translate('Calculate'),
+                              'GROUND RATE'=>$tr->translate('GROUND RATE'),
+                              'TOTAL'=>$tr->translate('TOTAL'),
+                              ];
+                          Cache::forever('calculatorStatics'.session()->get('locale'), $data);
+                          $calculatorStatics=Cache::get('calculatorStatics'.session()->get('locale'));
+                      }
 
 @endphp
 
 
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-        data-background="https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg"
-        style="background-image: url(&quot;https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg&quot;);">
+             data-background="https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg"
+             style="background-image: url(&quot;https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg&quot;);">
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
@@ -49,8 +49,9 @@
 
                     @foreach ($loadtypes as $key => $loadtype)
                         <div class='load-type'>
-                            <input type="radio" {{ $loadtype->id == 1 ? 'checked' : 0 }} value="{{ $loadtype['price'] }}"
-                                name="loadtype" id="{{ $key }}" class="d-none imgbgchk loadtype">
+                            <input type="radio"
+                                   {{ $loadtype->id == 1 ? 'checked' : 0 }} value="{{ $loadtype['price'] }}"
+                                   name="loadtype" id="{{ $key }}" class="d-none imgbgchk loadtype">
                             <label for="{{ $key }}">
                                 <img src="{{ Storage::url($loadtype->icon) }}" alt="{{ $loadtype['name'] }}">
                                 <span>{!! $loadtype['name'] !!}</span>
@@ -100,20 +101,16 @@
                     <strong>{{$calculatorStatics['GROUND RATE']}}:</strong>
                     <span id="ground_rate"></span>
                 </div>
-
                 <br>
-
                 <div class="pricing total">
                     <strong>{{$calculatorStatics['TOTAL']}}:</strong>
                     <span id="total"></span>
                     <span id="total_original" style="display: none"></span>
-
                 </div>
-
                 <div class="direct mt-2" style="display: none">
                     <div class="location">
                         <div class="icon city-icon"><img src="https://cdn-icons-png.flaticon.com/512/3909/3909383.png"
-                                alt="usa">
+                                                         alt="usa">
                             <div>
                                 <div id="cityname">Cityname</div>
                             </div>
@@ -131,18 +128,55 @@
 
                     </div>
                 </div>
+                @if($user->extra_expenses != null)
+                    <div class="d-flex flex-column mt-3 ">
+                        @php
+                            $extras=json_decode($user->extra_expenses);
+                        @endphp
+                        @foreach($extras as $key => $extra)
+                            <div class="d-flex justify-content-between align-items-middle mt-2">
+                                <div class="d-flex justify-content-between align-middle" style="min-width:130px ">
+                                    <label style="cursor: pointer" class="mt-1" for="{{$key}}">{{$key}}</label>
+                                    <input style="cursor: pointer" class="form-check-input extra-checkbox" id="{{$key}}"
+                                           type="checkbox" value="{{$extra}}}">
+                                </div>
+                                <input disabled class="form-control text-center" style="max-width: 150px" type="text"
+                                       value="{{$extra}}">
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function() {
+        const extras = {!!$user->extra_expenses !!};
+
+        const checkboxes = document.querySelectorAll('.extra-checkbox');
+
+        let totalextras = 0;
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', function () {
+                const value = parseFloat(this.value); // Convert the value to a number
+
+                if (this.checked) {
+                    totalextras += value; // Add value if checked
+                } else {
+                    totalextras -= value; // Subtract value if unchecked
+                }
+                console.log(totalextras);
+            });
+        });
+
+        $(document).ready(function () {
             // Fetch auction data from the database using AJAX
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
             var loggedIn = {{ Auth::guard('customer')->user() ? 'true' : 'false' }};
 
-            $('#AuctionSelect').on('change', function() {
+            $('#AuctionSelect').on('change', function () {
 
                 if (!loggedIn) {
                     window.location.href = "/customer/login";
@@ -158,14 +192,14 @@
                         'X-CSRF-TOKEN': csrf_token
                     },
 
-                    success: function(data) {
+                    success: function (data) {
                         $('#AucLocationsSelect').empty();
 
                         // Update auction select options based on received data
                         $('#AucLocationsSelect').append(
                             `<option value="-1">Select Location</option>`
                         );
-                        data.forEach(function(location) {
+                        data.forEach(function (location) {
                             $('#AucLocationsSelect').append(
                                 `<option value="${location.id}">${location.name}</option>`
                             );
@@ -175,7 +209,7 @@
                 });
             });
 
-            $('#AucLocationsSelect').on('change', function() {
+            $('#AucLocationsSelect').on('change', function () {
                 $.ajax({
                     url: "{{ route('calculate') }}", // Replace with your actual route name
                     method: 'POST',
@@ -188,14 +222,14 @@
                         'X-CSRF-TOKEN': csrf_token
                     },
 
-                    success: function(data) {
+                    success: function (data) {
                         $('#AucPortSelect').empty();
 
                         // Update auction select options based on received data
                         $('#AucPortSelect').append(
                             `<option value="-1">Select Exit Port</option>`
                         );
-                        data.forEach(function(location) {
+                        data.forEach(function (location) {
                             $('#AucPortSelect').append(
                                 `<option value="${location.id}">${location.name}</option>`
                             );
@@ -206,7 +240,7 @@
                 });
             });
 
-            $('#AucPortSelect').on('change', function() {
+            $('#AucPortSelect').on('change', function () {
                 $.ajax({
                     url: "{{ route('calculate') }}", // Replace with your actual route name
                     method: 'POST',
@@ -219,7 +253,7 @@
                         'X-CSRF-TOKEN': csrf_token
                     },
 
-                    success: function(data) {
+                    success: function (data) {
 
                         if (!data.price) {
                             console.log(" CONTACT ");
@@ -244,8 +278,7 @@
                 });
             });
 
-
-            $('#AucCountrySelect').on('change', function() {
+            $('#AucCountrySelect').on('change', function () {
                 $.ajax({
                     url: "{{ route('calculate') }}", // Replace with your actual route name
                     method: 'POST',
@@ -256,14 +289,14 @@
                         'X-CSRF-TOKEN': csrf_token
                     },
 
-                    success: function(data) {
+                    success: function (data) {
                         $('#AucPortCitySelect').empty();
 
                         // Update auction select options based on received data
                         $('#AucPortCitySelect').append(
                             `<option value="-1">Select Port/City</option>`
                         );
-                        data.forEach(function(location) {
+                        data.forEach(function (location) {
                             $('#AucPortCitySelect').append(
                                 `<option value="${location.id}">${location.name}</option>`
                             );
@@ -272,8 +305,7 @@
                 });
             });
 
-
-            $('#calculate').on('click', function() {
+            $('#calculate').on('click', function () {
                 $.ajax({
                     url: "{{ route('calculate') }}", // Replace with your actual route name
                     method: 'POST',
@@ -289,17 +321,15 @@
                         'X-CSRF-TOKEN': csrf_token
                     },
 
-                    success: function(data) {
+                    success: function (data) {
 
                         $('#ground_rate').text('$ ' + data.ground_rate);
-                        $('#total').text('$ ' + data.total);
+                        $('#total').text('$ ' + (data.total+totalextras));
                         $('#total_original').text('$ ' + data.total);
 
                         jQuery('.direct').fadeIn()
                         $('#cityname').text($("#AucLocationsSelect option:selected").text());
                         $('#portname').text($("#AucPortCitySelect option:selected").text());
-
-
 
 
                         // // Update auction select options based on received data
@@ -352,8 +382,6 @@
             //             jQuery('.direct').fadeIn()
             //             $('#cityname').text($("#AucLocationsSelect option:selected").text());
             //             $('#portname').text($("#AucPortCitySelect option:selected").text());
-
-
 
 
             //             // // Update auction select options based on received data

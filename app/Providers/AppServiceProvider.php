@@ -28,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(!app()->isProduction());
+
         Paginator::defaultView('vendor.pagination.bootstrap-4');
 
         // Bind the composer to a specific view

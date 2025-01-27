@@ -55,7 +55,7 @@
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-                                            <form action="{{route('sliders.store')}}" method="post" enctype="multipart/form-data">
+                                            <form id="createSlider" action="{{route('sliders.store')}}" method="post" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div  class="col-md-12 form-group">
@@ -65,10 +65,10 @@
 
                                                     </div>
                                                     <div  class="col-md-12 form-group">
-                                                        <label class="control-label">Image</label>
+                                                        <label for="image" class="control-label">Image</label>
 
-                                                        <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
-                                                               class="input-file mb-3" required>
+                                                        <input id="image" required accept="image/jpeg,image/png,image/webp,image/jpg" type="file" name="image"
+                                                               class="input-file mb-3" >
 
                                                     </div>
                                                 </div>
@@ -145,15 +145,15 @@
                                                                             <div class="row flex justify-content-center">
                                                                                 <div  class="col-md-12 form-group">
                                                                                     <label class="control-label">Title</label>
-                                                                                    <input  type="text" name="title" value="{{$slider->title}}"
+                                                                                    <input   type="text" name="title" value="{{$slider->title}}"
                                                                                             class="form-control mb-3" required>
 
                                                                                 </div>
                                                                                 <div  class="col-md-12 form-group">
-                                                                                    <label class="control-label">Image</label>
+                                                                                    <label for="image{{$index}}" class="control-label">Image</label>
 
-                                                                                    <input accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
-                                                                                           class="input-file mb-3" required>
+                                                                                    <input id="image{{$index}}" accept="image/jpeg,image/png,image/webp,image/jpg"  type="file" name="image"
+                                                                                           class="input-file mb-3" >
 
                                                                                 </div>
 
@@ -255,5 +255,15 @@
         </section>
         <!-- /.content -->
     </div>
+
+    <script>
+        document.getElementById("createSlider").addEventListener("submit", function (e) {
+            const fileInput = document.getElementById("image");
+            if (!fileInput.value) {
+                e.preventDefault(); // Prevent form submission
+                document.getElementById("error-message").style.display = "block";
+            }
+        });
+    </script>
 
 @endsection

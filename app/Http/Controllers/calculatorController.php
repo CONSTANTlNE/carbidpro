@@ -37,8 +37,9 @@ class calculatorController extends Controller
         $auctions = Auction::all();
         $loadtypes = LoadType::all();
         $countries = Country::all();
+        $user = auth()->user();
 
-        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries'));
+        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries', 'user'));
     }
 
     public function calculate(Request $request)
@@ -90,8 +91,8 @@ class calculatorController extends Controller
              $extra_for_team =   auth()->user()->extra_for_team;
 
 
-            if (   auth()->user()->extra_for_team &&  auth()->user()->parent_of != 0) {
-                $parent_dealer = Customer::where('id', auth()->user()->parent_of->parent_of)->first();
+            if ( auth()->user()->extra_for_team &&  auth()->user()->child_of != 0) {
+                $parent_dealer = Customer::where('id', auth()->user()->child_of)->first();
 
                 $parent_extra = $parent_dealer->extra_for_team + $extra_for_team;
 

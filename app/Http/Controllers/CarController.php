@@ -8,6 +8,7 @@ use App\Models\CarStatus;
 use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Models\Extraexpence;
 use App\Models\LoadType;
 use App\Models\Location;
 use App\Models\Port;
@@ -191,6 +192,7 @@ class CarController extends Controller
         $shipping_prices = ShippingPrice::all();
         $customers       = Customer::get();
         $dispatchers = User::role('Dispatch')->get();
+        $extra_expenses = Extraexpence::all();
 
         $car_status      = CarStatus::with('cars')->get();
 
@@ -206,6 +208,7 @@ class CarController extends Controller
                 'locations',
                 'customers',
                 'shipping_prices',
+                'extra_expenses'
             ),
         );
     }
@@ -262,16 +265,44 @@ class CarController extends Controller
             $car->amount_due = $request->input('total_cost');
         }
 
+
+        // Add Extra expense (which is granted to customer)
+        $balanceAccounting =$request->input('balance_accounting');
+        $extraexpenses = Extraexpence::all();
+
+        foreach ($extraexpenses as $extraexpense) {
+            if ($request->has($extraexpense->name) && $request->input($extraexpense->name) > 0) {
+                $balanceAccounting[] = [
+                    'name' => $extraexpense->name,
+                    'value' => $request->input($extraexpense->name),
+                    'date' => now()->format('Y-m-d') ,
+                ];
+            }
+        }
+
+        $balanceAccounting = json_encode($balanceAccounting);
+
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
             // Assuming balance_accounting is a JSON field in the database
-            $car->balance_accounting = json_encode($request->input('balance_accounting'));
+            $car->balance_accounting = $balanceAccounting;
         }
 
 
-
-
         $car->save();
+
+        // Change customer Extra expenses also if change during car addition ????
+//        $extraexpenses = Extraexpence::all();
+//        $extraExpenseArray = [];
+//        $customer = Customer::find($request->customer_id);
+//        foreach ($extraexpenses as $extraexpense) {
+//            if ($request->has($extraexpense->name)) {
+//                $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
+//            }
+//        }
+//        $customer->extra_expenses = json_encode($extraExpenseArray);
+//        $customer->save();
+
 
         // Handle images array
         if ($request->has('images2')) {
@@ -293,6 +324,7 @@ class CarController extends Controller
                 'issue_or_payment_date' => Carbon::now(),
             ]);
         }
+
 
 
         // if payed amount is indicated during the creation, also create relevant record in customer_balance
@@ -438,6 +470,7 @@ class CarController extends Controller
         $car        = Car::findOrFail($request->id);
         $car_status = CarStatus::get();
 
+        $extra_expenses = Extraexpence::all();
         $auctions          = Auction::all();
         $load_types        = LoadType::all();
         $ports             = Port::all();
@@ -446,7 +479,7 @@ class CarController extends Controller
         $balanceAccounting = json_decode($car->balance_accounting, true); // Decode the JSON
         $customers         = Customer::get();
         $dispatchers       = User::where('role', 'Dispatch')->get();
-
+        $selectedcustomer= Customer::find($car->customer_id);
         return view(
             'pages.cars.edit',
             compact(
@@ -460,6 +493,8 @@ class CarController extends Controller
                 'locations',
                 'customers',
                 'shipping_prices',
+                'extra_expenses',
+                'selectedcustomer'
             ),
         );
     }
@@ -521,6 +556,20 @@ class CarController extends Controller
         }
 
         $car->save();
+
+
+        // update Extra expenses of customer if updated during car update ??
+//        $extraexpenses = Extraexpence::all();
+//        $extraExpenseArray = [];
+//        $customer = Customer::find($request->customer_id);
+//        foreach ($extraexpenses as $extraexpense) {
+//            if ($request->has($extraexpense->name)) {
+//                $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
+//            }
+//        }
+//
+//        $customer->extra_expenses = json_encode($extraExpenseArray);
+//        $customer->save();
 
         return redirect()->route('cars.index')->with('success', 'Car updated successfully.');
     }

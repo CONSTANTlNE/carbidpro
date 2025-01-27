@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AnnouncementsSeeder::class);
         $this->call(CountrySeeder::class);
         $this->call(PortCitiesSeeder::class);
+        $this->call(ExtraexpenceSeeder::class);
 
 
 

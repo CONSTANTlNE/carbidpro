@@ -21,13 +21,13 @@ class ArrivedController extends Controller
 
         if (!empty($request->input('search')) && $request->has('search')) {
 
-            $groups = ContainerGroup::with('cars')->where('container_id', $request->input('search'))
+            $groups = ContainerGroup::with('cars.credit','cars.latestCredit')->where('container_id', $request->input('search'))
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3);
                 })
                 ->get();
         } else {
-            $groups = ContainerGroup::with('cars.credit')
+            $groups = ContainerGroup::with('cars.credit','cars.latestCredit')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3);  // Filter cars where container_status is 2
                 })
