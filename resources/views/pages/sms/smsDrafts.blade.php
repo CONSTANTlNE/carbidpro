@@ -13,7 +13,8 @@
     <div class="content-wrapper">
 
         @if($errors->any())
-            <div style="padding: 5px!important;" class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-25" role="alert">
+            <div style="padding: 5px!important;"
+                 class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-25" role="alert">
                 @foreach($errors->all() as $error)
                     <p>{{$error}}</p>
                 @endforeach
@@ -53,17 +54,21 @@
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="col-md-12 form-group">
-                                                        <input  type="text" name="action_name"
-                                                              required placeholder="Draft For" class="form-control">
+                                                        <input type="text" name="action_name"
+                                                               required placeholder="Draf Key" class="form-control">
                                                     </div>
-
                                                     <div class="col-md-12 form-group">
-                                                        <textarea required name="draft" class="form-control" rows="10"></textarea>
+                                                        <input type="text" name="action_description"
+                                                               required placeholder="Draft Description"
+                                                               class="form-control">
                                                     </div>
-
+                                                    <div class="col-md-12 form-group">
+                                                        <textarea style="font-size: 20px" required name="draft"
+                                                                  class="form-control" rows="10"></textarea>
+                                                    </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button"  class="btn btn-danger" data-dismiss="modal">
+                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
                                                         Close
                                                     </button>
                                                     <button type="submit" class="btn green_btn custom_grreen2">Create
@@ -81,6 +86,7 @@
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
                                         <th>Draft For</th>
+                                        <th>Draft Description</th>
                                         <th>Draft</th>
                                         <th>Status</th>
                                         <th>Action</th>
@@ -90,16 +96,20 @@
                                     @foreach($drafts as $index=> $draft)
                                         <tr class="text-center">
                                             <td>{{$draft->action_name}}</td>
+                                            <td>{{$draft->action_description}}</td>
                                             <td>{{$draft->draft}}</td>
                                             <td>
-                                                <form action="{{route('drafts.activate')}}" method="post" novalidate>
+                                                <form action="{{route('sms.drafts.activate')}}" method="post"
+                                                      novalidate>
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{$draft->id}}">
                                                     @if($draft->is_active==1)
-                                                        <button type="submit" class="btn btn-success btn-rounded w-md m-b-5">Active
+                                                        <button type="submit"
+                                                                class="btn btn-success btn-rounded w-md m-b-5">Active
                                                         </button>
                                                     @else
-                                                        <button type="submit" class="btn btn-danger btn-rounded w-md m-b-5">Inactive
+                                                        <button type="submit"
+                                                                class="btn btn-danger btn-rounded w-md m-b-5">Inactive
                                                         </button
                                                     @endif
                                                 </form>
@@ -119,21 +129,30 @@
                                                                         aria-hidden="true">×
                                                                 </button>
                                                             </div>
+
                                                             <div class="modal-body">
                                                                 <div class="row">
                                                                     <div class="col-md-12">
-                                                                        <form class="form-horizontal" action="{{route('auctions.update')}}" method="post">
+                                                                        <form class="form-horizontal"
+                                                                              action="{{route('sms.drafts.update')}}"
+                                                                              method="post">
                                                                             @csrf
-                                                                            <input type="hidden" name="id" value="{{$draft->id}}" id="">
+                                                                            <input type="hidden" name="id"
+                                                                                   value="{{$draft->id}}" id="">
                                                                             <div class="row flex justify-content-center">
 
-                                                                                <div class="col-md-6 form-group">
-                                                                                    <label class="control-label">Name</label>
+                                                                                <div class="col-md-12 form-group">
                                                                                     <input type="text"
-                                                                                           name="name"
-                                                                                           value="{{$draft->draft}}"
-                                                                                           class="form-control">
-
+                                                                                           name="action_description"
+                                                                                           required
+                                                                                           placeholder="Draft Description"
+                                                                                           class="form-control" value="{{$draft->action_description}}">
+                                                                                </div>
+                                                                                <div class="col-md-12 form-group">
+                                                                                    <textarea style="font-size: 20px"
+                                                                                              required name="draft"
+                                                                                              class="form-control"
+                                                                                              rows="10">{{$draft->draft}}</textarea>
                                                                                 </div>
                                                                                 <div class="col-md-12 form-group user-form-group mt-3">
                                                                                     <div class="flex justify-content-center">
@@ -154,67 +173,63 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-{{--                                                            <div class="modal-footer">--}}
-{{--                                                                <button type="button" class="btn btn-danger float-left"--}}
-{{--                                                                        data-dismiss="modal">Close--}}
-{{--                                                                </button>--}}
-{{--                                                            </div>--}}
                                                         </div>
-                                                        <!-- /.modal-content -->
                                                     </div>
-                                                    <!-- /.modal-dialog -->
                                                 </div>
-
-                                                {{--Delete Modal--}}
-                                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                                        data-target="#customer2{{$index}}"><i class="fa fa-trash-o"></i>
-                                                </button>
-                                                <div class="modal fade" id="customer2{{$index}}" tabindex="-1"
-                                                     role="dialog" style="display: none;" aria-hidden="true">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header modal-header-primary">
-                                                                <h3><i class="fa fa-user m-r-5"></i> Delete Auction</h3>
-                                                                <button type="button" class="close" data-dismiss="modal"
-                                                                        aria-hidden="true">×
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <form class="form-horizontal"
-                                                                              action="{{route('auctions.destroy')}}"
-                                                                              method="post">
-                                                                            @csrf
-                                                                            <input type="hidden" name="id"
-                                                                                   value="{{$auction->id}}">
-                                                                            <fieldset>
-                                                                                <div class="col-md-12 form-group user-form-group">
-                                                                                    <label class="control-label">Delete
-                                                                                        Auction : {{$auction->name}}
-                                                                                        ?</label>
-                                                                                    <div class="flex justify-content-center mt-3">
-                                                                                        <button type="button"
-                                                                                                data-dismiss="modal"
-                                                                                                class="btn btn-danger btn-sm">
-                                                                                            NO
-                                                                                        </button>
-                                                                                        <button type="submit"
-                                                                                                class="btn btn-add btn-sm">
-                                                                                            YES
-                                                                                        </button>
+                                                    {{--Delete Modal--}}
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                            data-toggle="modal"
+                                                            data-target="#customer2{{$index}}"><i
+                                                                class="fa fa-trash-o"></i>
+                                                    </button>
+                                                    <div class="modal fade" id="customer2{{$index}}" tabindex="-1"
+                                                         role="dialog" style="display: none;" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header modal-header-primary">
+                                                                    <h3><i class="fa fa-user m-r-5"></i> Delete SMS Draft
+                                                                    </h3>
+                                                                    <button type="button" class="close"
+                                                                            data-dismiss="modal"
+                                                                            aria-hidden="true">×
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <form class="form-horizontal"
+                                                                                  action="{{route('sms.drafts.delete')}}"
+                                                                                  method="post">
+                                                                                @csrf
+                                                                                <input type="hidden" name="id"
+                                                                                       value="{{$draft->id}}">
+                                                                                <fieldset>
+                                                                                    <div class="col-md-12 form-group user-form-group">
+                                                                                        <label class="control-label">Delete
+                                                                                            Draft : {{$draft->action_name}}
+                                                                                            ?</label>
+                                                                                        <div class="flex justify-content-center mt-3">
+                                                                                            <button type="button"
+                                                                                                    data-dismiss="modal"
+                                                                                                    class="btn btn-danger btn-sm">
+                                                                                                NO
+                                                                                            </button>
+                                                                                            <button type="submit"
+                                                                                                    class="btn btn-add btn-sm">
+                                                                                                YES
+                                                                                            </button>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div>
-                                                                            </fieldset>
-                                                                        </form>
+                                                                                </fieldset>
+                                                                            </form>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <!-- /.modal-content -->
                                                         </div>
-                                                        <!-- /.modal-content -->
+                                                        <!-- /.modal-dialog -->
                                                     </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -233,5 +248,6 @@
     <script src="{{asset('assets/plugins/modals/classie.js')}}"></script>
     <script src="{{asset('assets/plugins/modals/modalEffects.js')}}"></script>
     <!-- End Page Lavel Plugins
+
 
 @endsection

@@ -193,9 +193,7 @@ class CarController extends Controller
         $customers       = Customer::get();
         $dispatchers = User::role('Dispatch')->get();
         $extra_expenses = Extraexpence::all();
-
         $car_status      = CarStatus::with('cars')->get();
-
 
         return view(
             'pages.cars.create',
@@ -208,7 +206,8 @@ class CarController extends Controller
                 'locations',
                 'customers',
                 'shipping_prices',
-                'extra_expenses'
+                'extra_expenses',
+
             ),
         );
     }

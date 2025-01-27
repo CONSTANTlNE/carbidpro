@@ -653,10 +653,20 @@ class CustomerController extends Controller
             $customer->number_of_cars    = $request->input('number_of_cars');
             $customer->is_active         = 0; // Set account as active by default
 
-            $extraExpenseArray = [];
+
+            $extraExpenseArray   = [];
+            $extraExpenseArray[] = ['name' => '', 'value' => 0, 'date' => ''];
             foreach ($extraexpenses as $extraexpense) {
                 if ($request->has($extraexpense->name)) {
-                    $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
+                    $request->validate([
+                        $extraexpense->name => 'nullable|numeric',
+                    ]);
+                    if ($request->input($extraexpense->name) > 0) {
+                        $extraExpenseArray[] = [
+                            'name' => $extraexpense->name,
+                            'value' => $request->input($extraexpense->name),
+                        ];
+                    }
                 }
             }
             $customer->extra_expenses = json_encode($extraExpenseArray);

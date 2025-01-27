@@ -47,7 +47,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-
                             <div class="btn-group flex">
                                 {{-- Add new Customer Modal--}}
                                 @if(!request()->query('archive'))
@@ -174,8 +173,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                                 {{-- Per Page--}}
                                 <form action="{{route('customers.index')}}">
                                     <select style="width: 70px" class="ml-3 form-control" name="perpage" id=""
@@ -247,6 +244,8 @@
                                     </thead>
                                     <tbody>
                                     @foreach($customers as $index=> $customer)
+
+
                                         <tr class="text-center">
                                             <td>{{$customer->company_name}}</td>
                                             <td>{{$customer->contact_name}}</td>
@@ -267,7 +266,8 @@
                                                     @endif
                                                     @if($loop->last)
                                                         <div class="w-100 d-flex justify-content-center">
-                                                            <p class="btn btn-danger">{{$totalAmountDue}} $</p>
+                                                            <p style="min-width:75px!important;padding-right: 2px!important;padding-left: 2px!important"
+                                                               class="btn btn-danger">{{$totalAmountDue}}$</p>
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -275,7 +275,8 @@
                                             <td>
                                                 @if($customer->balances->isNotEmpty())
                                                     <div class="w-100 d-flex justify-content-center">
-                                                        <p class="btn btn-success"> {{$customer->balances->sum('amount')}}
+                                                        <p style="min-width:75px!important;padding-right:  2px!important;padding-left: 2px!important"
+                                                           class="btn btn-success"> {{$customer->balances->where('is_approved',1)->sum('amount')}}
                                                             $</p>
                                                     </div>
                                                 @endif
@@ -325,6 +326,10 @@
                                                 <td>{{$customer->deleted_at?->format('d-m-Y')}}</td>
                                             @endif
                                             <td>
+                                                @php
+                                                    $customerextraexpense = json_decode($customer->extra_expenses, true);
+//dd($customerextraexpense);
+                                                @endphp
 
                                                 {{--Edit Modal--}}
                                                 <button type="button" class="btn btn-add btn-sm" data-toggle="modal"
@@ -430,10 +435,8 @@
                                                                        class="text-center mt-3">Extra
                                                                         Expenses</p>
                                                                     <div class="row">
-                                                                        @php
-                                                                            $customerextraexpense = json_decode($customer->extra_expenses, true);
-                                                                        @endphp
                                                                         @foreach($extraexpences as $index10 => $extraexpence)
+
                                                                             <div class="col-md-4 form-group">
                                                                                 <label class="control-label">{{$extraexpence->name}}</label>
                                                                                 <input name="{{$extraexpence->name}}"
@@ -441,9 +444,8 @@
                                                                                        placeholder=""
                                                                                        class="form-control"
                                                                                        @if($customer->extra_expenses != null)
-                                                                                           value="{{array_key_exists($extraexpence->name,$customerextraexpense)?$customerextraexpense[$extraexpence->name]:''}}"
-                                                                                       @endif
-                                                                                >
+                                                                                           value="{{ (array_search($extraexpence->name, array_column($customerextraexpense, 'name')) !== false) ? $customerextraexpense[array_search($extraexpence->name, array_column($customerextraexpense, 'name'))]['value'] : '' }}"
+                                                                                        @endif>
                                                                             </div>
                                                                         @endforeach
                                                                     </div>

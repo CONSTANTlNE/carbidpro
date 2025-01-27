@@ -24,7 +24,7 @@ class ExtraexpenceController extends Controller
                 }
                 $balanceAccounting = $customerExpenses;
             } else {
-                return view('pages.htmx.htmxExtraExpenseCustomer', compact('selectedcustomer'));
+                $balanceAccounting = [];
             }
 
 

@@ -41,6 +41,8 @@ class SampleMail extends Mailable
         return new Content(
             view: 'frontend.emails.sample',
             with: [
+                'company_name' => $this->content['company_name'],
+                'dealer_name'=>$this->content['dealer_name'],
                 'name' => $this->content['name'],
                 'date' => $this->content['date'],
                 'amount' => $this->content['amount'],

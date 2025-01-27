@@ -122,7 +122,6 @@
                                             <tr class="cs-secondary_color">
                                                 <th style="padding-left: 5px" class="cs-width_5 cs-normal p-2">DESCRIPTION</th>
 
-
                                                 <th style="padding-right: 5px" class="cs-width_2 cs-normal cs-text_right">AMOUNT</th>
                                             </tr>
                                             </thead>

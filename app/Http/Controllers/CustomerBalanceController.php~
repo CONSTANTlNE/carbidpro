@@ -64,6 +64,7 @@ class CustomerBalanceController extends Controller
 
         $balance = new CustomerBalance;
 
+
         $balance->amount            = $request->bank_payment;
         $balance->full_name         = $request->full_name;
         $balance->date              = $request->payment_date ?: Carbon::now();
@@ -74,6 +75,7 @@ class CustomerBalanceController extends Controller
         $balance->customer_id       = $request->customer_id;
 
         $balance->save();
+
 
         return back();
     }

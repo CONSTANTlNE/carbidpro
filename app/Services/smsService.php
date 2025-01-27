@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Models\SmsDraft;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -30,7 +31,6 @@ class smsService
         ]);
 
 
-
         $responseBody = $response->body();
 
         // Convert XML string to a PHP object
@@ -38,10 +38,10 @@ class smsService
         // Convert PHP object to an array (optional)
         $dataArray = json_decode(json_encode($xmlObject), true);
 
-        $code          = $dataArray['code'];
-        $phone         = $dataArray['phone'];
+        $code  = $dataArray['code'];
+        $phone = $dataArray['phone'];
 
-        if($code=== '-7'){
+        if ($code === '-7') {
             if (Cache::get('invalidPhones')) {
                 $array = Cache::get('invalidPhones');
             } else {
@@ -50,114 +50,147 @@ class smsService
             $array[] = $phone;
             Cache::put('invalidPhones', $array, 86400); // Cache for 1 day (86400 seconds)
         }
-        if (isset($dataArray['transaction_id'])){
+        if (isset($dataArray['transaction_id'])) {
             $transactionId = $dataArray['transaction_id'];
         }
     }
 
     public function newCarAdded(string $number, $car)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'The vehicle ( '.$car->make_model_year.' ) has been added to the cabinet. Please pay the amount on time',
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        $draft = SmsDraft::where('action_name', 'newCarAdded')->first();
+
+        if ($draft && $draft->is_active === 1) {
+            $message = str_replace("CAR-NAME", $car->make_model_year, $draft->draft);
+
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function carLoaded(string $number, $car, $container_id)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => ' Your vehicle ( '.$car->make_model_year.')  is loaded in a container #'.$container_id,
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        $draft = SmsDraft::where('action_name', 'carLoaded')->first();
 
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace(["CAR-NAME", "CONTAINER"], [$car->make_model_year, $container_id], $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function containerOpenedd(string $number, $car)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'Container for ( '.$car->make_model_year.' ) is Opened',
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        $draft = SmsDraft::where('action_name', 'containerOpened')->first();
+
+
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace("CAR-NAME", $car->make_model_year, $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function newDepositCustomer(string $number, $balance)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'Your payment of ( '.$balance->amount.' )  been sent. Please wait for confirmation',
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        $draft = SmsDraft::where('action_name', 'newDepositCustomer')->first();
+
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace("DEPOSIT-AMOUNT", $balance->amount, $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function depositConfirmationCustomer(string $number, $balance)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'Your payment of ( '.$balance->amount.' ) has been confirmed',
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        $draft = SmsDraft::where('action_name', 'confirmDeposit')->first();
+
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace("DEPOSIT-AMOUNT", $balance->amount, $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function readyForPickup(string $number, $car)
     {
+        $draft = SmsDraft::where('action_name', 'readyForPickup')->first();
 
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'Your vehicle ( '.$car->make_model_year.' ) is ready for pickup',
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace("CAR-NAME", $car->make_model_year, $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
     }
 
     public function deposit(string $number, $customer, $balance)
     {
-        $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
-            'username'   => $this->username,
-            'password'   => $this->password,
-            'client_id'  => $this->client_id,
-            'service_id' => $this->service_id,
-            'phone'      => '995'.$number,
-            'text'       => 'ახალი ჩარიცხვა '."\n".
-                'დილერი: '.$customer->company_name."\n".
-                'სახელი: '.$balance->full_name."\n"."\n".
+        $draft = SmsDraft::where('action_name', 'newDepositUs')->first();
 
-                'თარიღი: '.now()->format('d-m-Y')."\n".
-                'თანხა: '.$balance->amount,
-            'from'       => 'CARBIDPRO',
-            'route'      => 'smsc',
-        ]);
+
+        if ($draft && $draft->is_active === 1) {
+            $message  = str_replace(["DEALER", "FULL-NAME", "DEPOSIT-AMOUNT"], [$customer->company_name, $balance->full_name, $balance->amount], $draft->draft);
+            $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
+                'username'   => $this->username,
+                'password'   => $this->password,
+                'client_id'  => $this->client_id,
+                'service_id' => $this->service_id,
+                'phone'      => '995'.$number,
+                'text'       => $message,
+                'from'       => 'CARBIDPRO',
+                'route'      => 'smsc',
+            ]);
+        }
+
+
     }
 
     public function statusCheck($transaction)

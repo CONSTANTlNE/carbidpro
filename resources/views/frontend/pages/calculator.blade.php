@@ -153,23 +153,23 @@
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
             crossorigin="anonymous"></script>
     <script>
-        const extras = {!!$user->extra_expenses !!};
-
-        const checkboxes = document.querySelectorAll('.extra-checkbox');
-
         let totalextras = 0;
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', function () {
-                const value = parseFloat(this.value); // Convert the value to a number
 
-                if (this.checked) {
-                    totalextras += value; // Add value if checked
-                } else {
-                    totalextras -= value; // Subtract value if unchecked
-                }
-                console.log(totalextras);
+        @if($user->extra_expenses != null)
+            const extras = {!!$user->extra_expenses !!};
+            const checkboxes = document.querySelectorAll('.extra-checkbox');
+            checkboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', function () {
+                    const value = parseFloat(this.value);
+                    if (this.checked) {
+                        totalextras += value;
+                    } else {
+                        totalextras -= value;
+                    }
+                });
             });
-        });
+        @endif
+
 
         $(document).ready(function () {
             // Fetch auction data from the database using AJAX
@@ -324,7 +324,7 @@
                     success: function (data) {
 
                         $('#ground_rate').text('$ ' + data.ground_rate);
-                        $('#total').text('$ ' + (data.total+totalextras));
+                        $('#total').text('$ ' + (data.total + totalextras));
                         $('#total_original').text('$ ' + data.total);
 
                         jQuery('.direct').fadeIn()

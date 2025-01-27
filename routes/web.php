@@ -26,7 +26,9 @@ use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UserController;
+use App\Models\Car;
 use App\Models\Customer;
+use App\Models\SmsDraft;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -271,10 +273,10 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     Route::controller(SmsController::Class)->group(function (){
 
         Route::get('/sms/drafts','drafts')->name('sms.drafts');
-        Route::get('/sms/drafts/save','storeDraft')->name('sms.drafts.store');
-        Route::get('/sms/drafts/activate','activateDraft')->name('sms.drafts.activate');
-        Route::get('/sms/drafts/update','updateDraft')->name('sms.drafts.update');
-        Route::get('/sms/drafts/delete','deleteDraft')->name('sms.drafts.delete');
+        Route::post('/sms/drafts/save','storeDraft')->name('sms.drafts.store');
+        Route::post('/sms/drafts/activate','activateDraft')->name('sms.drafts.activate');
+        Route::post('/sms/drafts/update','updateDraft')->name('sms.drafts.update');
+        Route::post('/sms/drafts/delete','deleteDraft')->name('sms.drafts.delete');
         Route::get('/sms/invalids/clear','clearInvalids')->name('sms.invalid.clear');
 
         Route::get('/sms/all','allsms')->name('sms.all');
@@ -512,6 +514,16 @@ Route::get('/savelocations', function () {
 })->name('st');
 
 
+route::get('/smstest', function () {
+
+    $car=Car::first();
+
+    $message1=SmsDraft::where('action_name','newCarAdded')->first()->draft;
+
+    $message = str_replace("CAR-NAME", $car->make_model_year, $message1);
+
+    return $message;
+});
 
 // TEST ROUTES
 
