@@ -439,6 +439,10 @@ class CustomerBalanceController extends Controller
             $creditrecord->delete();
         }
 
+        if(!$car->latestCredit){
+            $car->amount_due = $car->amount_due + ($payment->amount * -1);
+        }
+
         $car->save();
         $payment->delete();
 

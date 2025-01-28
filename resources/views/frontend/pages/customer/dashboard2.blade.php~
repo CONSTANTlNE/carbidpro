@@ -328,7 +328,7 @@ $creditService = new CreditService();
                                                             @if(Carbon::parse($credit->issue_or_payment_date)===Carbon::today())
                                                                 <span style="color:blue">{{round($car->total_cost)}}</span>
                                                             @else
-                                                                <span style="color:blue">{{ round($car->total_cost+$creditService->totalAccruedInterestTillToday($car->id))}}</span>
+{{--                                                                <span style="color:blue">{{ round($car->total_cost+$creditService->totalAccruedInterestTillToday($car->id))}}</span>--}}
                                                             @endif
                                                         @endif
                                                     @endforeach

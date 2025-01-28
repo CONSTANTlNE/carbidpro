@@ -132,17 +132,23 @@
                     <div class="d-flex flex-column mt-3 ">
                         @php
                             $extras=json_decode($user->extra_expenses);
+
                         @endphp
-                        @foreach($extras as $key => $extra)
-                            <div class="d-flex justify-content-between align-items-middle mt-2">
-                                <div class="d-flex justify-content-between align-middle" style="min-width:130px ">
-                                    <label style="cursor: pointer" class="mt-1" for="{{$key}}">{{$key}}</label>
-                                    <input style="cursor: pointer" class="form-check-input extra-checkbox" id="{{$key}}"
-                                           type="checkbox" value="{{$extra}}}">
+                        @foreach($extras as $index => $extra)
+                            @if($index>0)
+                                <div class="d-flex justify-content-between align-items-middle mt-2">
+                                    <div class="d-flex justify-content-between align-middle" style="min-width:130px ">
+                                        <label style="cursor: pointer" class="mt-1"
+                                               for="{{$extra->name}}">{{$extra->name}}</label>
+                                        <input style="cursor: pointer" class="form-check-input extra-checkbox"
+                                               id="{{$extra->name}}"
+                                               type="checkbox" value="{{$extra->value}}}">
+                                    </div>
+                                    <input disabled class="form-control text-center" style="max-width: 150px"
+                                           type="text"
+                                           value="{{$extra->value}}">
                                 </div>
-                                <input disabled class="form-control text-center" style="max-width: 150px" type="text"
-                                       value="{{$extra}}">
-                            </div>
+                            @endif
                         @endforeach
                     </div>
                 @endif
@@ -156,18 +162,22 @@
         let totalextras = 0;
 
         @if($user->extra_expenses != null)
-            const extras = {!!$user->extra_expenses !!};
-            const checkboxes = document.querySelectorAll('.extra-checkbox');
-            checkboxes.forEach((checkbox) => {
-                checkbox.addEventListener('change', function () {
-                    const value = parseFloat(this.value);
-                    if (this.checked) {
-                        totalextras += value;
-                    } else {
-                        totalextras -= value;
-                    }
-                });
+
+        const extras = {!!$user->extra_expenses !!};
+        console.log(extras);
+
+        const checkboxes = document.querySelectorAll('.extra-checkbox');
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', function () {
+                const value = parseFloat(this.value);
+                if (this.checked) {
+                    totalextras += value;
+                } else {
+                    totalextras -= value;
+                }
+                console.log(totalextras);
             });
+        });
         @endif
 
 

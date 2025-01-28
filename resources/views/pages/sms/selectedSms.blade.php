@@ -45,7 +45,8 @@
         </section>
         @if($errors->any())
             <div
-                 class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-full text-center" role="alert">
+                    class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-full text-center"
+                    role="alert">
                 @foreach($errors->all() as $error)
                     <p>{{$error}}</p>
                 @endforeach
@@ -74,16 +75,24 @@
                 <div class="col-lg-8">
                     <form action="{{route('sms.send.selected')}}" method="post">
                         @csrf
-                        <div class="card-body d-flex justify-content-center">
-                            <div class="d-flex flex-column align-middle justify-content-center">
-                                <div class="d-flex justify-content-center">
-                                <input  style="max-width: 250px"
-                                        type="text"
-                                        id="searchInput"
-                                        placeholder="Search for names.."
-                                        onkeyup="searchTable()"
-                                />
+                        <div class="card-body d-flex justify-content-center ">
+                            <div class="d-flex flex-column align-middle ">
+                                <div class="d-flex justify-content-around">
+                                    <input style="max-width: 250px"
+                                           type="text"
+                                           id="searchInput"
+                                           placeholder="Search for names.."
+                                           onkeyup="searchTable()"
+                                    />
+                                    <div class="d-flex justify-content-between ">
+                                        <label style="cursor: pointer" for="selectall">Select All
+                                            <input type="checkbox" id="selectall">
+                                        </label>
+
+                                    </div>
+
                                 </div>
+
                                 <table id="myTable" class="mt-2 mb-3">
                                     <thead>
                                     <tr>
@@ -104,6 +113,7 @@
                                                        style="height: 20px;width: 20px;cursor: pointer"
                                                        type="checkbox"
                                                        name="phone[]"
+                                                       class="numbers"
                                                        value="{{$customer->phone}}"
                                                         @checked(is_array(old('phone')) && in_array($customer->phone, old('phone')))>
                                             </td>
@@ -115,7 +125,7 @@
                                 <div class="pagination mb-3">
                                     <button type="button" id="prevBtn">Previous</button>
                                     <span id="pageInfo"></span>
-                                    <button  type="button" id="nextBtn">Next</button>
+                                    <button type="button" id="nextBtn">Next</button>
                                 </div>
                             </div>
                         </div>
@@ -146,6 +156,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
+            const selectall=document.getElementById('selectall');
+            const numbers=document.querySelectorAll('.numbers');
+            selectall.addEventListener('click', function () {
+                numbers.forEach(function (number) {
+                    number.checked = selectall.checked;
+                });
+            });
+
+
+
+
             const table = document.getElementById('myTable');
             const tbody = table.getElementsByTagName('tbody')[0];
             const rows = Array.from(tbody.getElementsByTagName('tr'));

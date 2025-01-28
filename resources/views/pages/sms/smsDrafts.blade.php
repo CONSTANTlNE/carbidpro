@@ -55,7 +55,7 @@
                                                 <div class="modal-body">
                                                     <div class="col-md-12 form-group">
                                                         <input type="text" name="action_name"
-                                                               required placeholder="Draf Key" class="form-control">
+                                                               required placeholder="Draft Key (For Developer)" class="form-control">
                                                     </div>
                                                     <div class="col-md-12 form-group">
                                                         <input type="text" name="action_description"

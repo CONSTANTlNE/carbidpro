@@ -45,7 +45,8 @@
         </section>
         @if($errors->any())
             <div
-                 class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-full text-center" role="alert">
+                    class="ml-3 alert custom_alerts alert-danger alert-dismissible fade show w-full text-center"
+                    role="alert">
                 @foreach($errors->all() as $error)
                     <p>{{$error}}</p>
                 @endforeach
@@ -74,16 +75,24 @@
                 <div class="col-lg-8">
                     <form action="{{route('sms.send.selected')}}" method="post">
                         @csrf
-                        <div class="card-body d-flex justify-content-center">
-                            <div class="d-flex flex-column align-middle justify-content-center">
-                                <div class="d-flex justify-content-center">
-                                <input  style="max-width: 250px"
-                                        type="text"
-                                        id="searchInput"
-                                        placeholder="Search for names.."
-                                        onkeyup="searchTable()"
-                                />
+                        <div class="card-body d-flex justify-content-center ">
+                            <div class="d-flex flex-column align-middle ">
+                                <div class="d-flex justify-content-around">
+                                    <input style="max-width: 250px"
+                                           type="text"
+                                           id="searchInput"
+                                           placeholder="Search for names.."
+                                           onkeyup="searchTable()"
+                                    />
+                                    <div class="d-flex justify-content-between ">
+                                        <label style="cursor: pointer" for="selectall">Select All
+                                            <input type="checkbox" id="selectall">
+                                        </label>
+
+                                    </div>
+
                                 </div>
+
                                 <table id="myTable" class="mt-2 mb-3">
                                     <thead>
                                     <tr>
@@ -109,15 +118,13 @@
                                             </td>
                                         </tr>
                                     @endforeach
-
-
                                     </tbody>
                                 </table>
                                 <!-- Pagination Controls -->
                                 <div class="pagination mb-3">
                                     <button type="button" id="prevBtn">Previous</button>
                                     <span id="pageInfo"></span>
-                                    <button  type="button" id="nextBtn">Next</button>
+                                    <button type="button" id="nextBtn">Next</button>
                                 </div>
                             </div>
                         </div>

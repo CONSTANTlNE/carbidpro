@@ -14,8 +14,9 @@ class SmsController extends Controller
     public function allsms()
     {
         $depositNumbers = MobileNumbers::where('type', 'new_deposit')->get();
+        $customers = Customer::select('id', 'contact_name', 'phone', 'company_name')->get();
 
-        return view('pages.sms.allSms', compact('depositNumbers'));
+        return view('pages.sms.allSms', compact('depositNumbers', 'customers'));
     }
 
     public function sendAll(Request $request)

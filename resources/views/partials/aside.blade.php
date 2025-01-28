@@ -159,11 +159,7 @@
                     <ul class="treeview-menu">
                         <li class="">
                             <a href="{{ route('sms.all') }}">
-                                <span>To All</span>
-                                <span class="pull-right-container"></span>
-                            </a>
-                            <a href="{{ route('sms.selected') }}">
-                                <span>Select Recipient</span>
+                                <span>Send Sms</span>
                                 <span class="pull-right-container"></span>
                             </a>
                             <a href="{{ route('sms.drafts') }}">
