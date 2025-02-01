@@ -36,7 +36,7 @@ class ArrivedController extends Controller
                             // Search for cars by relevant fields (car model, make, etc.)
                             $query->where('container_status', 3)
                                 ->where(function ($q) use ($searchTerm) {
-                                    $q->where('vin', 'like', '%' . $searchTerm . '%');
+                                    $q->where('vin', 'like', '%' . $searchTerm . '%')
                                 });
                         });
                 })

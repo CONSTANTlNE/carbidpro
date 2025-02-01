@@ -61,6 +61,7 @@ class smsService
 
         if ($draft && $draft->is_active === 1) {
             $message = str_replace("CAR-NAME", $car->make_model_year, $draft->draft);
+//            $message  = str_replace(["CAR-NAME","VIN"], [$car->make_model_year, $car->vin], $draft->draft);
 
             $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
                 'username'   => $this->username,
@@ -80,7 +81,7 @@ class smsService
         $draft = SmsDraft::where('action_name', 'carLoaded')->first();
 
         if ($draft && $draft->is_active === 1) {
-            $message  = str_replace(["CAR-NAME", "CONTAINER"], [$car->make_model_year, $container_id], $draft->draft);
+            $message  = str_replace(["CAR-NAME", "CONTAINER","VIN"], [$car->make_model_year, $container_id, $car->vin], $draft->draft);
             $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
                 'username'   => $this->username,
                 'password'   => $this->password,

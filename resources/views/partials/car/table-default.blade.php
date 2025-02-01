@@ -81,13 +81,70 @@ use Carbon\Carbon  ;
                             Edit
                         </button>
                     </a>
-                    @if(!$car->latestCredit)
+                    @if(!$car->latestCredit && $car->amount_due > 0)
                         <button type="button" class="btn btn-primary  btn-sm"
                                 data-toggle="modal"
-
-                                data-target="   {{$car->latestCredit? '' : '#creditmodal'.$index}}">
+                                data-target="{{$car->latestCredit? '' : '#creditmodal'.$index}}">
                             Give Credit
                         </button>
+                        {{--Credit modal--}}
+                        <div class="modal fade" id="creditmodal{{$index}}" tabindex="-1" role="dialog"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <section>
+                                        <form action="{{route('give.credit')}}" method="post">
+                                            @csrf
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Give Credit</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="control-label">Amount:</label>
+                                                        <input type="hidden" name="amount" value="{{ $car->amount_due}}">
+                                                        <input type="hidden" name="car_id" value="{{ $car->id}}">
+                                                        <input type="hidden" name="customer_id"
+                                                               value="{{ $car->customer->id}}">
+                                                        <input type="text" disabled
+                                                               value="{{ $car->amount_due}}" class="form-control">
+                                                    </div>
+
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="control-label">Monthly %</label>
+                                                        <input required name="percent" type="number" min="1" placeholder=""
+                                                               class="form-control">
+                                                    </div>
+
+                                                    <div class="col-md-4 form-group">
+                                                        <label class="control-label">Issue Date</label>
+                                                        <input min="{{ $car->created_at->format('Y-m-d') }}"  required name="issue_date" type="date" placeholder="Invoice Date"
+                                                               class="form-control">
+                                                    </div>
+
+                                                    <div class="col-md-12 form-group">
+                                                        <label class="control-label">Comment</label>
+                                                        <input name="comment" type="text" placeholder="Comment"
+                                                               class="form-control">
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer justify-content-center">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close
+                                                </button>
+                                                <button class="btn green_btn custom_grreen2">Save changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
                     @endif
 
                     {{--Credit Info Button--}}
@@ -97,7 +154,7 @@ use Carbon\Carbon  ;
                             Credit Info
                         </button>
                     @endif
-                    {{--Credit modal--}}
+                    {{--CreditInfo modal--}}
                     <div class="modal fade " id="creditinfomodal{{$index}}" tabindex="-1" role="dialog"
                          aria-hidden="true">
                         <div class="modal-dialog modal-lg" role="document">

@@ -8,16 +8,11 @@
               rel="stylesheet"/>
     @endpush
     @section('body-class', 'hold-transition sidebar-mini')
-    @php
-        use App\Services\CreditService;
-    use Carbon\Carbon  ;
-        $creditService = new CreditService();
 
-    @endphp
-            <!--preloader-->
-{{--    <div id="preloader">--}}
-{{--        <div id="status"></div>--}}
-{{--    </div>--}}
+    <!--preloader-->
+    {{--<div id="preloader">--}}
+    {{--    <div id="status"></div>--}}
+    {{--</div>--}}
 
     <!-- Site wrapper -->
     <div class="wrapper">
@@ -26,6 +21,7 @@
         <!-- Left side column. contains the sidebar -->
         @include('partials.aside')
         <!-- =============================================== -->
+
 
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -38,13 +34,32 @@
                     <small>Car list</small>
                 </div>
             </section>
+
+            <div class="container">
+                @if ($errors->any())
+                    <div class="alert alert-danger" style="margin-top: 1rem;margin-bottom: 0;">
+                        <ul style="margin:0;padding:0;">
+                            @foreach ($errors->all() as $error)
+                                <li style="list-style: none;">{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+
+
             <!-- Main content -->
             <div class="content">
                 <div class="row">
                     <!-- Form controls -->
                     <div class="col-sm-12">
                         <div class="card lobicard all_btn_card" id="lobicard-custom-control1" data-sortable="true">
-
+                            <div class="card-header all_card_btn">
+                                <div class="card-title custom_title">
+                                    <a class="btn btn-add" href="{{ route('cars.index') }}"><i class="fa fa-list"></i>
+                                        Car List </a>
+                                </div>
+                            </div>
                             <div class="card-body">
                                 <style>
                                     .form-group {
@@ -57,8 +72,10 @@
                                         margin: 0;
                                     }
                                 </style>
-                                <form action="{{ route('car.update', $car->id) }}" id="carForm" method="POST">
+                                <form action="{{ route('car.store') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
+                                    <input style="display: none" id="images2" type="file" name="images2[]" multiple>
+
                                     <div class="col-sm-12">
                                         <div class="row">
                                             <div class="form-group">
@@ -66,11 +83,15 @@
                                                 <select
                                                         hx-get="{{route('htmx.get.extraexpense')}}"
                                                         hx-target="#extraexpense"
-                                                        name="customer_id" class="form-control" id="customer_id" required>
+                                                        autocomplete="nope"
+                                                        name="customer_id"
+                                                        class="form-control"
+                                                        id="customer_id" required>
                                                     <option value=""></option>
                                                     @foreach ($customers as $customer)
                                                         <option value="{{ $customer->id }}"
-                                                                {{ $customer->id == $car->customer_id ? 'selected' : '' }}>
+                                                                {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+
                                                             {{ $customer->contact_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -78,51 +99,57 @@
 
                                             <div class="form-group">
                                                 <label>Broker</label>
-                                                <select name="dispatch_id" class="form-control" id="dispatch_id">
+                                                <select autocomplete="nope" name="dispatch_id" class="form-control"
+                                                        id="dispatch_id" required>
                                                     <option value=""></option>
                                                     @foreach ($dispatchers as $dispatch)
                                                         <option value="{{ $dispatch->id }}"
-                                                                {{ $dispatch->id == $car->dispatch_id ? 'selected' : '' }}>
+                                                                {{ old('dispatch_id') == $dispatch->id ? 'selected' : '' }}>
                                                             {{ $dispatch->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
 
+
                                             <div class="form-group">
                                                 <label>Make/Model/Year</label>
-                                                <input type="text" value="{{ $car->make_model_year }}"
-                                                       name="make_model_year" class="form-control">
+                                                <input autocomplete="nope" type="text" name="make_model_year"
+                                                       class="form-control"
+                                                       value="{{ old('make_model_year') }}" required>
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Title</label>
-                                                <select name="title" class="form-control" id="title">
+                                                <select autocomplete="nope" name="title" class="form-control" id="title"
+                                                        required>
                                                     <option value=""></option>
-                                                    <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO
+                                                    <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
                                                     </option>
-                                                    <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
+                                                    <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
+                                                        YES
                                                     </option>
-                                                    <option value="bypost" {{ $car->title == 'bypost' ? 'selected' : '' }}>
-                                                        BY POST
+                                                    <option value="bypost"
+                                                            {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST
                                                     </option>
                                                     <option value="pending"
-                                                            {{ $car->title == 'pending' ? 'selected' : '' }}>PENDING
+                                                            {{ old('title') == 'pending' ? 'selected' : '' }}>PENDING
                                                     </option>
                                                 </select>
+
                                             </div>
+
 
                                             <div class="form-group">
                                                 <label>Vin</label>
-                                                <input type="text" value="{{ $car->vin }}" name="vin"
-                                                       class="form-control">
+                                                <input autocomplete="nope" type="text" name="vin" class="form-control"
+                                                       value="{{ old('vin') }}">
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Percent</label>
-                                                <input type="text"
-                                                       value="{{ $car->credit->first()?->monthly_percent*100 }}"
-                                                       name="percent"
-                                                       class="form-control" disabled>
+                                                <input autocomplete="nope" type="text" name="percent"
+                                                       class="form-control"
+                                                       value="{{ old('percent') }}">
                                             </div>
 
 
@@ -132,31 +159,35 @@
 
                                                     <div class="col-md-4">
                                                         <label>Lot</label>
-                                                        <input value="{{ $car->lot }}" type="text" name="lot"
-                                                               class="form-control">
+                                                        <input autocomplete="nope" type="text" name="lot"
+                                                               class="form-control"
+                                                               value="{{ old('lot') }}" required>
                                                     </div>
+
 
                                                     <div class="col-md-4">
                                                         <label>Gate or Member</label>
-                                                        <input type="text" value="{{ $car->gate_or_member }}"
-                                                               name="gate_or_member" class="form-control">
+                                                        <input autocomplete="nope" type="text" name="gate_or_member"
+                                                               class="form-control"
+                                                               value="{{ old('gate_or_member') }}" required>
                                                     </div>
-
 
                                                     <div class="col-md-4 d-flex" style="align-items: center;">
                                                         <label>Type of Fuel</label><br>
 
                                                         <label class="radio-inline">
-                                                            <input name="type_of_fuel" value="Petrol" type="radio"
-                                                                   required
-                                                                    {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Petrol' ? 'checked' : '' }}>
+                                                            <input autocomplete="nope" name="type_of_fuel"
+                                                                   value="Petrol" type="radio"
+                                                                   {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}
+                                                                   required>
                                                             Petrol
                                                         </label>
 
                                                         <label class="radio-inline">
-                                                            <input name="type_of_fuel" value="Hybrid" type="radio"
-                                                                   required
-                                                                    {{ old('type_of_fuel', $car->type_of_fuel ?? '') == 'Hybrid' ? 'checked' : '' }}>
+                                                            <input autocomplete="nope" name="type_of_fuel"
+                                                                   value="Hybrid" type="radio"
+                                                                   {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}
+                                                                   required>
                                                             Hybrid
                                                         </label>
                                                     </div>
@@ -170,12 +201,12 @@
                                                 <div class="row">
                                                     <div class="col-md-2">
                                                         <label for="auction">Auction</label>
-                                                        <select id="auction" name="auction"
+                                                        <select autocomplete="nope" id="auction" name="auction"
                                                                 class="form-control select2">
                                                             <option value="">Select an option</option>
                                                             @foreach ($auctions as $auction)
                                                                 <option value="{{ $auction->id }}"
-                                                                        {{ $auction->id == $car->auction ? 'selected' : '' }}>
+                                                                        {{ old('auction') == $auction->id ? 'selected' : '' }}>
                                                                     {{ $auction->name }}
                                                                 </option>
                                                             @endforeach
@@ -184,12 +215,11 @@
 
                                                     <div class="col-md-2">
                                                         <label for="loadType">Load Type</label>
-                                                        <select name="load_type" id="loadType"
+                                                        <select autocomplete="nope" name="load_type" id="loadType"
                                                                 class="form-control select2">
                                                             <option value="">Select an option</option>
                                                             @foreach ($load_types as $load_type)
-                                                                <option value="{{ $load_type->id }}"
-                                                                        {{ $load_type->id == $car->load_type ? 'selected' : '' }}>
+                                                                <option value="{{ $load_type->id }}">
                                                                     {{ $load_type->name }}
                                                                 </option>
                                                             @endforeach
@@ -198,7 +228,7 @@
 
                                                     <div class="col-md-2">
                                                         <label for="fromState">From State</label>
-                                                        <select name="from_state" id="fromState"
+                                                        <select autocomplete="nope" name="from_state" id="fromState"
                                                                 class="form-control select2">
                                                             <option value="">Select an option</option>
                                                             <!-- This will be populated dynamically based on the auction selection -->
@@ -208,7 +238,7 @@
                                                     <!-- Add this for To Port and Load Type, etc. -->
                                                     <div class="col-md-2">
                                                         <label for="to_port_id">To Port Id</label>
-                                                        <select name="to_port_id" id="to_port_id"
+                                                        <select autocomplete="nope" name="to_port_id" id="to_port_id"
                                                                 class="form-control select2">
                                                             <option value="">Select an option</option>
                                                             <!-- This will be populated dynamically -->
@@ -217,147 +247,130 @@
 
                                                     <div class="col-md-2">
                                                         <label for="zip_code">Exact location-zip</label>
-                                                        <input type="text" class="form-control" name="zip_code"
-                                                               id="zip_code"
-                                                               value="{{ old('zip_code', $car->zip_code ?? '') }}">
+                                                        <input autocomplete="nope" type="text" class="form-control"
+                                                               name="zip_code"
+                                                               id="zip_code" value="{{ old('zip_code') }}" required>
                                                     </div>
 
                                                     <div class="col-md-2">
                                                         <label for="warehouse">Warehouse</label>
-                                                        <input type="text" value="TRT - New Jersey"
+                                                        <input autocomplete="nope" type="text"
+                                                               value="{{ old('warehouse') }}"
                                                                class="form-control" name="warehouse" id="warehouse"
-                                                               value="{{ old('warehouse') }}" required>
+                                                               required>
                                                     </div>
+
                                                 </div>
+                                                {{--Extra Expenses inserted via HTMX on customer select change--}}
                                                 <div class="row mt-3" id="extraexpense">
-                                                    @php
-                                                        $customerextraexpense = json_decode($selectedcustomer->extra_expenses, true);
-                                                    @endphp
-
-
-                                                    @foreach($extra_expenses as $index10 => $extraexpence)
-                                                        <div class="col-md-2 form-group">
-                                                            <label class="control-label">{{$extraexpence->name}}</label>
-                                                            <input name="{{$extraexpence->name}}"
-                                                                   type="text"
-                                                                   placeholder=""
-                                                                   class="form-control"
-                                                                   @if($selectedcustomer->extra_expenses != null)
-                                                                       value="{{array_key_exists($extraexpence->name,$customerextraexpense)?$customerextraexpense[$extraexpence->name]:''}}"
-                                                                    @endif
-                                                            >
-                                                        </div>
-                                                    @endforeach
-
-
 
                                                 </div>
                                             </div>
+
+
                                         </div>
+
                                     </div>
 
-                                    <div class="container">
+                                      {{-- Here Comes Content from HTMX alpine initialized--}}
+                                    <div class="container" id="alpinehtml">
                                         <div x-data="$store.balanceAccountingStore" class="mt-4">
-                                            <p x-text="'Number of items: ' + balance_accounting.length"></p>
+                                            <div class="d-flex" style="gap:10px">
+                                                <p x-text="'Number of items: ' + balance_accounting.length"></p>
 
-                                            <!-- Display the total of values -->
-                                            <p>Total Value: <span x-text="calculateTotal()"></span></p>
+                                                <!-- Display the total of values -->
+                                                <p>Total Value: <span x-text="calculateTotal()"></span></p>
+                                            </div>
 
                                             <!-- Repeater Fields in One Row -->
                                             <template x-for="(item, index) in balance_accounting" :key="index">
                                                 <div class="row repeater-item mt-2 align-items-center">
                                                     <div class="col-md-4">
-                                                        <input required type="text"
-                                                               :name="`balance_accounting[${index}][name]`"
+                                                        <input type="text" :name="`balance_accounting[${index}][name]`"
                                                                x-model="item.name"
                                                                class="name-autocomplete form-control"
-                                                               placeholder="Enter item name">
+                                                               placeholder="Enter item name" required>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <input required type="number"
+                                                        <input type="number"
                                                                :name="`balance_accounting[${index}][value]`"
                                                                x-model.number="item.value" class="form-control"
-                                                               placeholder="Enter item value">
+                                                               placeholder="Enter item value" required>
                                                     </div>
                                                     {{-- DATE--}}
-                                                    <div class="col-md-4">
-                                                        <input required
-                                                               type="date"
-                                                               :name="`balance_accounting[${index}][date]`"
-                                                               x-model="item.date"
-                                                               class="form-control"
-                                                               x-init="item.date = item.date || new Date().toISOString().split('T')[0]">
+                                                    <div style="display: none" class="col-md-4">
+                                                        <input type="date" :name="`balance_accounting[${index}][date]`"
+                                                               x-model="item.date" class="form-control"
+                                                               x-init="item.date = item.date || '{{ now()->format('Y-m-d') }}'">
                                                     </div>
                                                     <div class="col-md-2">
                                                         <button type="button" class="btn btn-danger"
                                                                 @click="confirmRemoveField(index)">Remove
                                                         </button>
+
                                                     </div>
                                                 </div>
                                             </template>
 
                                             <!-- Add Button -->
-                                            <button type="button" class="btn btn-primary mt-3" @click="addField">Add
-                                                Another Item
+                                            <button type="button" class="btn btn-primary mt-3" @click="addField">
+                                                Add Another Item
                                             </button>
 
-                                            {{--                                        <div x-data="{--}}
-                                            {{--                                            payed: {{ $car->payed }}--}}
-                                            {{--                                            get amountDue() {--}}
-                                            {{--                                                return calculateTotal() - parseFloat(this.payed || 0);--}}
-                                            {{--                                            },--}}
-                                            {{--                                            validateNumber() {--}}
-                                            {{--                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point--}}
-                                            {{--                                            }--}}
-                                            {{--                                        }">--}}
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label for="allcost">All Cost</label>
-                                                    <input type="text" name="total_cost" id="allcost"
-                                                           class="form-control" x-bind:value="calculateTotal()"
-                                                           readonly>
-                                                </div>
+                                            <div x-data="{
+                                            payed: '0',
+                                            get amountDue() {
+                                                return calculateTotal() - parseFloat(this.payed || 0);
+                                            },
+                                            validateNumber() {
+                                                this.payed = this.payed.replace(/[^0-9.]/g, ''); // Only keep numbers and a single decimal point
+                                            }
+                                        }">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <label for="allcost">All Cost</label>
+                                                        <input type="text" name="total_cost" id="allcost"
+                                                               class="form-control" x-bind:value="calculateTotal()"
+                                                               readonly>
+                                                    </div>
 
-                                                {{--                                                <div class="col-md-4">--}}
-                                                {{--                                                    <label for="payed">Payed</label>--}}
-                                                {{--                                                    <input type="text" value="{{ $car->payed }}" name="payed"--}}
-                                                {{--                                                        id="payed" class="form-control" x-model="payed"--}}
-                                                {{--                                                        x-on:input="validateNumber" required>--}}
-                                                {{--                                                </div>--}}
+                                                    <div class="col-md-4">
+                                                        <label for="payed">Payed</label>
+                                                        <input type="text" name="payed"
+                                                               id="payed" class="form-control" x-model="payed"
+                                                               x-on:input="validateNumber" required>
+                                                    </div>
 
-                                                <div class="col-md-4">
-                                                    <label for="amountDue">Amount Due</label>
-                                                    <input type="text"
-                                                           class="form-control"  readonly
-                                                           value="{{round($car->amount_due+round( ((new CreditService())->totalInterestFromLastCalc($car->id))) )}}">
+                                                    <div class="col-md-4">
+                                                        <label for="amountDue">Amount Due</label>
+                                                        <input type="text" name="balance" id="amountDue"
+                                                               class="form-control" x-bind:value="amountDue" readonly>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
 
                                     <div class="container mb-3">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label for="vehicle_owner_name">Vehicle Owner name
                                                 </label>
-                                                <input type="text" value="{{ $car->vehicle_owner_name }}"
-                                                       name="vehicle_owner_name" id="vehicle_owner_name"
+                                                <input type="text" name="vehicle_owner_name" id="vehicle_owner_name"
                                                        class="form-control">
                                             </div>
 
                                             <div class="col-md-4">
                                                 <label for="owner_id_number">Owner ID Number
                                                 </label>
-                                                <input type="text" value="{{ $car->owner_id_number }}"
-                                                       name="owner_id_number" id="owner_id_number" class="form-control">
+                                                <input type="text" name="owner_id_number" id="owner_id_number"
+                                                       class="form-control">
                                             </div>
 
                                             <div class="col-md-4">
                                                 <label for="owner_phone_number">Owner Phone number
                                                 </label>
-                                                <input type="text" value="{{ $car->owner_phone_number }}"
-                                                       name="owner_phone_number" id="owner_phone_number"
+                                                <input type="text" name="owner_phone_number" id="owner_phone_number"
                                                        class="form-control">
                                             </div>
 
@@ -373,8 +386,7 @@
 
                                     <div class="form-group" style="max-width: 100%">
                                         <label>Images</label><br>
-                                        <input type="file" data-car_id="{{ $car->id }}" id="filepond"
-                                               name="images[]" multiple>
+                                        <input type="file" id="filepond" name="images[]" multiple>
 
                                         <style>
                                             .img-fluid {
@@ -384,41 +396,24 @@
                                             }
                                         </style>
 
-                                        @if ($car->getMedia('images')->isNotEmpty())
-                                            <div class="existing-images mt-4">
-                                                <h6>Existing Images</h6>
-                                                <div class="row mt-2">
-                                                    @foreach ($car->getMedia('images') as $image)
-                                                        <div class="col-md-2">
-                                                            <div class="image-thumbnail mb-2">
-                                                                <a href="{{ $image->getUrl() }}" target="_blank">
-                                                                    <img src="{{ $image->getUrl() }}" class="img-fluid"
-                                                                         alt="Uploaded Image">
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endif
                                     </div>
+
 
                                     <div class="container">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label for="note">Note</label>
                                                 <textarea name="comment" class="form-control" id="note" cols="30"
-                                                          rows="2">{{ $car->comment }}</textarea>
+                                                          rows="2"></textarea>
                                             </div>
 
                                             <div class="col-md-4">
                                                 <label>CAR Status</label>
                                                 <select name="status" class="form-control" id="customer_id">
-                                                    <option value=""></option>
                                                     @foreach ($car_status as $status)
-                                                        <option value="{{ $status->id }}"
-                                                                {{ $status->id == $car->car_status_id ? 'selected' : '' }}>
-                                                            {{ $status->name }}</option>
+                                                        <option @selected($status->name=='For Dispatch') value="{{ $status->id }}">
+                                                            {{ $status->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -426,18 +421,14 @@
                                             <div class="col-md-4">
                                                 <label>Satart dispatch?</label>
                                                 <select name="is_dispatch" class="form-control" id="is_dispatch">
-                                                    <option value="yes"
-                                                            {{ $car->is_dispatch == 'yes' ? 'selected' : '' }}>YES
-                                                    </option>
-                                                    <option value="no" {{ $car->is_dispatch == 'no' ? 'selected' : '' }}>
-                                                        NO
-                                                    </option>
+                                                    <option value="yes" selected>YES</option>
+                                                    <option value="no">NO</option>
+
                                                 </select>
                                             </div>
                                         </div>
 
                                     </div>
-
                                     <div class="reset-button">
                                         <button type="submit" class="btn btn-success"> Save</button>
                                     </div>
@@ -472,6 +463,8 @@
             <script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>
 
             <script>
+
+
                 document.addEventListener("DOMContentLoaded", function () {
                     // Register FilePond plugins
                     FilePond.registerPlugin(
@@ -482,7 +475,7 @@
 
                     // Turn input element into a pond
                     // Get the car_id from the input element
-                    const inputElement = document.querySelector('input[type="file"]');
+                    const inputElement = document.getElementById('filepond');
                     const carId = inputElement.getAttribute('data-car_id');
 
                     // Initialize FilePond with car_id passed in the process data
@@ -512,59 +505,113 @@
                         }
                     });
 
+
+                    setTimeout(function () {
+                        document.querySelector('[name="images[]"]').addEventListener('change', function (event) {
+                            // Get the files selected in the filepond input
+                            const filepondFiles = event.target.files;
+
+                            // Get the hidden images2 input element
+                            const images2Input = document.getElementById('images2');
+
+                            // Create a new DataTransfer object to manage files
+                            const dataTransfer = new DataTransfer();
+
+                            // Add all files from filepond to the DataTransfer object
+                            for (let i = 0; i < filepondFiles.length; i++) {
+                                dataTransfer.items.add(filepondFiles[i]);
+                            }
+
+                            // Assign the files to the images2 input
+                            images2Input.files = dataTransfer.files;
+                        })
+                    }, 300)
+
+
                 });
             </script>
 
-            <script>
-                // Ensure Alpine.js Reactive Store is initialized properly
+
+            <script id="alpinetarget">
+
                 document.addEventListener('alpine:init', () => {
-                    Alpine.store('balanceAccountingStore', {
-                        balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
 
-                        addField() {
-                            this.balance_accounting.push({
-                                name: '',
-                                value: 0,
-                                date: ''
-                            });
-                        },
-                        // New method with confirmation
-                        confirmRemoveField(index) {
-                            if (confirm("Are you sure you want to remove this item?")) {
-                                this.removeField(index);
-                            }
-                        },
-                        removeField(index) {
-                            this.balance_accounting.splice(index, 1);
-                        },
 
-                        calculateTotal() {
-                            return this.balance_accounting.reduce((total, item) => {
-                                return total + (parseFloat(item.value) || 0);
-                            }, 0);
-                        },
 
-                        // Update or add Shipping cost
-                        updateShippingCost(shippingCost) {
-                            let shippingFound = false;
+                Alpine.store('balanceAccountingStore', {
 
-                            for (let i = 0; i < this.balance_accounting.length; i++) {
-                                if (this.balance_accounting[i].name === 'Shipping cost') {
-                                    this.balance_accounting[i].value = shippingCost;
-                                    shippingFound = true;
-                                    break;
-                                }
-                            }
+                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
 
-                            if (!shippingFound) {
-                                this.balance_accounting.push({
-                                    name: 'Shipping cost',
-                                    value: shippingCost
-                                });
+
+                    addField() {
+
+                        initializeAutocomplete();
+
+                        this.balance_accounting.push({
+                            name: '',
+                            value: 0,
+                            date: ''
+                        });
+                    },
+
+                    // New method with confirmation
+                    confirmRemoveField(index) {
+                        if (confirm("Are you sure you want to remove this item?")) {
+                            this.removeField(index);
+                        }
+                    },
+
+                    removeField(index) {
+                        this.balance_accounting.splice(index, 1);
+                    },
+
+                    calculateTotal() {
+                        return this.balance_accounting.reduce((total, item) => {
+                            return total + (parseFloat(item.value) || 0);
+                        }, 0);
+                    },
+
+                    // Update or add Shipping cost
+                    updateShippingCost(shippingCost) {
+                        let shippingFound = false;
+
+                        for (let i = 0; i < this.balance_accounting.length; i++) {
+                            if (this.balance_accounting[i].name === 'Shipping cost') {
+                                this.balance_accounting[i].value = shippingCost;
+                                shippingFound = true;
+                                break;
                             }
                         }
-                    });
+
+                        if (!shippingFound) {
+                            this.balance_accounting.push({
+                                name: 'Shipping cost',
+                                value: shippingCost
+                            });
+                        }
+                    }
                 });
+
+                });
+            </script>
+
+
+            <script>
+                // Ensure Alpine.js Reactive Store is initialized properly
+
+
+                // Example words for autocomplete
+                const suggestedWords = [
+                    'Shipping cost',
+                    'Vehicle cost',
+                    'Fee amount',
+                    'Insurance cost',
+                    'Hybrid',
+                    'Storage',
+                    'TITLE',
+                    'Sublot',
+                    'Credit',
+                ];
 
                 $(function () {
                     var availableWarehouse = [
@@ -585,19 +632,6 @@
                     });
 
                 });
-
-                // Example words for autocomplete
-                const suggestedWords = [
-                    'Vehicle cost',
-                    'Shipping cost',
-                    'Fee amount',
-                    'Insurance cost',
-                    'Hybrid',
-                    'Storage',
-                    'TITLE',
-                    'Sublot',
-                    'Credit',
-                ];
 
                 // Initialize jQuery UI autocomplete
                 function initializeAutocomplete() {
@@ -622,9 +656,7 @@
             <script>
                 $(document).ready(function () {
 
-                    var savedAuction = "{{ $car->auction }}"; // Saved auction value
-                    var savedFromState = "{{ $car->from_state }}"; // Saved from_state value
-                    var savedToPortId = "{{ $car->to_port_id }}"; // Saved to_port_id value
+                    var savedAuction = ""; // Saved auction value
 
                     // On page load, trigger fetchFromStates if auction is preloaded
                     if (savedAuction) {
@@ -840,6 +872,7 @@
                                             value: response.shipping_cost
                                         });
                                     }
+
                                 } catch (error) {
                                     console.log("Error updating Alpine store:", error);
                                 }
@@ -875,12 +908,13 @@
                     console.log(alpineComponent.balance_accounting);
                     console.log(alpineComponent.balance_accounting);
 
+
                     // Find if "Shipping cost" already exists in the repeater
                     for (let i = 0; i < alpineComponent.balance_accounting.length; i++) {
                         if (alpineComponent.balance_accounting[i].name === 'Shipping cost') {
                             // Update the existing shipping cost
                             alpineComponent.balance_accounting[i].value = shippingCost;
-                            console.log("Updated Shipping Cost: ", alpineComponent.balance_accounting[i].value);
+
                             shippingFound = true;
                             break;
                         }
@@ -902,8 +936,8 @@
                 $(document).ready(function () {
                     // Predefined suggestions for the name field
                     const predefinedNames = [
-                        'Vehicle cost',
                         'Shipping cost',
+                        'Vehicle cost',
                         'Fee amount',
                         'Insurance cost',
                         'Hybrid',
@@ -916,22 +950,22 @@
                     // Function to add a new balance accounting entry
                     function addEntry() {
                         const entryHtml = `
-            <div class="balance-entry row mb-3">
-                <div class="col-md-5">
-                    <label>Name</label>
-                    <input type="text" class="form-control entry-name" placeholder="Enter name">
-                </div>
-                <div class="col-md-5">
-                    <label>Value</label>
-                    <input type="number" class="form-control entry-value" placeholder="Enter value" value="0">
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-danger remove-entry">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
+        <div class="balance-entry row mb-3">
+            <div class="col-md-5">
+                <label>Name</label>
+                <input type="text" class="form-control entry-name" placeholder="Enter name">
             </div>
-        `;
+            <div class="col-md-5">
+                <label>Value</label>
+                <input type="number" class="form-control entry-value" placeholder="Enter value" value="0">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-danger remove-entry">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
                         $('#balanceAccountingContainer').append(entryHtml);
 
                         // Initialize autocomplete for the new entry with click to trigger suggestions

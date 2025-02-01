@@ -99,6 +99,9 @@
     @session('error')
     <p class="alert alert-danger mb-0">{{ session('error') }}</p>
     @endsession
+    @session('success')
+    <p class="alert alert-success mb-0">{{ session('success') }}</p>
+    @endsession
     @if($errors->any())
         <ul style="all: unset">
             @foreach($errors->all() as $error)

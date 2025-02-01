@@ -325,6 +325,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
     Route::controller(ExtraexpenceController::class)->group(function () {
         route::get('/htmx/get/expenses', 'htmxGetExtraExpense')->name('htmx.get.extraexpense');
+        route::get('/htmx/select/particular/expense', 'htmxinsertExtraExpense')->name('htmx.get.selectextraexpense');
     });
 
     // Manual upload of customers and users OF/From old app
@@ -536,7 +537,9 @@ route::get('/logout', function () {
     session()->regenerateToken();
 });
 
-
+route::get('/tempdir', function () {
+    dd(sys_get_temp_dir());
+});
 
 
 require __DIR__.'/auth.php';

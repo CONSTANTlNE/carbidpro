@@ -380,6 +380,7 @@ class ContainerController extends Controller
 
             // Store the file in 'public/payment_invoice_files' directory
             $path = $payment_file_1->store('payment_file_1', 'public');
+
             // Save the path in the database
             $container->payment_file_1 = $path;
         }

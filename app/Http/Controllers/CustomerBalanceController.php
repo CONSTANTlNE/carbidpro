@@ -24,7 +24,7 @@ class CustomerBalanceController extends Controller
     public function index(Request $request)
     {
         if ($request->has('search') && !empty($request->search)) {
-            $payment_requests = CustomerBalance::with(['customer.cars'])
+            $payment_requests = CustomerBalance::with(['customer.cars', 'media'])
                 ->where('type', 'fill')
                 ->where(function ($query) use ($request) {
                     $query
@@ -45,7 +45,7 @@ class CustomerBalanceController extends Controller
         }
 
 
-        $payment_requests = CustomerBalance::with(['customer.cars'])
+        $payment_requests = CustomerBalance::with(['customer.cars', 'media'])
             ->where('type', 'fill')
             ->orderBy('created_at', 'desc')
             ->paginate(50)
@@ -211,7 +211,7 @@ class CustomerBalanceController extends Controller
 
             // Mail::to(config('carbiddata.email'))->send(new \App\Mail\paymentReport($content));
 
-            return back();
+            return back()->with('success', 'Amount paid for ' . $car->vin);
         }
 
         return back()->with('error', 'Not enough deposit');
@@ -234,6 +234,16 @@ class CustomerBalanceController extends Controller
         $balance->type              = 'fill';
         $balance->comment           = $request->comment;
         $balance->save();
+
+
+        if ($request->hasFile('paymentorder')) {
+
+            $balance->media->first()?->delete();
+
+            $balance->addMediaFromRequest('paymentorder')->toMediaCollection('paymentorder');
+
+        }
+
 
         return back();
     }
@@ -344,8 +354,8 @@ class CustomerBalanceController extends Controller
 
         // Return error message if Payment is more that total amount Due
         if ($car->credit->isNotEmpty()) {
-            $accruedPercent = round((new CreditService())->totalInterestFromLastCalc($car->id));
-            if (round($car->credit->last()->credit_amount + $accruedPercent) < $request->amount) {
+
+            if (  round($car->latestCredit->credit_amount+(new CreditService())->totalInterestFromLastCalc($car->id)) < $request->amount) {
                 return back()->with('error', 'You can not pay more than amount due');
             }
         } else {
@@ -360,6 +370,8 @@ class CustomerBalanceController extends Controller
             ->sum('amount');
 
         if ($deposit >= $request->amount) {
+
+
             $balance              = new CustomerBalance();
             $balance->customer_id = $request->customer_id;
             $balance->car_id      = $request->car_id;
@@ -373,8 +385,10 @@ class CustomerBalanceController extends Controller
             $balance->save();
 
             // If no Credit Given deduct from amount due
+
             if ($car->credit->isEmpty()) {
                 $car->amount_due = $car->amount_due - $request->amount;
+                $car->save();
             }
 
 

@@ -1,45 +1,3 @@
-<div class="row mt-3" id="extraexpense" hx-swap-oob="true">
-    @if(isset($selectedcustomer) && $selectedcustomer->extra_expenses)
-        @php
-
-            // Decode the JSON extra expenses, or default to an empty array if null
-            $customerExtraExpenses = $selectedcustomer->extra_expenses ? json_decode($selectedcustomer->extra_expenses, true) : [];
-        @endphp
-{{--        <form class="d-flex align-middle"--}}
-{{--              hx-get="{{route('htmx.get.selectextraexpense')}}"--}}
-{{--              hx-target="#alpinehtml"--}}
-{{--              hx-vals='{"customer_id": "{{ $selectedcustomer->id }}"}'--}}
-{{--              hx-trigger="change"--}}
-{{--        >--}}
-            @foreach($extra_expenses as $index10 => $extraexpence)
-
-                @php
-//                    dd($extraexpence->name,$customerExpenses);
-                  // Use the collection's firstWhere method to find the expense by name
-                  $foundExpense = collect($customerExtraExpenses)->firstWhere('name', $extraexpence->name);
-                  // If found, get its value; otherwise default to an empty string
-                  $expenseValue = $foundExpense ? $foundExpense['value'] : '';
-                @endphp
-
-                <div class="col-md-2 form-group">
-                    <div class="d-flex align-middle">
-                        <label style="max-width: max-content; cursor: pointer" class="control-label">
-                            {{ $extraexpence->name }}
-{{--                            <input type="checkbox" name="expense_name[]" id="{{ $extraexpence->name }}"--}}
-{{--                                   value="{{ $extraexpence->name }}">--}}
-                            <input type="checkbox" name="{{ $extraexpence->name }}" id="{{ $extraexpence->name }}"
-                                   value="{{ ($match = collect($customerExpenses)->firstWhere('name', $extraexpence->name)) ? $match->value : 0 }}">
-                        </label>
-                    </div>
-                    <input type="text"
-                           class="form-control"
-                           value="{{ $expenseValue }}"
-                           oninput="document.getElementById('{{ $extraexpence->name }}').value = this.value">
-                </div>
-            @endforeach
-{{--        </form>--}}
-    @endif
-</div>
 
 
 <div class="container" id="alpinehtml" hx-swap-oob="true">
@@ -58,13 +16,13 @@
                     <input type="text" :name="`balance_accounting[${index}][name]`"
                            x-model="item.name"
                            class="name-autocomplete form-control"
-                           placeholder="Enter item name" required>
+                           placeholder="Enter item name">
                 </div>
                 <div class="col-md-4">
                     <input type="number"
                            :name="`balance_accounting[${index}][value]`"
                            x-model.number="item.value" class="form-control"
-                           placeholder="Enter item value" required>
+                           placeholder="Enter item value">
                 </div>
                 {{-- DATE--}}
                 <div style="display: none" class="col-md-4">
@@ -120,7 +78,7 @@
     </div>
 </div>
 
-<script id="alpinetarget" hx-swap-oob="true">
+<script id="alpinetarget"  hx-swap-oob="true">
 
     // document.addEventListener('alpine:init', () => {
     //

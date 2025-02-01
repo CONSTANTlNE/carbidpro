@@ -253,16 +253,16 @@ class CarController extends Controller
 //      $car->balance = $request->input('balance');  ?? whyyy????
 
         // Debit changed to total_cost
-        $car->total_cost    = $request->input('total_cost');
+//        $car->total_cost    = $request->input('total_cost');
         $car->car_status_id = $request->input('status');
 
 
-        if ($request->input('payed')) {
-            // At this point percent on credit (if any) is not included
-            $car->amount_due = $request->input('total_cost') - $request->input('payed');
-        } else {
-            $car->amount_due = $request->input('total_cost');
-        }
+//        if ($request->input('payed')) {
+//            // At this point percent on credit (if any) is not included
+//            $car->amount_due = $request->input('total_cost') - $request->input('payed');
+//        } else {
+//            $car->amount_due = $request->input('total_cost');
+//        }
 
 
         // Add Extra expense (which is granted to customer)
@@ -278,15 +278,17 @@ class CarController extends Controller
                 ];
             }
         }
-
         $balanceAccounting = json_encode($balanceAccounting);
-
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
             // Assuming balance_accounting is a JSON field in the database
             $car->balance_accounting = $balanceAccounting;
         }
 
+
+        $sum = array_sum(array_map(fn($item) => $item->value, json_decode($balanceAccounting)));
+        $car->total_cost = $sum;
+        $car->amount_due = $sum;
 
         $car->save();
 
@@ -514,6 +516,7 @@ class CarController extends Controller
         }
 
 
+
         $car->balance_accounting = json_encode($request->input('balance_accounting'));
         $car->customer_id        = $request->input('customer_id');
         $car->make_model_year    = $request->input('make_model_year');
@@ -539,6 +542,7 @@ class CarController extends Controller
         if ($request->filled('payed')) {
             $car->payed = $request->input('payed');
         }
+
         $car->total_cost         = $request->input('total_cost');
         $car->car_status_id      = $request->input('status');
 
@@ -556,19 +560,6 @@ class CarController extends Controller
 
         $car->save();
 
-
-        // update Extra expenses of customer if updated during car update ??
-//        $extraexpenses = Extraexpence::all();
-//        $extraExpenseArray = [];
-//        $customer = Customer::find($request->customer_id);
-//        foreach ($extraexpenses as $extraexpense) {
-//            if ($request->has($extraexpense->name)) {
-//                $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
-//            }
-//        }
-//
-//        $customer->extra_expenses = json_encode($extraExpenseArray);
-//        $customer->save();
 
         return redirect()->route('cars.index')->with('success', 'Car updated successfully.');
     }

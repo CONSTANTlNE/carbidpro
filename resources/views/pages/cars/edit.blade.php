@@ -231,27 +231,29 @@
                                                 </div>
                                                 <div class="row mt-3" id="extraexpense">
                                                     @php
-                                                        $customerextraexpense = json_decode($selectedcustomer->extra_expenses, true);
+                                                        $customerExtraExpenses = json_decode($selectedcustomer->extra_expenses, true);
                                                     @endphp
 
 
                                                     @foreach($extra_expenses as $index10 => $extraexpence)
+                                                        @php
+                                                          $foundExpense = collect($customerExtraExpenses)->firstWhere('name', $extraexpence->name);
+                                                          // If found, get its value; otherwise default to an empty string
+                                                          $expenseValue = $foundExpense ? $foundExpense['value'] : '';
+                                                        @endphp
+
                                                         <div class="col-md-2 form-group">
-                                                            <label class="control-label">{{$extraexpence->name}}</label>
-                                                            <input name="{{$extraexpence->name}}"
-                                                                   type="text"
-                                                                   placeholder=""
-                                                                   disabled
+                                                            <div class="d-flex align-middle">
+                                                                <label style="max-width: max-content;" class="control-label">
+                                                                    {{ $extraexpence->name }}
+                                                                </label>
+                                                            </div>
+                                                            <input type="text"
                                                                    class="form-control"
-                                                                   @if($selectedcustomer->extra_expenses != null)
-                                                                       value="{{array_key_exists($extraexpence->name,$customerextraexpense)?$customerextraexpense[$extraexpence->name]:''}}"
-                                                                    @endif
-                                                            >
+                                                                   value="{{ $expenseValue }}"
+                                                                    disabled>
                                                         </div>
                                                     @endforeach
-
-
-
                                                 </div>
                                             </div>
                                         </div>
@@ -281,14 +283,15 @@
                                                                placeholder="Enter item value">
                                                     </div>
                                                     {{-- DATE--}}
-                                                    <div class="col-md-4">
+                                                    <divgit>
                                                         <input required
+                                                               style="display: none"
                                                                type="date"
                                                                :name="`balance_accounting[${index}][date]`"
                                                                x-model="item.date"
                                                                class="form-control"
                                                                x-init="item.date = item.date || new Date().toISOString().split('T')[0]">
-                                                    </div>
+                                                    </divgit>
                                                     <div class="col-md-2">
                                                         <button type="button" class="btn btn-danger"
                                                                 @click="confirmRemoveField(index)">Remove

@@ -32,9 +32,13 @@
         document.getElementById('carID2').value = {{$car->id}};
 
         // for htmx call for calculating accrued percent and total amount due including accrued percent
+    @if($car->latestCredit)
+            document.getElementById('due').value = {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}
+            document.getElementById('due2').value = {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}
+     @else
         document.getElementById('due').value = {{$car->amount_due}};
         document.getElementById('due2').value = {{$car->amount_due}};
-
+    @endif
         document.getElementById('closeSearch2').click();
 
         // eneable payment date only if car is found
@@ -50,15 +54,10 @@
                 <td style="cursor: pointer" class="mr-1 border">
 
                     @if($car->latestCredit)
-
-                            {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}
-
+                        {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}
                     @else
-
-                            {{$car->amount_due }}
-
+                        {{$car->amount_due }}
                     @endif
-
                 </td>
             </tr>
         @endforeach

@@ -19,19 +19,51 @@ class ExtraexpenceController extends Controller
             $customerExpenses = json_decode($selectedcustomer->extra_expenses);
 
             if ($customerExpenses !== null) {
+
                 foreach ($customerExpenses as $expense) {
                     $expense->date = now()->format('Y-m-d');  // Add date to each expense
                 }
-                $balanceAccounting = $customerExpenses;
+//                $balanceAccounting = $customerExpenses;
+
             } else {
                 return view('pages.htmx.htmxExtraExpenseCustomer', compact('selectedcustomer'));
             }
 
 
+
             return view('pages.htmx.htmxExtraExpenseCustomer',
-                compact('selectedcustomer', 'extra_expenses', 'balanceAccounting'));
+                compact('selectedcustomer', 'extra_expenses', 'customerExpenses'));
         }
 
-        return view('pages.htmx.htmxExtraExpenseCustomer', compact('selectedcustomer'));
+    }
+
+
+    public function htmxinsertExtraExpense(Request $request)
+    {
+
+        $expenseName = $request->expense_name;
+        $selectedcustomer = Customer::where('id', $request->customer_id)->first();
+        $customerExpenses = json_decode($selectedcustomer->extra_expenses);
+
+
+//        dd($expenseName);
+        if ($customerExpenses !== null && $request->expense_name) {
+
+            foreach ($customerExpenses as $expense) {
+                $expense->date = now()->format('Y-m-d');
+            }
+
+            $filteredExpenses = array_filter($customerExpenses, function ($expense) use ($expenseName) {
+                return in_array($expense->name, $expenseName);
+            });
+
+            $balanceAccounting = array_values($filteredExpenses);
+
+
+        } else {
+            return view('pages.htmx.htmxSelectExtraExpense', compact('selectedcustomer'));
+        }
+
+        return view('pages.htmx.htmxSelectExtraExpense', compact('balanceAccounting'));
     }
 }
