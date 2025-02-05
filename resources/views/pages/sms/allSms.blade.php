@@ -61,8 +61,8 @@
 
         {{--Employee Numbers--}}
         <div class="d-flex justify-content-center mt-3">
-            <button type="button" class="btn btn-purple" data-toggle="modal" data-target="#bigmode">New Deposit
-                Numbers
+            <button type="button" class="btn btn-purple" data-toggle="modal" data-target="#bigmode">
+                Finance USER numbers to send deposit notification
             </button>
             <div class="modal fade" id="bigmode" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">

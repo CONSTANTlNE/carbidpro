@@ -41,6 +41,10 @@
     @endif
 </div>
 
+<div class="form-group" id="customercomment" hx-swap-oob="true">
+    <label>Customer Comment</label>
+    <textarea disabled rows="3" class="form-control" id="extraexpense">{{$selectedcustomer->comment}}</textarea>
+</div>
 
 <div class="container" id="alpinehtml" hx-swap-oob="true">
     <div x-data="$store.balanceAccountingStore" class="mt-4">

@@ -28,7 +28,7 @@ class Car extends Model implements HasMedia, Sortable
 
     public function port()
     {
-        return $this->belongsTo(Port::class, 'port_id');
+        return $this->belongsTo(Port::class, 'to_port_id');
     }
 
     public function state()

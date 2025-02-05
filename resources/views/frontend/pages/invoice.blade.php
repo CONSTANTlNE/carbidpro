@@ -129,7 +129,7 @@
                                             @foreach($costs as $key =>$amount)
                                                 <tr class="border-bottom-1">
                                                     <td style="padding-left: 5px!important" class="cs-width_5 cs-primary_color cs-f15">
-                                                        {{$amount['name']}} {{$amount['name']=='Vehicle cost' ? ' - ' . $car->vin : ''}}
+                                                        {{$amount['name']}} {{$amount['name']=='Vehicle cost' ? ' VIN : ' . $car->vin : ''}}
                                                     </td>
                                                     <td  style="padding-right: 5px!important"
                                                             class=" cs-width_2 cs-text_right cs-primary_color cs-f15">$

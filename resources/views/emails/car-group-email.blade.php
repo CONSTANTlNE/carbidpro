@@ -14,7 +14,7 @@
     <ul>
         @foreach ($carGroup as $car)
             <li style="color:rgb(47,85,151)">Vin# {{ $car->vin }} / {{ $car->make_model_year }}
-                ({{ $car->vehicle_owner_name }} {{ $car->owner_id_number }})
+                (Name: {{ $car->vehicle_owner_name }} ID: {{ $car->owner_id_number }})
             </li>
         @endforeach
     </ul>

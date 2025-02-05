@@ -159,6 +159,12 @@
                                                             </div>
                                                         @endforeach
                                                     </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12 form-group">
+                                                            <label class="control-label">Comment</label>
+                                                            <textarea class="form-control" name="comment" id=""  rows="5">{{old('comment')}}</textarea>
+                                                        </div>
+                                                    </div>
 
                                                 </div>
                                                 <div class="modal-footer">
@@ -448,6 +454,12 @@
                                                                                         @endif>
                                                                             </div>
                                                                         @endforeach
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-12 form-group">
+                                                                            <label class="control-label">Comment</label>
+                                                                            <textarea class="form-control" name="comment"   rows="5">{{$customer->comment}}</textarea>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer justify-content-center">

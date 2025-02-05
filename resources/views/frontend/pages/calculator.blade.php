@@ -104,7 +104,7 @@
                 <br>
                 <div class="pricing total">
                     <strong>{{$calculatorStatics['TOTAL']}}:</strong>
-                    <span id="total"></span>
+                    <span style="margin-right: 20px" id="total"></span>
                     <span id="total_original" style="display: none"></span>
                 </div>
                 <div class="direct mt-2" style="display: none">
@@ -119,8 +119,19 @@
                     </div>
                     <hr style="width: 100%;">
                     <div class="location">
-                        <div class="icon port-icon">
-                            <img src="https://cdn.icon-icons.com/icons2/1468/PNG/512/ship_101088.png" alt="ship">
+                        <div class="icon port-icon text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512">
+                                <mask id="a">
+                                    <circle cx="256" cy="256" r="256" fill="#fff"/>
+                                </mask>
+                                <g mask="url(#a)">
+                                    <path fill="#eee"
+                                          d="M0 0h224l32 32 32-32h224v224l-32 32 32 32v224H288l-32-32-32 32H0V288l32-32-32-32Z"/>
+                                    <path fill="#d80027"
+                                          d="M224 0v224H0v64h224v224h64V288h224v-64H288V0h-64zm-96 96v32H96v32h32v32h32v-32h32v-32h-32V96h-32zm224 0v32h-32v32h32v32h32v-32h32v-32h-32V96h-32zM128 320v32H96v32h32v32h32v-32h32v-32h-32v-32h-32zm224 0v32h-32v32h32v32h32v-32h32v-32h-32v-32h-32z"/>
+                                </g>
+                            </svg>
+                            {{--                            <img src="https://cdn.icon-icons.com/icons2/1468/PNG/512/ship_101088.png" alt="ship">--}}
                             <div>
                                 <div id="portname">Portname</div>
                             </div>
@@ -129,7 +140,7 @@
                     </div>
                 </div>
                 @if($user->extra_expenses != null)
-                    <div class="d-flex flex-column mt-3 ">
+                    <div  class="d-flex flex-column mt-3  ">
                         @php
                             $extras=json_decode($user->extra_expenses);
 
@@ -159,27 +170,33 @@
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
             crossorigin="anonymous"></script>
     <script>
+
+        // Calculate Customers extra expenses and add to shipping price
         let totalextras = 0;
 
         @if($user->extra_expenses != null)
-
         const extras = {!!$user->extra_expenses !!};
         console.log(extras);
 
         const checkboxes = document.querySelectorAll('.extra-checkbox');
         checkboxes.forEach((checkbox) => {
             checkbox.addEventListener('change', function () {
-                const value = parseFloat(this.value);
+                let value = parseFloat(this.value);
+
                 if (this.checked) {
                     totalextras += value;
                 } else {
                     totalextras -= value;
                 }
-                console.log(totalextras);
+                setTimeout(() => {
+                    document.getElementById('calculate').click();
+                }, 100)
+
             });
         });
         @endif
 
+        // Calculate Shipping price
 
         $(document).ready(function () {
             // Fetch auction data from the database using AJAX
@@ -357,59 +374,6 @@
                 });
             });
 
-
-            // $('input[name="loadtype"]').on('change', function() {
-            //     var total_original = $('#total_original').text();
-
-            //     $('#total').text(parseInt(total_original))
-            //     var current = $('#total').text();
-            //     $('#total').text('')
-            //     var loadtype = $('input[name="loadtype"]:checked').val();
-            //     $('#total').text(parseInt(current) + parseInt(loadtype));
-            // });
-
-            // $('#AucPortCitySelect').on('change', function() {
-            //     $.ajax({
-            //         url: "{{ route('calculate') }}", // Replace with your actual route name
-            //         method: 'POST',
-            //         data: {
-            //             country_port: $('#AucPortCitySelect').val(),
-            //             auction_id: $('#AuctionSelect').val(),
-            //             location_id: $('#AucLocationsSelect').val(),
-            //             port_id: $('#AucPortSelect').val(),
-            //             loadtype: $('input[name="loadtype"]:checked').val(),
-            //         },
-            //         headers: {
-            //             'X-CSRF-TOKEN': csrf_token
-            //         },
-
-            //         success: function(data) {
-
-            //             $('#ground_rate').text(data.ground_rate);
-            //             $('#total').text(data.total);
-            //             $('#total_original').text(data.total);
-
-            //             jQuery('.direct').fadeIn()
-            //             $('#cityname').text($("#AucLocationsSelect option:selected").text());
-            //             $('#portname').text($("#AucPortCitySelect option:selected").text());
-
-
-            //             // // Update auction select options based on received data
-            //             // $('#AucPortCitySelect').append(
-            //             //     `<option value="-1">Select Port/City</option>`
-            //             // );
-            //             // data.forEach(function(location) {
-            //             //     $('#AucPortCitySelect').append(
-            //             //         `<option value="${location.id}">${location.name}</option>`
-            //             //     );
-            //             // });
-
-
-            //         }
-            //     });
-            // });
-
-
-        }); // End of $(document).ready
+        });
     </script>
 @endsection

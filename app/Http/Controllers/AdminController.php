@@ -180,7 +180,8 @@ class AdminController extends Controller
             $customer->unhashed_password = $request->input('password');
         }
         $customer->number_of_cars = $request->input('number_of_cars');
-        $customer->is_active      = 1;
+        $customer->comment          = $request->input('comment');
+
 
 
         $extraExpenseArray=[];

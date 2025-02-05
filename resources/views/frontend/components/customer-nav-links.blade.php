@@ -1,16 +1,16 @@
 <div class="row justify-content-center">
     <div class="col-lg-12">
         <div class="d-flex mt-4 justify-content-between align-middle flex-column flex-md-row">
+
             <ul style="padding-left: 0">
                 <li class="tabs__item ">
                     <form class="m-auto m-md-0" action="{{route('generate.link')}}" target="_blank">
                         <input type="hidden" name="customer_id" value="{{auth()->user()->id}}">
-                        <button style="all: unset;cursor: pointer"
-                                class="m-auto m-md-0 ">
+                        <button style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;cursor: pointer"
+                                class="m-auto m-md-0">
                             Old Version
                         </button>
                     </form>
-
                 </li>
                 <li class="tabs__item ">
                     <a href="{{ route('customer.dashboard') }}"

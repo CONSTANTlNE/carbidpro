@@ -192,7 +192,8 @@ use Carbon\Carbon  ;
                                                     <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
                                                 @elseif($index2-1>=0)
                                                     <td style="min-width: 100px"
-                                                        class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                        class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}
+                                                    </td>
                                                 @endif
                                                 @if($index2-1>=0)
                                                     <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>

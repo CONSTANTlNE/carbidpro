@@ -367,6 +367,26 @@
 
                                         </div>
                                     </div>
+                                    {{-- red green defaulr color--}}
+                                    <div class="container mb-3">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;border-radius: 20px;text-align: center" class="border">
+                                                    <input @checked($car->record_color===null)  type="radio" name="record_color" value=" "> No Color
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;color:white;border-radius: 20px;text-align: center;background: green">
+                                                    <input  @checked($car->record_color=='#82f98261') type="radio" name="record_color" value="#82f98261"> Green
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;background:red;border-radius: 20px;text-align: center;color:white">
+                                                    <input @checked($car->record_color=='#F6CBCC') type="radio" name="record_color" value="#F6CBCC"> Red
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="form-group" style="max-width: 100%">
                                         <label>Container #</label><br>

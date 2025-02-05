@@ -90,7 +90,6 @@
                                             @php
                                                 $hasError = '';
                                                 $groupCount = isset($groups) && is_object($groups) ? count($groups) : $status->container_status_count; // Ensure $groups is valid and countable
-
                                             @endphp
                                             @if (auth()->user()->hasRole('Finance') && $status->slug == 'loaded-payments')
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"
@@ -110,16 +109,13 @@
 
                                     <div>
                                         <form class="form-inline my-2 my-lg-0" method="GET">
-
                                             <input class="form-control mr-sm-2"
                                                 value="{{ isset($_GET['search']) ? $_GET['search'] : '' }}"
                                                 name="search" type="search" placeholder="Search" aria-label="Search">
                                             <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
                                         </form>
                                     </div>
-
                                 </div>
-
                             </div>
 
 

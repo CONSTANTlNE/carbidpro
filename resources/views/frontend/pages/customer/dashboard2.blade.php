@@ -99,7 +99,11 @@ $creditService = new CreditService();
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
                 <h2 style="margin-top: 80px;padding: 0;">
+                    @if(request()->routeIs('customer.dashboard'))
                     {{$dashboardStatics['Car list']}}
+                    @elseif(request()->routeIs('customer.archivedcars'))
+                        {{$dashboardStatics['Car History']}}
+                    @endif
                 </h2>
             </div>
         </div>
@@ -145,7 +149,7 @@ $creditService = new CreditService();
                         @endphp
 
                         @foreach ($cars as $key => $car)
-                            {{--Calculate Total Amount Due--}}
+                            {{--Calculate Total Amount Due of all cars--}}
                             @if($car->latestCredit)
                                 @php
                                     $totalAmountDue = $totalAmountDue +  round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
@@ -156,18 +160,27 @@ $creditService = new CreditService();
                                 @endphp
                             @endif
 
-
                             @php
                                 $createdDate = \Carbon\Carbon::parse($car->created_at);
                                 $currentDate = \Carbon\Carbon::now();
                                 $differenceInDays = $createdDate->diffInDays($currentDate);
 
-                                if ((isset($balance) && $balance <= 0) || $car->total_cost <= 0) {
-                                    $color = '#82f98261';
-                                } else {
-                                    $color = $car->color;
-                                }
+
+                                    // amount due calclulation for car
+                                      if($car->latestCredit){
+                                       $amountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id));
+                                        }else {
+                                           $amountDue=  round($car->amount_due);
+                                        }
+
+                                      // tr Colors
+                                      if ($amountDue<1 && $car->record_color!=='#F6CBCC'){
+                                            $color = '#82f98261';
+                                      } else {
+                                          $color = $car->record_color;
+                                      }
                             @endphp
+
                             <tr style="background-color: {{ $color }}" class="text-center">
                                 <td style="font-size: 14px;min-width: 90px"
                                     class="text-center">
@@ -343,13 +356,8 @@ $creditService = new CreditService();
                                             </div>
                                             {{-- Amount Due on car--}}
                                             <div style="font-size: 15px;width: 150px ">
-
                                                 <span class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}} :</span>
-                                                @if($car->latestCredit)
-                                                    <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
-                                                @else
-                                                    <span style="color:red">${{round( $car->amount_due) }}</span>
-                                                @endif
+                                                <span style="color:red">${{$amountDue}}</span>
                                             </div>
                                         </td>
                                     @endif
@@ -445,7 +453,7 @@ $creditService = new CreditService();
                                                                         <td class="p-1  text-center">{{round($credit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</td>
                                                                         <td></td>
                                                                         <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                                        <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
+                                                                        <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id)) }}</td>
                                                                         <td></td>
                                                                         <td></td>
                                                                     </tr>
@@ -494,18 +502,16 @@ $creditService = new CreditService();
                                     </td>
                                 @endif
                             </tr>
-{{--                            @if($loop->last)--}}
-{{--                                <div class="w-100 d-flex justify-content-center">--}}
-{{--                                    <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
+                            {{--                            @if($loop->last)--}}
+                            {{--                                <div class="w-100 d-flex justify-content-center">--}}
+                            {{--                                    <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>--}}
+                            {{--                                </div>--}}
+                            {{--                            @endif--}}
                         @endforeach
-
                         </tbody>
-
                     </table>
                 </div>
-                <div class="w-100 d-flex justify-content-center">
+                <div class="w-100 d-flex justify-content-end">
                     <p class="btn btn-danger">Total Amount Due: {{$totalAmountDue}} $</p>
                 </div>
                 <br>

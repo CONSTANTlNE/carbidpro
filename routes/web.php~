@@ -156,7 +156,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
 //        Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
         Route::get('/containers/htmx/select/car', 'htmxSelectCar')->name(name: 'container.htmx.select.car');
-        Route::get('/containers/htmx/select/car2', 'htmxSelectForReplaceCar')->name(name: 'container.htmx.select.car2');
+        Route::get('/containers/htmx/select/car', 'htmxSelectForReplaceCar')->name(name: 'container.htmx.select.car2');
     });
 
     Route::controller(ArrivedController::class)->group(function () {

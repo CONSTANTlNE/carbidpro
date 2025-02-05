@@ -250,6 +250,7 @@ class CarController extends Controller
         $car->container_number   = $request->input('container_number');
         $car->warehouse          = $request->input('warehouse');
         $car->comment            = $request->input('comment');
+        $car->record_color       = $request->input('record_color');
 //      $car->balance = $request->input('balance');  ?? whyyy????
 
         // Debit changed to total_cost
@@ -348,7 +349,7 @@ class CarController extends Controller
         (new smsService())->newCarAdded($phone, $car);
 
         // Redirect or return a response after saving
-        return redirect()->route('cars.index')->with('success', 'Car created successfully.');
+        return redirect()->route('car.edit', $car->id)->with('success', 'Car updated successfully.');
     }
 
     public function showStatus($slug, Request $request)
@@ -539,6 +540,9 @@ class CarController extends Controller
         $car->warehouse          = $request->input('warehouse');
         $car->comment            = $request->input('comment');
         $car->balance            = $request->input('balance');
+        $car->record_color       = $request->input('record_color');
+
+
         if ($request->filled('payed')) {
             $car->payed = $request->input('payed');
         }

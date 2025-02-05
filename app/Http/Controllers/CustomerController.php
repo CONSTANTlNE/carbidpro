@@ -160,8 +160,7 @@ class CustomerController extends Controller
         $car = Car::where('vin', $vin)->first();
 
         // Let's get some media.
-        $downloads = $car->getMedia();
-
+        $downloads = $car->getMedia('images');
 
         // Download the files associated with the media in a streamed way.
         // No prob if your files are very large.
@@ -616,6 +615,7 @@ class CustomerController extends Controller
             $customer->child_of          = $current->id; // assign main dealer ID as parent if subdealer is registered by a main dealer
             // Extra is a Dealer profit added for subdealer transactions or we can set manually and give either discount or different price for particular dealers
             $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
+            $customer->comment          = $request->input('comment');
             $customer->save();
 
             $customer->save();

@@ -19,4 +19,9 @@ class ContainerGroup extends Model  implements HasMedia
         return $this->belongsToMany(Car::class, 'container_group_container');
     }
 
+    public function port(){
+        return $this->belongsTo(Port::class, 'to_port_id');
+
+    }
+
 }

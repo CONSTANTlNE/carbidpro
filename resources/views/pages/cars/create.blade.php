@@ -96,6 +96,10 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <div class="form-group" id="customercomment">
+                                                <label>Customer Comment</label>
+                                                <textarea disabled rows="3" class="form-control" id="extraexpense"></textarea>
+                                            </div>
 
                                             <div class="form-group">
                                                 <label>Broker</label>
@@ -376,6 +380,27 @@
 
                                         </div>
                                     </div>
+                                    {{-- red green defaulr color--}}
+                                    <div class="container mb-3">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;border-radius: 20px;text-align: center" class="border">
+                                                    <input checked  type="radio" name="record_color" value=" "> No Color
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;color:white;border-radius: 20px;text-align: center;background: green">
+                                                    <input type="radio" name="record_color" value="#82f98261"> Green
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label style="padding: 10px;background:red;border-radius: 20px;text-align: center;color:white">
+                                                    <input  type="radio" name="record_color" value="#F6CBCC"> Red
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
 
                                     <div class="form-group" style="max-width: 100%">
                                         <label>Container #</label><br>
@@ -615,10 +640,14 @@
 
                 $(function () {
                     var availableWarehouse = [
-                        'TRT - New Jersey',
-                        'TRT - TX Texas',
-                        'TRT - CA California',
-                        'TRT - GA Georgia',
+                        // 'TRT - New Jersey',
+                        // 'TRT - TX Texas',
+                        // 'TRT - CA California',
+                        // 'TRT - GA Georgia',
+                        'TRT - GA 31326',
+                        'TRT - CA 90248',
+                        'TRT - NJ 07114',
+                        'TRT - TX 77571'
                     ];
 
                     $("#warehouse").autocomplete({

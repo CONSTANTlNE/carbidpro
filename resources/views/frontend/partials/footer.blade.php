@@ -52,7 +52,7 @@
 
   <!-- Start of Footer section
                                                  ============================================= -->
-  <footer id="ft-footer" class="ft-footer-section">
+  <footer @if(request()->routeIs('calculator.index')) style="margin-top: 90px!important;" @endif id="ft-footer" class="ft-footer-section">
       <div class="container">
           <div class="ft-footer-copywrite-1 text-center">
               <span>Copyright @ 2024 {{ Cache::get('footerStatics' . session()->get('locale'))['All Rights Reserved'] }} | <a href="/terms-and-conditions"
