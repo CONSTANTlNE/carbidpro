@@ -278,4 +278,11 @@ class CreditService
             }
         }
     }
+
+
+    public function totalCreditRecalc($car){
+
+
+
+    }
 }

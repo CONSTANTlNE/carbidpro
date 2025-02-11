@@ -47,7 +47,6 @@
                       method="post">
                     @csrf
                     <div style="text-align: right ">
-
                         <div class="d-flex flex-column flex-md-row justify-content-between text-center gap-2">
                             <div>
                                 <label style="font-size: 14px"
@@ -63,9 +62,10 @@
                         </div>
                         <div class="d-flex flex-column flex-md-row justify-content-between text-center gap-2 mt-2">
                             <div>
-                                <label style="font-size: 14px"
-                                       for="full_name">{{Cache::get('dashboardStatics' . session()->get('locale'))['Sender']}}
-                                    ({{Cache::get('dashboardStatics' . session()->get('locale'))['Full Name']}})</label>
+                                <label style="font-size: 14px" for="full_name">
+                                    {{Cache::get('dashboardStatics' . session()->get('locale'))['Sender']}}
+                                    ({{Cache::get('dashboardStatics' . session()->get('locale'))['Full Name']}})
+                                </label>
                                 <br class="hideBr">
                                 <input style="width: 200px;margin-left: 7px" id="full_name" type="text"
                                        name="full_name">
@@ -89,6 +89,27 @@
                     </div>
                 </form>
 
+                {{--  ===============  Transfer to old account  ================  --}}
+                @if(auth()->user()->newwebsitecustomer===0)
+                    <div style="text-align: right ">
+                        <form action="{{route('transfer.to.old')}}">
+                            <div class="d-flex flex-column flex-md-row justify-content-between text-center gap-2 mt-2">
+                                <div>
+                                    <label style="font-size: 14px"
+                                           for="full_name">
+                                        Transfer Deposit to Old
+                                    </label>
+                                    <br class="hideBr">
+                                    <input style="width: 200px;margin-left: 7px" id="full_name" type="text"
+                                           name="amount">
+                                </div>
+                                <button style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;">
+                                    Transfer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

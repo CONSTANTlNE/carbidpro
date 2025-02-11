@@ -82,13 +82,61 @@
                                 <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
                             </select>
                         </td>
-                        <td>
+                        <td style="display: flex;flex-direction: column;gap: 10px">
                             <!-- Button to open the modal -->
                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                 data-target="#imageUploadModal-{{ $car->id }}"
                                 data-record-id="{{ $car->id }}">
-                                Upload
+                                Upload Car Photo
                             </button>
+
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#blimage{{ $car->id }}">
+                                Upload BL Photo
+                            </button>
+                            <!-- Modal  BL Images -->
+
+                            <div class="modal fade" id="blimage{{ $car->id }}" tabindex="-1"
+                                 role="dialog" aria-labelledby="blimage" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"> BL Images</h5>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Hidden input to pass the car ID -->
+                                            <input type="hidden" value="{{ $car->id }}" name="car_id"
+                                                   id="recordIdInput">
+
+                                            <!-- FilePond input for multiple image uploads -->
+                                            <input type="file" data-car_id="{{ $car->id }}" class="filepond2"
+                                                   id="filepond" name="images[]" multiple>
+
+                                            <!-- Section to display existing images -->
+                                            @if ($car->getMedia('images')->isNotEmpty())
+                                                <div class="existing-images mt-4">
+                                                    <h6>Existing Images</h6>
+                                                    <div class="row mt-2">
+                                                        @foreach ($car->getMedia('bl_images') as $image)
+                                                            <div class="col-md-3">
+                                                                <div class="image-thumbnail mb-2">
+                                                                    <img src="{{ $image->getUrl() }}" class="img-fluid"
+                                                                         style="max-height: 100px; object-fit: cover;"
+                                                                         alt="Uploaded Image">
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Modal for FilePond upload -->
                             <div class="modal fade" id="imageUploadModal-{{ $car->id }}" tabindex="-1"
@@ -96,7 +144,7 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Upload Images</h5>
+                                            <h5 class="modal-title">Car Images</h5>
                                             <button type="button" class="close" data-dismiss="modal"
                                                 aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -238,6 +286,63 @@
                         revert: null, // Revert uploaded image if necessary
                     }
                 });
+
+
+                // Disable submit button initially
+
+                // Enable submit button only when files are added
+                // pond.on('addfile', (error, file) => {
+                //     if (!error) {
+                //         submitBtn.prop('disabled', false);
+                //     }
+                // });
+
+                // // Disable submit button when no files are present
+                // pond.on('removefile', () => {
+                //     if (pond.getFiles().length === 0) {
+                //         submitBtn.prop('disabled', true);
+                //     }
+                // });
+            });
+
+
+
+            //  Upload Bl images
+            const inputElements2 = document.querySelectorAll('.filepond2');
+
+            // Iterate over each input element and initialize FilePond
+            inputElements2.forEach(function(inputElement2) {
+                // Get the car_id from each input element
+                const carId = inputElement2.getAttribute('data-car_id');
+                const submitBtn = $('#submit-btn-' + carId);
+
+                // Initialize FilePond for each input element
+                const pond = FilePond.create(inputElement2, {
+                    allowMultiple: true, // Allow multiple file uploads
+                    maxFiles: 15, // Limit to 15 files
+                    acceptedFileTypes: ['image/*'], // Only accept image files
+                    maxFileSize: '10MB', // Maximum file size of 10MB
+
+                    // FilePond server configuration
+                    server: {
+                        process: {
+                            url: '{{ route('upload.bl.images') }}',
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            // Add extra data (car_id) to the request
+                            ondata: (formData) => {
+                                formData.append('car_id', carId);
+                                return formData;
+                            },
+                            onload: (response) => console.log('Upload successful!', response),
+                            onerror: (response) => console.error('Upload error:', response)
+                        },
+                        revert: null, // Revert uploaded image if necessary
+                    }
+                });
+
 
                 // Disable submit button initially
 

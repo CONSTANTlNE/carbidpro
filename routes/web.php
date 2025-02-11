@@ -28,6 +28,7 @@ use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UserController;
 use App\Models\Car;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
 use App\Models\SmsDraft;
 use App\Models\State;
 use App\Models\User;
@@ -37,7 +38,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
 
-
+// Just example not using in this project .. but using in old
 Route::get('/oldversionlogin', function ( Illuminate\Http\Request $request) {
 
     $token = $request->get('token');
@@ -138,6 +139,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     Route::post('/upload-images', [ImageUploadController::class, 'store'])->name('upload.images.spatie');
+    Route::post('/upload-images2', [ImageUploadController::class, 'storeBlImages'])->name('upload.bl.images');
 
     // Containers
     Route::controller(ContainerController::class)->group(function () {
@@ -269,10 +271,11 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Credit
     Route::controller(CreditController::class)->group(function () {
         Route::post('/give.credit', 'giveCredit')->name('give.credit');
+        Route::post('/total-recalculation', 'totalRecalc')->name('credit.total.recalc');
     });
 
     // SMS
-    Route::controller(SmsController::Class)->group(function (){
+    Route::controller(SmsController::class)->group(function (){
 
         Route::get('/sms/drafts','drafts')->name('sms.drafts');
         Route::post('/sms/drafts/save','storeDraft')->name('sms.drafts.store');
@@ -455,16 +458,72 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
         // Dealer pays for a particular car from General balance
         Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
+
     });
 
     route::controller(InvoiceController::Class)->group(function (){
         Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
     });
 
+
+
+    // Make deposit transfer call to Old Website
+    Route::get('/transfer/deposit', function (Request $request) {
+
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if ($request->has('customer_id')){
+            $user = $request->get('customer_id');
+        } else{
+            $user = auth()->user()->id;
+        }
+
+        $deposit = CustomerBalance::where('customer_id',$user)
+            ->where('is_approved', 1)
+            ->sum('amount');
+
+        if ($deposit < $request->amount) {
+            return back()->with('error', 'Not enough deposit');
+        }
+
+        $transferAmount=new CustomerBalance();
+        $transferAmount->customer_id=$user;
+        $transferAmount->amount=-$request->amount;
+        $transferAmount->date=now()->toDateString();
+        $transferAmount->type='transfer_to_old_account';
+        $transferAmount->is_approved=1;
+        $transferAmount->save();
+
+
+        // Generate token
+        $payload = [
+            'id' => $user,
+            'timestamp' => now()->timestamp
+        ];
+
+
+        $sharedSecret = env('CARBID_SECRET'); // A shared key between both apps
+        $token = base64_encode(json_encode($payload)); // Base64 encode for easy transmission
+        $signature = hash_hmac('sha256', $token, $sharedSecret); // Sign the token
+        $amount=$request->amount;
+
+//        $amount=500;
+
+//        $oldSite = 'https://oldcarbidpro.ews.ge.test/transferamountfromnew?token=' . urlencode($token) . '&signature=' . urlencode($signature) . '&amount=' . $amount;
+        $oldSite = 'https://old.carbidpro.com/transferamountfromnew?token=' . urlencode($token) . '&signature=' . urlencode($signature) . '&amount=' . $amount;
+
+        return  redirect()->to($oldSite);
+
+    })->name('transfer.to.old');
+
+
 });
 
-// Old Website Authorization
 
+
+//   authorize from this app to  Old Website
 Route::middleware('auth')->group(function () {
     Route::get('/generate-link', function (Request $request) {
         if ($request->has('customer_id')){
@@ -483,11 +542,13 @@ Route::middleware('auth')->group(function () {
         $token = base64_encode(json_encode($payload)); // Base64 encode for easy transmission
         $signature = hash_hmac('sha256', $token, $sharedSecret); // Sign the token
 
-        $oldSite = 'https://carbidpro.com/oldversionlogin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
+        $oldSite = 'https://old.carbidpro.com/oldversionlogin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
 
         return  redirect()->to($oldSite);
 
     })->name('generate.link');
+
+
 });
 
 
@@ -540,9 +601,6 @@ route::get('/logout', function () {
     session()->regenerateToken();
 });
 
-route::get('/tempdir', function () {
-    dd(sys_get_temp_dir());
-});
 
 
 require __DIR__.'/auth.php';

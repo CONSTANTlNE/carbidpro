@@ -16,7 +16,7 @@
             <span class="sr-only">Toggle navigation</span>
             <span class="pe-7s-angle-left-circle"></span>
         </a>
-
+           <p style="color: white">{{auth()->user()->name}} - {{auth()->user()->role}}</p>
         <div class="collapse navbar-collapse navbar-custom-menu">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown notifications-menu">

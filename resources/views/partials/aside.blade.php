@@ -133,7 +133,7 @@
                 </li>
             @endrole
 
-            @hasanyrole('Admin|Terminal Agent')
+            @hasanyrole('Admin|Terminal Agent|Developer')
                 <li class="">
                     <a href="{{ route('arrived.index') }}">
                         <i class="fa fa-anchor"></i><span>Arrived</span>

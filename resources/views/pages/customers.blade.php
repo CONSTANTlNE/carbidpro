@@ -292,23 +292,27 @@
                                             <td>{{$customers->where('id',$customer->child_of)->first()?->contact_name}}</td>
                                             <td>{{$customer->extra_for_team}}</td>
                                             <td>
+                                                @if($customer->newwebsitecustomer===1)
                                                 <form action="{{route('customers.autologin')}}" method="post"
                                                       target="_blank">
                                                     @csrf
                                                     <input type="hidden" name="customer_id" value="{{$customer->id}}">
-                                                    <button class="btn btn-primary">Login
-                                                        @if($customer->created_at < now())
-                                                            (new)
-                                                        @endif
-                                                    </button>
+                                                    <button class="btn btn-info btn-rounded w-md m-b-5">Login(new) </button>
                                                 </form>
-                                                @if($customer->created_at < now())
+                                                @else
+                                                    <form action="{{route('customers.autologin')}}" method="post"
+                                                          target="_blank">
+                                                        @csrf
+                                                        <input type="hidden" name="customer_id" value="{{$customer->id}}">
+                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new) </button>
+                                                    </form>
+
                                                     <form action="{{route('generate.link')}}" method="get"
                                                           target="_blank" class="mt-3">
                                                         @csrf
                                                         <input type="hidden" name="customer_id"
                                                                value="{{$customer->id}}">
-                                                        <button class="btn btn-primary">Login (old)</button>
+                                                        <button class="btn btn-purple btn-rounded w-md m-b-5">Login (old)</button>
                                                     </form>
                                                 @endif
                                             </td>

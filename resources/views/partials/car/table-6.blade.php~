@@ -1,8 +1,7 @@
 @push('css')
     <!-- FilePond CSS -->
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
-          rel="stylesheet"/>
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
 
     <style>
         .existing-images img {
@@ -17,91 +16,88 @@
 <div class="table-responsive">
     <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
         <thead class="back_table_color">
-        <tr class="info">
-            <th>ID</th>
-            <th>CAR INFO</th>
-            <th>FROM-TO</th>
+            <tr class="info">
+                <th>ID</th>
+                <th>CAR INFO</th>
+                <th>FROM-TO</th>
 
-            <th>Price</th>
-            <th>Carrier</th>
+                <th>Price</th>
+                <th>Carrier</th>
 
-            <th>Pickup & Delivery Dates</th>
-            <th>Title</th>
-            <th>Photos</th>
-            <th>Payment Info</th>
-            <th>Action</th>
-        </tr>
+                <th>Pickup & Delivery Dates</th>
+                <th>Title</th>
+                <th>Photos</th>
+                <th>Payment Info </th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
-        @foreach ($cars as $car)
-            @if ($car->title == 'yes' && $car->title_delivery == 'no')
-                <script>
-                    var isEmpty = true;
-                </script>
-            @elseif(!$car->getMedia('images')->isNotEmpty())
-                <script>
-                    var isEmpty = true;
-                </script>
-            @else
-                <script>
-                    var isEmpty = false;
-                </script>
-            @endif
-            <tr>
-
-                <td>
-                    {{ $car->id }}</td>
-                <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
-                <form action="{{ route('car.listupdate', $car->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="status"
-                           value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                    <td>@include('partials.car.table_content-parts.field-from')</td>
-                    <td>
-                        @include('partials.car.table_content-parts.car-price')
-                    </td>
-                    <td>
-                        <label for="company_name">Company name:</label><br>
-                        {{ $car->company_name }}
-                        <br>
-                        <label for="contact_info">Contact info:</label><br>
-                        {{ $car->contact_info }}
-                    </td>
+            @foreach ($cars as $car)
+                @if ($car->title == 'yes' && $car->title_delivery == 'no')
+                    <script>
+                        var isEmpty = true;
+                    </script>
+                @elseif(!$car->getMedia('images')->isNotEmpty())
+                    <script>
+                        var isEmpty = true;
+                    </script>
+                @else
+                    <script>
+                        var isEmpty = false;
+                    </script>
+                @endif
+                <tr>
 
                     <td>
-                        <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
-                               name="pickup_dates" class="form-control daterange"/>
-                    </td>
-                    <td>
-                        <label style="margin: 0;padding:0">T/status</label>
-                        <br>
-                        <span> {{ $car->title }}</span>
+                        {{ $car->id }}</td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
+                    <form action="{{ route('car.listupdate', $car->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="status"
+                            value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
+                        <td>@include('partials.car.table_content-parts.field-from')</td>
+                        <td>
+                            @include('partials.car.table_content-parts.car-price')
+                        </td>
+                        <td>
+                            <label for="company_name">Company name:</label><br>
+                            {{ $car->company_name }}
+                            <br>
+                            <label for="contact_info">Contact info:</label><br>
+                            {{ $car->contact_info }}
+                        </td>
 
-                        <label class="mt-2" for="title_delivery">T/delivery</label>
-                        <select name="title_delivery"
+                        <td>
+                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange" />
+                        </td>
+                        <td>
+                            <label style="margin: 0;padding:0">T/status</label>
+                            <br>
+                            <span> {{ $car->title }}</span>
+
+                            <label class="mt-2" for="title_delivery">T/delivery</label>
+                            <select name="title_delivery"
                                 class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
-                            <option value=""></option>
-                            <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
-                            </option>
-                            <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
-                        </select>
-                    </td>
+                                <option value=""></option>
+                                <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
+                                </option>
+                                <option value="no" {{ $car->title_delivery == 'no' ? 'selected' : '' }}>NO</option>
+                            </select>
+                        </td>
 
 
-                    <td>
-                        <div style="display: flex;flex-direction: column;gap: 10px; justify-content: center;height: 100%!important">
+                        <td style="display: flex;flex-direction: column;gap: 10px">
                             <!-- Button to open the modal -->
                             <button type="button"
-                                    class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
-                                    data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
-                                    data-record-id="{{ $car->id }}">
+                                class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
+                                data-record-id="{{ $car->id }}">
                                 Upload Car Photo
                             </button>
 
-                            <button type="button"
-                                    class="btn  btn-sm  {{ !$car->getMedia('bl_images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
-                                    data-toggle="modal"
+                            <button type="button" class="btn  btn-sm  {{ !$car->getMedia('bl_images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}" data-toggle="modal"
                                     data-target="#blimage{{ $car->id }}">
                                 Upload BL Photo
                             </button>
@@ -150,24 +146,25 @@
                             </div>
                             <!-- Modal for FilePond upload -->
                             <div class="modal fade" id="imageUploadModal-{{ $car->id }}" tabindex="-1"
-                                 role="dialog" aria-labelledby="imageUploadModalLabel" aria-hidden="true">
+                                role="dialog" aria-labelledby="imageUploadModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title">Car Images</h5>
                                             <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
+                                                aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
                                         <div class="modal-body">
                                             <!-- Hidden input to pass the car ID -->
                                             <input type="hidden" value="{{ $car->id }}" name="car_id"
-                                                   id="recordIdInput">
+                                                id="recordIdInput">
 
                                             <!-- FilePond input for multiple image uploads -->
                                             <input type="file" data-car_id="{{ $car->id }}" class="filepond"
-                                                   id="filepond" name="images[]" multiple>
+                                                id="filepond" name="images[]" multiple>
+
 
 
                                             <!-- Section to display existing images -->
@@ -179,8 +176,8 @@
                                                             <div class="col-md-3">
                                                                 <div class="image-thumbnail mb-2">
                                                                     <img src="{{ $image->getUrl() }}" class="img-fluid"
-                                                                         style="max-height: 100px; object-fit: cover;"
-                                                                         alt="Uploaded Image">
+                                                                        style="max-height: 100px; object-fit: cover;"
+                                                                        alt="Uploaded Image">
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -191,71 +188,70 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
 
-                    <td>
-                        <label for="payment_method">Payment method</label>
-                        <select name="payment_method" id="payment_method" class="form-control" required>
-                            <option value=""></option>
-                            <option value="zelle" {{ $car->payment_method == 'zelle' ? 'selected' : '' }}>Zelle
-                            </option>
-                            <option value="check" {{ $car->payment_method == 'check' ? 'selected' : '' }}>Check
-                            </option>
-                            <option value="bank" {{ $car->payment_method == 'bank' ? 'selected' : '' }}>Bank
-                                transfer
-                            </option>
-                        </select>
+                        </td>
 
-                        <label for="payment_company">Company Name</label>
-                        <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
-                               name="payment_company" id="payment_company" class="mt-1 form-control" required>
+                        <td>
+                            <label for="payment_method">Payment method</label>
+                            <select name="payment_method" id="payment_method" class="form-control" required>
+                                <option value=""></option>
+                                <option value="zelle" {{ $car->payment_method == 'zelle' ? 'selected' : '' }}>Zelle
+                                </option>
+                                <option value="check" {{ $car->payment_method == 'check' ? 'selected' : '' }}>Check
+                                </option>
+                                <option value="bank" {{ $car->payment_method == 'bank' ? 'selected' : '' }}>Bank
+                                    transfer</option>
+                            </select>
 
-                        <label for="payment_address">Payment Address</label>
-                        <input type="text" value="{{ $car->payment_address }}" name="payment_address"
-                               id="payment_address" class="form-control" required>
+                            <label for="payment_company">Company Name</label>
+                            <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
+                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
 
-
-                        <div class="record-row">
-                            <label for="payment_photo_1">Recipte</label>
-                            <input type="file" id="payment_photo_1" name="payment_photo" required
-                                   accept="image/*" onchange="previewImage(event, 'preview_{{ $car->id }}')">
-                            <br>
-                            <br>
-
-                            @if (!empty($car->payment_photo))
-                                <a href="{{ Storage::url($car->payment_photo) }}" target="_blank">
-
-                                    <img src="{{ Storage::url($car->payment_photo) }}" style="max-width: 150px;"
-                                         alt="Recipte">
-                                </a>
-                            @endif
-
-                            <img id="preview_{{ $car->id }}" src="" alt="Image preview"
-                                 style="display:none; width: 150px;">
+                            <label for="payment_address">Payment Address</label>
+                            <input type="text" value="{{ $car->payment_address }}" name="payment_address"
+                                id="payment_address" class="form-control" required>
 
 
-                        </div>
+                            <div class="record-row">
+                                <label for="payment_photo_1">Recipte</label>
+                                <input type="file" id="payment_photo_1" name="payment_photo" required
+                                    accept="image/*" onchange="previewImage(event, 'preview_{{ $car->id }}')">
+                                <br>
+                                <br>
+
+                                @if (!empty($car->payment_photo))
+                                    <a href="{{ Storage::url($car->payment_photo) }}" target="_blank">
+
+                                        <img src="{{ Storage::url($car->payment_photo) }}" style="max-width: 150px;"
+                                            alt="Recipte">
+                                    </a>
+                                @endif
+
+                                <img id="preview_{{ $car->id }}" src="" alt="Image preview"
+                                    style="display:none; width: 150px;">
 
 
-                    </td>
+                            </div>
 
-                    <td>
-                        <button type="submit" id="submit-btn-{{ $car->id }}"
+
+                        </td>
+
+                        <td>
+                            <button type="submit" id="submit-btn-{{ $car->id }}"
                                 class="btn btn-success btn-sm">
-                            Next
-                        </button>
+                                Next
+                            </button>
 
-                        <br>
-                        <br>
-                        <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
-                        <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
+                            <br>
+                            <br>
+                            <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
+                            <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 
-                    </td>
-                </form>
+                        </td>
+                    </form>
 
-            </tr>
-        @endforeach
+                </tr>
+            @endforeach
 
         </tbody>
     </table>
@@ -271,7 +267,7 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
 
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     // Set the src of the preview image to the file's content
                     preview.src = e.target.result;
                     preview.style.display = 'block'; // Show the preview image
@@ -296,7 +292,7 @@
     <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
     <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.min.js"></script>
     <script
-            src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js">
+        src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js">
     </script>
     <script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>
 
@@ -304,11 +300,11 @@
 
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Register FilePond plugins
             FilePond.registerPlugin(
                 FilePondPluginImagePreview, // for showing image preview
@@ -320,7 +316,7 @@
             const inputElements = document.querySelectorAll('.filepond');
 
             // Iterate over each input element and initialize FilePond
-            inputElements.forEach(function (inputElement) {
+            inputElements.forEach(function(inputElement) {
                 // Get the car_id from each input element
                 const carId = inputElement.getAttribute('data-car_id');
                 const submitBtn = $('#submit-btn-' + carId);
@@ -357,10 +353,11 @@
             });
 
 
+
             //  Upload Bl images
             const inputElements2 = document.querySelectorAll('.filepond2');
             // Iterate over each input element and initialize FilePond
-            inputElements2.forEach(function (inputElement2) {
+            inputElements2.forEach(function(inputElement2) {
                 // Get the car_id from each input element
                 const carId = inputElement2.getAttribute('data-car_id');
                 const submitBtn = $('#submit-btn-' + carId);
@@ -414,7 +411,10 @@
         });
 
 
-        $(function () {
+
+
+
+        $(function() {
 
             // console.log(isEmpty);
             // if (isEmpty) {
@@ -434,20 +434,20 @@
                 $(".storage").autocomplete({
                     source: suggestedWords,
                     minLength: 0 // Show suggestions even when no input is typed
-                }).focus(function () {
+                }).focus(function() {
                     // Force the dropdown to show when the input gains focus
                     $(this).autocomplete("search", "");
                 });
             }
 
             // Initialize autocomplete on page load
-            $(document).ready(function () {
+            $(document).ready(function() {
                 initializeAutocomplete();
             });
 
 
             // Initialize date range picker for each .daterange input
-            $('.daterange').each(function () {
+            $('.daterange').each(function() {
                 let daterangeInput = $(this);
                 let recordId = daterangeInput.data(
                     'record-id'); // Get the record ID from the data attribute
@@ -459,7 +459,7 @@
                         format: 'DD.MM.YYYY'
                     },
                     autoUpdateInput: true // Automatically updates input with default value
-                }, function (start, end, label) {
+                }, function(start, end, label) {
                     let today = moment().startOf('day'); // Get today's date at 00:00:00
 
                     // Get the corresponding submit button for the current daterange

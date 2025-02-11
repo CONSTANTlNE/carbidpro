@@ -100,7 +100,7 @@ $creditService = new CreditService();
             <div class="ft-breadcrumb-content headline text-center position-relative">
                 <h2 style="margin-top: 80px;padding: 0;">
                     @if(request()->routeIs('customer.dashboard'))
-                    {{$dashboardStatics['Car list']}}
+                    {{$dashboardStatics['My Cars']}}
                     @elseif(request()->routeIs('customer.archivedcars'))
                         {{$dashboardStatics['Car History']}}
                     @endif

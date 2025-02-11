@@ -357,7 +357,7 @@ class CarController extends Controller
         $carStatus = CarStatus::where('slug', $slug)->first();
 
         // $car_status = CarStatus::withCount('cars')->get();
-        if (auth()->user()->hasRole('Admin')) {
+        if (auth()->user()->hasRole('Admin|Developer')) {
             $car_status = CarStatus::with('cars')->withCount('cars')->get();
         } else {
             $car_status = CarStatus::with('cars')->withCount([
@@ -367,7 +367,7 @@ class CarController extends Controller
             ])->get();
         }
 
-        if (auth()->user()->hasRole('Admin')) {
+        if (auth()->user()->hasRole('Admin|Developer')) {
             $sortColumn    = $request->get('sort', 'customers.contact_name'); // Default sort by customer
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 

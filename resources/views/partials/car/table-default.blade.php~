@@ -285,7 +285,7 @@ use Carbon\Carbon  ;
                         <form style="all: unset" action="{{route('credit.total.recalc')}}" method="post">
                             @csrf
                             <input type="hidden" name="car_id" value="{{$car->id}}">
-                            <button class="btn btn-warning btn-sm">
+                            <button class="btn btn-danger btn-sm">
                                 <i class="fa fa-refresh"></i>
                             </button>
                         </form>

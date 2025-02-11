@@ -38,6 +38,25 @@
             td {
                 padding: 7px;
             }
+
+
+            .hideBr {
+                display: none;
+            }
+
+            @media only screen and (max-width: 400px) {
+                .hideBr {
+                    display: block;
+                }
+
+                #bank_payment {
+                    width: 250px !important;
+                }
+
+                #full_name {
+                    width: 250px !important;
+                }
+            }
         </style>
     @endpush
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
@@ -46,7 +65,7 @@
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{{ $phistoryStatics['Payments'] }}</h2>
+                <h2 style="margin-top: 80px;padding: 0;">{{Cache::get('dashboardStatics' . session()->get('locale'))['Payment History'] }}</h2>
 
             </div>
         </div>

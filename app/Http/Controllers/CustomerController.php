@@ -616,6 +616,7 @@ class CustomerController extends Controller
             // Extra is a Dealer profit added for subdealer transactions or we can set manually and give either discount or different price for particular dealers
             $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
             $customer->comment          = $request->input('comment');
+            $customer->	newwebsitecustomer=1;
             $customer->save();
 
             $customer->save();

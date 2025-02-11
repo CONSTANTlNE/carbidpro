@@ -15,7 +15,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach ($cars as $car)
+        @foreach ($cars as  $car)
             <tr>
 
                 <td>
@@ -50,10 +50,31 @@
                     </td>
 
                     <td>
-                        <button type="submit" class="btn btn-success btn-sm">
+                        <button data-target="#shipping{{$car->id}}" data-toggle="modal" type="button" class="btn btn-success btn-sm">
                             Next
                         </button>
-
+{{--                        internal shipping confirmation modal--}}
+                        <div class="modal fade" id="shipping{{$car->id}}" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+{{--                                        <h5 class="modal-title" >Modal title</h5>--}}
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>
+                                            Want to leave internal shipping unchanged?
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                                        <button type="submit" class="btn green_btn custom_grreen2">Yes / Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <br>
                         <br>
                         <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>

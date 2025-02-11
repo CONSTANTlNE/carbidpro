@@ -526,7 +526,7 @@ class CustomerBalanceController extends Controller
             return back()->with('error', 'Not enough deposit');
         }
 
-
+        
 
 
         if ($request->customer_id){

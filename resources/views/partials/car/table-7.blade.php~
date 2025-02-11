@@ -24,7 +24,6 @@
 
             <th>Price</th>
             <th>Carrier</th>
-
             <th>Pickup & Delivery Dates</th>
             <th>Title</th>
             <th>Photos</th>
@@ -57,6 +56,7 @@
                     <input type="hidden" name="status"
                            value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                     <td>@include('partials.car.table_content-parts.field-from')</td>
+
                     <td>
                         @include('partials.car.table_content-parts.car-price')
                     </td>
@@ -69,8 +69,7 @@
                     </td>
 
                     <td>
-                        <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
-                               name="pickup_dates" class="form-control daterange"/>
+                        {{ $car->pickup_dates }}
                     </td>
                     <td>
                         <label style="margin: 0;padding:0">T/status</label>
@@ -78,8 +77,8 @@
                         <span> {{ $car->title }}</span>
 
                         <label class="mt-2" for="title_delivery">T/delivery</label>
-                        <select name="title_delivery"
-                                class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
+                        <select name="title_delivery" data-car-id="{{ $car->id }}"
+                                class="form-control title_delivery {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
                                 id="title_delivery" required>
                             <option value=""></option>
                             <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
@@ -88,22 +87,19 @@
                         </select>
                     </td>
 
-
                     <td>
                         <div style="display: flex;flex-direction: column;gap: 10px; justify-content: center;height: 100%!important">
                             <!-- Button to open the modal -->
                             <button type="button"
-                                    class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                    class="btn {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
                                     data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
                                     data-record-id="{{ $car->id }}">
-                                Upload Car Photo
+                                Car Images
                             </button>
 
-                            <button type="button"
-                                    class="btn  btn-sm  {{ !$car->getMedia('bl_images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
-                                    data-toggle="modal"
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
                                     data-target="#blimage{{ $car->id }}">
-                                Upload BL Photo
+                               BL Images
                             </button>
                             <!-- Modal  BL Images -->
 
@@ -112,7 +108,7 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">BL Images</h5>
+                                            <h5 class="modal-title"> BL Images</h5>
                                             <button type="button" class="close" data-dismiss="modal"
                                                     aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -148,13 +144,14 @@
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Modal for FilePond upload -->
                             <div class="modal fade" id="imageUploadModal-{{ $car->id }}" tabindex="-1"
                                  role="dialog" aria-labelledby="imageUploadModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Car Images</h5>
+                                            <h5 class="modal-title">Upload Images</h5>
                                             <button type="button" class="close" data-dismiss="modal"
                                                     aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -166,8 +163,9 @@
                                                    id="recordIdInput">
 
                                             <!-- FilePond input for multiple image uploads -->
-                                            <input type="file" data-car_id="{{ $car->id }}" class="filepond"
-                                                   id="filepond" name="images[]" multiple>
+                                            <input type="file" style="display: none"
+                                                   data-car_id="{{ $car->id }}" class="filepond" id="filepond"
+                                                   name="images[]" multiple>
 
 
                                             <!-- Section to display existing images -->
@@ -215,11 +213,10 @@
                         <input type="text" value="{{ $car->payment_address }}" name="payment_address"
                                id="payment_address" class="form-control" required>
 
-
                         <div class="record-row">
                             <label for="payment_photo_1">Recipte</label>
-                            <input type="file" id="payment_photo_1" name="payment_photo" required
-                                   accept="image/*" onchange="previewImage(event, 'preview_{{ $car->id }}')">
+                            <input type="file" id="payment_photo_1" name="payment_photo" accept="image/*"
+                                   onchange="previewImage(event, 'preview_{{ $car->id }}')">
                             <br>
                             <br>
 
@@ -237,15 +234,9 @@
 
                         </div>
 
-
                     </td>
 
                     <td>
-                        <button type="submit" id="submit-btn-{{ $car->id }}"
-                                class="btn btn-success btn-sm">
-                            Next
-                        </button>
-
                         <br>
                         <br>
                         <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
@@ -262,31 +253,6 @@
 </div>
 
 @push('js')
-    <script>
-        function previewImage(event, previewId) {
-            const input = event.target;
-            const preview = document.getElementById(previewId);
-
-            // Ensure a file was selected
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    // Set the src of the preview image to the file's content
-                    preview.src = e.target.result;
-                    preview.style.display = 'block'; // Show the preview image
-                };
-
-                // Read the file
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                // Hide preview if no image is selected
-                preview.src = '';
-                preview.style.display = 'none';
-            }
-        }
-    </script>
-
     <!-- FilePond JS -->
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 
@@ -308,7 +274,33 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script type="text/javascript">
+        $('.title_delivery').on('change', function (e) {
+
+            var title = $(this).val(); // Get the user ID from the hidden input
+            var carid = $(this).data('car-id'); // Get the user ID from the hidden input
+            console.log($(this).data('car-id'));
+            $.ajax({
+                url: '{{ route('car.updateByid') }}',
+                type: 'POST', // HTTP method for deletion
+                data: {
+                    id: carid,
+                    title_delivery: title,
+                    onlytitl_delivery: true
+                }, // Send the serialized form data (including the CSRF token)
+                success: function (response) {
+                    location.reload();
+
+                },
+                error: function (xhr) {
+                    location.reload();
+                }
+            });
+        });
+
+
         document.addEventListener("DOMContentLoaded", function () {
+
+
             // Register FilePond plugins
             FilePond.registerPlugin(
                 FilePondPluginImagePreview, // for showing image preview
@@ -316,17 +308,16 @@
                 FilePondPluginFileValidateSize // for validating file size
             );
 
-            // Select all file input elements
+            // Turn input element into a pond
+            // Get the car_id from the input element
             const inputElements = document.querySelectorAll('.filepond');
+            // const carId = inputElement.getAttribute('data-car_id');
 
-            // Iterate over each input element and initialize FilePond
-            inputElements.forEach(function (inputElement) {
-                // Get the car_id from each input element
+            inputElements.forEach((inputElement) => {
+                // Get the car_id from the current input element
                 const carId = inputElement.getAttribute('data-car_id');
-                const submitBtn = $('#submit-btn-' + carId);
-
-                // Initialize FilePond for each input element
-                const pond = FilePond.create(inputElement, {
+                // Initialize FilePond with car_id passed in the process data
+                FilePond.create(inputElement, {
                     allowMultiple: true, // Allow multiple file uploads
                     maxFiles: 15, // Limit to 15 files
                     acceptedFileTypes: ['image/*'], // Only accept image files
@@ -348,17 +339,15 @@
                             onload: (response) => console.log('Upload successful!', response),
                             onerror: (response) => console.error('Upload error:', response)
                         },
-                        revert: null, // Revert uploaded image if necessary
+                        revert: null // Revert uploaded image if necessary
                     }
                 });
-
-                // Disable submit button initially
-
             });
 
 
             //  Upload Bl images
             const inputElements2 = document.querySelectorAll('.filepond2');
+
             // Iterate over each input element and initialize FilePond
             inputElements2.forEach(function (inputElement2) {
                 // Get the car_id from each input element
@@ -416,12 +405,11 @@
 
         $(function () {
 
-            // console.log(isEmpty);
-            // if (isEmpty) {
-            //     $('.buttonexport .btn.btn-primary').addClass('btn-danger');
-            // } else {
-            //     $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
-            // }
+            if (isEmpty) {
+                $('.buttonexport .btn.btn-primary').addClass('btn-danger');
+            } else {
+                $('.buttonexport .btn.btn-primary').removeClass('btn-danger');
+            }
 
             // Example words for autocomplete
             const suggestedWords = [
