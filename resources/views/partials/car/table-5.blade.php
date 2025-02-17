@@ -75,7 +75,7 @@
                             <label class="mt-2" for="title_delivery">T/delivery</label>
                             <select name="title_delivery"
                                 class="form-control {{ $car->title == 'yes' && $car->title_delivery == 'no' ? 'error' : '' }}"
-                                id="title_delivery" required>
+                                id="title_delivery" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                                 <option value=""></option>
                                 <option value="yes" {{ $car->title_delivery == 'yes' ? 'selected' : '' }}>YES
                                 </option>
@@ -195,10 +195,10 @@
                                 <option value="bank" {{ $car->payment_method == 'bank' ? 'selected' : '' }}>Bank
                                     transfer</option>
                             </select>
-                            <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
-                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
+                            <input type="text" value="{{ $car->payment_company }}" placeholder="Receiver Name"
+                                name="payment_company" id="payment_company" class="mt-1 form-control" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                             <input type="text" value="{{ $car->payment_address }}" placeholder="Payment Address"
-                                name="payment_address" id="payment_address" class="form-control mt-1" required>
+                                name="payment_address" id="payment_address" class="form-control mt-1" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
 
                         </td>
 

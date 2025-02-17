@@ -36,9 +36,7 @@ use Carbon\Carbon  ;
         <tbody>
         @foreach ($cars as $index => $car)
             <tr>
-
-                <td>
-                    {{ $car->id }}</td>
+                <td>{{ $car->id }}</td>
                 <td class="car_info">
                     @include('partials.car.table_content-parts.car-info')
                 </td>
@@ -59,10 +57,8 @@ use Carbon\Carbon  ;
                 </td>
                 <td>
                     @if (!empty($car->CarStatus))
-                        <a
-                                href="{{ route('car.showStatus', $car->CarStatus->slug) }}">{{ $car->CarStatus->name }}</a>
+                        <a href="{{ route('car.showStatus', $car->CarStatus->slug) }}">{{ $car->CarStatus->name }}</a>
                     @endif
-
                 </td>
                 <td>
                     <strong>All Cost:</strong><br>

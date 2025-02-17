@@ -26,7 +26,7 @@
 
                         <td>
                             <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
-                                required>
+                                required pattern=".*\S.*" title="This field cannot be empty or contain only spaces" >
 
                         </td>
 

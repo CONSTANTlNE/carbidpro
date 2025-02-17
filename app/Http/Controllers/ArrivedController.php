@@ -8,6 +8,7 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Services\smsService;
 use Illuminate\Http\Request;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ArrivedController extends Controller
 {
@@ -16,7 +17,6 @@ class ArrivedController extends Controller
      */
     public function index(Request $request)
     {
-
         if (!empty($request->input('search')) && $request->has('search')) {
 //
 //            $groups = ContainerGroup::with('cars.credit','cars.latestCredit')
@@ -29,28 +29,30 @@ class ArrivedController extends Controller
             $groups = ContainerGroup::with('cars.credit', 'cars.latestCredit')
                 ->where(function ($query) use ($request) {
                     // Search by container_id
-                    $query->where('container_id', $request->input('search'))
+                    $query
+                        ->where('container_id', $request->input('search'))
                         ->orWhereHas('cars', function ($query) use ($request) {
                             $searchTerm = $request->input('search');
 
                             // Search for cars by relevant fields (car model, make, etc.)
-                            $query->where('container_status', 3)
+                            $query
+                                ->where('container_status', 3)
                                 ->where(function ($q) use ($searchTerm) {
-                                    $q->where('vin', 'like', '%' . $searchTerm . '%');
+                                    $q->where('vin', 'like', '%'.$searchTerm.'%');
                                 });
                         });
                 })
                 ->get();
         } else {
-            $groups = ContainerGroup::with('cars.credit','cars.latestCredit')
+            $groups = ContainerGroup::with('cars.credit', 'cars.latestCredit')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3);  // Filter cars where container_status is 2
                 })
                 ->get();
         }
 
-        $cars = '';
-        $ports = Port::all();
+        $cars      = '';
+        $ports     = Port::all();
         $loadtypes = LoadType::all();
 
         return view(
@@ -59,13 +61,10 @@ class ArrivedController extends Controller
                 'cars',
                 'groups',
                 'ports',
-                'loadtypes'
-            )
+                'loadtypes',
+            ),
         );
-
     }
-
-
 
     /**
      * Update the specified resource in storage.
@@ -114,8 +113,8 @@ class ArrivedController extends Controller
         if ($request->has('opened')) {
             $container->opened = $request->opened;
             // Send sms for dealers
-            foreach($container->cars as $car){
-                (new smsService())->containerOpenedd($car->customer->phone,$car);
+            foreach ($container->cars as $car) {
+                (new smsService())->containerOpenedd($car->customer->phone, $car);
             }
         }
 
@@ -130,8 +129,6 @@ class ArrivedController extends Controller
         $container->save();
 
         return redirect()->back()->with(['message' => 'Container updated successfully']);
-
-
     }
 
     public function updateCar(Request $request, string $id)
@@ -159,7 +156,8 @@ class ArrivedController extends Controller
         if ($request->hasFile('container_images')) {
             foreach ($request->file('container_images') as $image) {
                 // Add each image to the media collection
-                $car->addMedia($image)
+                $car
+                    ->addMedia($image)
                     ->toMediaCollection('container_images');
             }
         }
@@ -168,19 +166,15 @@ class ArrivedController extends Controller
         $car->save();
 
         return response()->json(['message' => 'Car data updated successfully!']);
-
-
     }
 
     public function showImages(string $id)
     {
-        $car = Car::where('id', $id)->first();
+        $car    = Car::where('id', $id)->first();
         $images = $car->getMedia('container_images');
 
         return view('pages.arrived.gallery', compact('images'));
-
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -188,5 +182,13 @@ class ArrivedController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+
+    public function deleteImage(Request $request) {
+        $image=Media::where('id', $request->image_id)->first();
+        $image->delete();
+
+        return back();
     }
 }

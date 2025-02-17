@@ -19,6 +19,7 @@ use App\Services\CreditService;
 use App\Services\smsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CarController extends Controller
 {
@@ -33,7 +34,7 @@ class CarController extends Controller
 
         if ($request->has('archive')) {
             $cars = Car::onlyTrashed()->with([
-                'dispatch', 'customer', 'state', 'CarStatus','firstCredit', 'Auction', 'credit' => function ($query) {
+                'dispatch', 'customer', 'state', 'CarStatus','firstCredit', 'Auction','groups', 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
                 }, 'latestCredit',
             ]);
@@ -41,7 +42,7 @@ class CarController extends Controller
         } else {
 
             $cars = Car::with([
-                'dispatch', 'customer', 'state', 'CarStatus','firstCredit', 'Auction', 'credit' => function ($query) {
+                'dispatch', 'customer', 'state', 'CarStatus','firstCredit', 'Auction','groups', 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
                 }, 'latestCredit',
             ]);
@@ -372,7 +373,7 @@ class CarController extends Controller
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 
             // Base query with eager loading
-            $cars = Car::with(['dispatch', 'customer', 'state', 'Auction'])->where('car_status_id',
+            $cars = Car::with(['dispatch', 'customer', 'state', 'Auction','groups'])->where('car_status_id',
                 $carStatus->id); // Keep eager loading for relationships
 
             // Check if there is a search query
@@ -715,6 +716,7 @@ class CarController extends Controller
         $car    = Car::findOrFail($request->car_id);
         $number = $car->customer->phone;
         $key    = $request->key;
+        $carindex=$request->carindex;
 
 //        dd($car);
 
@@ -726,7 +728,7 @@ class CarController extends Controller
         }
         $car->save();
 
-        return view('pages.htmx.htmxCarPickup', compact('car', 'key'));
+        return view('pages.htmx.htmxCarPickup', compact('car', 'key', 'carindex'));
     }
 
     public function restoreTrashed($id)
@@ -740,5 +742,17 @@ class CarController extends Controller
         return back()->with('error', 'Car not found');
 
     }
+
+    public function deleteImage(Request $request) {
+
+        $image=Media::where('id', $request->image_id)->first();
+        $image->delete();
+
+        return response()->noContent();
+
+    }
+
+
+
 
 }

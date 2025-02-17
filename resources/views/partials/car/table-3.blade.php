@@ -48,10 +48,10 @@
                     <td>{{ $car->title }}</td>
                     <td>
                         <label for="company_name">Storage:</label><br>
-                        <input type="text" name="storage" class="form-control storage" id="storage" required>
+                        <input type="text" name="storage" class="form-control storage" id="storage" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                         <br>
                         <label for="contact_info">Cost:</label><br>
-                        <input type="number" class="form-control" name="cost" required>
+                        <input type="number" class="form-control" name="cost" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                     </td>
                     <td>
                         <button type="submit" id="submit-btn-{{ $car->id }}"

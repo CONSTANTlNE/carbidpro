@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\Car;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 
 class ContainerController extends Controller
@@ -54,7 +55,7 @@ class ContainerController extends Controller
         $groups = '';
         $cars   = '';
 
-
+//  CONTAINER STATUS IS CHANGED ON CARS and thetn ContainerGroup is filtered according to cars which have cotainer_status
         if ($slug == 'for-load') {
             if (isset($_GET)) {
                 $query = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
@@ -94,7 +95,7 @@ class ContainerController extends Controller
                     ->where('container_status', 1)->paginate(50);
             }
         } elseif ($slug == 'loading-pending') {
-            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port' ,'port')
+            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port', 'port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 2); // Filter cars where container_status is 2
                 });
@@ -115,7 +116,8 @@ class ContainerController extends Controller
                 });
             }
             $groups = $groupsQuery->get();
-        } else {
+        } // LOADED PAYMENTS ,
+        else {
             $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3); // Filter cars where container_status is 3
@@ -136,13 +138,31 @@ class ContainerController extends Controller
                         });
                 });
             }
-
             $groups = $groupsQuery->get();
         }
 
 
         $ports     = Port::all();
         $loadtypes = LoadType::all();
+
+
+        // C O U N T S
+        $pendingCount = $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType',
+            'cars.port', 'port')
+            ->whereHas('cars', function ($query) {
+                $query->where('container_status', 2); // Filter cars where container_status is 2
+            })->count();
+
+        $loadingCount = $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType',
+            'cars.port', 'port')
+            ->whereHas('cars', function ($query) {
+                $query->where('container_status', 3); // Filter cars where container_status is 2
+            })->count();
+
+
+        $forLoadCount = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
+            ->where('container_status', 1)->count();
+
 
         return view(
             'pages.containers.index',
@@ -152,6 +172,9 @@ class ContainerController extends Controller
                 'container_status',
                 'ports',
                 'loadtypes',
+                'forLoadCount',
+                'pendingCount',
+                'loadingCount',
             ),
         );
     }
@@ -172,10 +195,10 @@ class ContainerController extends Controller
 
         $carIds        = $validated['car_ids']; // Ensure this is an array of IDs
         $car_ids_array = explode(",", $carIds[0]);
-        $cars = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title','warehouse']);
+        $cars          = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title', 'warehouse']);
 
         // Check if all `to_port_id` are the same
-        if ($cars->pluck('to_port_id')->unique()->count() !== 1 || $cars->pluck('warehouse')->unique()->count()!== 1 ) {
+        if ($cars->pluck('to_port_id')->unique()->count() !== 1 || $cars->pluck('warehouse')->unique()->count() !== 1) {
             // Return error if `to_port_id` values are not the same
             return redirect()->back()->with(['message' => 'Cars Port and TRT need same', 'alert-type' => 'error']);
         }
@@ -240,7 +263,22 @@ class ContainerController extends Controller
             $container->booking_id = $request->booking_id;
         }
 
+
+        if ($request->has('arrival_time')) {
+            $container->arrival_time = $request->arrival_time;
+            Car::whereIn('id', $car_ids)->update(['arrival_time' => $request->arrival_time]);
+        }
+
         if ($request->hasFile('bol_photo')) {
+
+            //  if changed file by user , delete previous file from storage
+            if ($container->bol_photo!==null){
+                $filepath='public/'.$container->bol_photo;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
             // Get the uploaded file (single file)
             $photo = $request->file('bol_photo');
 
@@ -250,13 +288,16 @@ class ContainerController extends Controller
             $container->photo = $path;
         }
 
-        if ($request->has('arrival_time')) {
-            $container->arrival_time = $request->arrival_time;
-            Car::whereIn('id', $car_ids)->update(['arrival_time' => $request->arrival_time]);
-        }
-
-
         if ($request->hasFile('invoice_file')) {
+
+            //  if changed file by user , delete previous file from storage
+            if ($container->invoice_file!==null){
+                $filepath='public/'.$container->invoice_file;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
             // Get the uploaded file (single file)
             $invoice_file = $request->file('invoice_file');
 
@@ -264,9 +305,22 @@ class ContainerController extends Controller
             $path = $invoice_file->store('invoice_file', 'public');
             // Save the path in the database
             $container->invoice_file = $path;
+
+
+
         }
 
         if ($request->hasFile('payment_file_1')) {
+
+
+            //  if changed file by user , delete previous file from storage
+            if ($container->payment_file_1!==null){
+                $filepath='public/'.$container->payment_file_1;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
             // Get the uploaded file (single file)
             $payment_file_1 = $request->file('payment_file_1');
 
@@ -278,6 +332,16 @@ class ContainerController extends Controller
         }
 
         if ($request->hasFile('payment_file_2')) {
+
+            //  if changed file by user , delete previous file from storage
+            if ($container->payment_file_2!==null){
+                $filepath='public/'.$container->payment_file_2;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
+
             // Get the uploaded file (single file)
             $payment_file_2 = $request->file('payment_file_2');
 
@@ -287,8 +351,16 @@ class ContainerController extends Controller
             $container->payment_file_2 = $path;
         }
 
-
         if ($request->hasFile('thc_invoice')) {
+
+            //  if changed file by user , delete previous file from storage
+            if ($container->thc_invoice!==null){
+                $filepath='public/'.$container->thc_invoice;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
             // Get the uploaded file (single file)
             $thc_invoice = $request->file('thc_invoice');
 
@@ -351,17 +423,17 @@ class ContainerController extends Controller
             'oldcar_id' => 'required|exists:cars,id',
         ]);
 
-        $key                   = $request->key;
-        $newcarid              = $request->input('new_car_id'.$key);
+        $key      = $request->key;
+        $newcarid = $request->input('new_car_id'.$key);
 
         // Fetch the original car
-        $container    = ContainerGroup::findOrFail($request->container_id);
-        $oldcar = Car::where('id', $request->oldcar_id)->first();
-        $oldcar->container_status=1;
+        $container                = ContainerGroup::findOrFail($request->container_id);
+        $oldcar                   = Car::where('id', $request->oldcar_id)->first();
+        $oldcar->container_status = 1;
         $oldcar->save();
 
-        $newcar=Car::where('id',$newcarid)->first();
-        $newcar->container_status=2;
+        $newcar                   = Car::where('id', $newcarid)->first();
+        $newcar->container_status = 2;
         $newcar->save();
 
         // Detach the old car from the group
@@ -467,8 +539,8 @@ class ContainerController extends Controller
     {
         $key         = $request->key;
         $carstoadd   = Car::where('to_port_id', $request->to_port_id)
-            ->where('warehouse',$request->trt)
-            ->where('container_status',1)
+            ->where('warehouse', $request->trt)
+            ->where('container_status', 1)
             ->get();
         $containerid = $request->container_id;
 
@@ -478,17 +550,40 @@ class ContainerController extends Controller
 
     public function htmxSelectForReplaceCar(Request $request)
     {
-        $key         = $request->key;
+        $key = $request->key;
 //dd($request->all());
-        $carstoadd   = Car::where('to_port_id', $request->to_port_id)
-            ->where('warehouse',$request->trt)
-            ->where('container_status',1)
+        $carstoadd = Car::where('to_port_id', $request->to_port_id)
+            ->where('warehouse', $request->trt)
+            ->where('container_status', 1)
             ->get();
 
         $containerid = $request->container_id;
-        $oldcar_id=$request->oldcar_id;
+        $oldcar_id   = $request->oldcar_id;
 
 
-        return view('pages.htmx.htmxReplaceCarFromContainer', compact('carstoadd', 'key', 'containerid','oldcar_id'));
+        return view('pages.htmx.htmxReplaceCarFromContainer', compact('carstoadd', 'key', 'containerid', 'oldcar_id'));
+    }
+
+    public function deleteImages($id, $image_type)
+    {
+
+        $group=ContainerGroup::where('id', $id)->first();
+
+        if ($group){
+            $filename = $group->$image_type;
+            $filepath='public/'.$filename;
+
+            if (Storage::exists($filepath)) {
+                Storage::delete($filepath);
+                $group->$image_type = null;
+                $group->save();
+                return back()->with('success', 'Image deleted successfully.');
+            } else {
+                return back()->with('error', 'File not found.');
+            }
+        }
+
+        return back()->with('error', 'Group not found.');
+
     }
 }

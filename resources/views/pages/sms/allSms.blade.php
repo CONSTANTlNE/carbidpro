@@ -103,10 +103,12 @@
                                     @foreach($depositNumbers as $depositNumber)
                                         <tr>
                                             <td>
-                                                <input class="form-control w-100" type="text" name="name[]" value="{{$depositNumber->employee}}"
+                                                <input class="form-control w-100" type="text" name="name[]"
+                                                       value="{{$depositNumber->employee}}"
                                                        placeholder="Employee name">
                                             </td>
-                                            <td><input class="form-control w-100" type="text" name="numbers[]" value="{{$depositNumber->number}}"
+                                            <td><input class="form-control w-100" type="text" name="numbers[]"
+                                                       value="{{$depositNumber->number}}"
                                                        placeholder="Employee number"></td>
                                             <td>
                                                 <button class="btn btn-danger" type="button" onclick="removeRow(this)">
@@ -125,7 +127,7 @@
                                 >Add New
                                 </button>
                                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                <button  class="btn  btn-success">Save changes</button>
+                                <button class="btn  btn-success">Save changes</button>
                             </div>
                         </form>
                     </div>
@@ -164,7 +166,8 @@
                                            onkeyup="searchTable()"
                                     />
                                     <div class="d-flex justify-content-between ">
-                                        <label class="btn btn-primary" style="cursor: pointer" for="selectall">Select All
+                                        <label class="btn btn-primary" style="cursor: pointer" for="selectall">Select
+                                            All
                                             <input style="width: 15px;height: 15px" type="checkbox" id="selectall">
                                         </label>
 
@@ -210,22 +213,35 @@
                         </div>
                         <div class="card">
                             <div class="card-body">
+                                <label for="">Select Draft</label>
+                                <select hx-get="{{route('sms.draft.htmx')}}"
+                                        hx-target="#target"
+                                        hx-trigger="change"
+                                        name="draft">
+                                    <option value="">Select Draft</option>
+                                    @foreach($drafts as $draft)
+                                        <option value="{{$draft->id}}">{{$draft->action_description}}</option>
+                                    @endforeach
+                                </select>
 
                                 <div class="form-group">
                                     <label>Message</label>
-                                    <textarea name="message" id="" class="w-100" rows="10">{{old('message')}}</textarea>
+                                    <div id="target">
+                                        <textarea name="message" id="" class="w-100"
+                                                  rows="10">{{old('message')}}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-add"><i class="fa fa-check"></i> send
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-add"><i class="fa fa-check"></i> send
-                                    </button>
-                                </div>
-
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </section>
+
         {{--Send SMS to particular number--}}
         <section class="content">
             <div class="row justify-content-center">
@@ -236,8 +252,9 @@
                             <form action="{{route('sms.send.recipient')}}" method="post">
                                 @csrf
                                 <div class="form-group text-center">
-                                    <label>Send SMS to Single Bumber</label>
-                                    <input style="max-width: 150px;margin:auto;text-align: center" type="text" class="form-control"
+                                    <label>Send SMS to Single Number</label>
+                                    <input style="max-width: 150px;margin:auto;text-align: center" type="text"
+                                           class="form-control"
                                            name="number" placeholder="Enter Phone">
                                 </div>
                                 <div class="form-group">
@@ -277,15 +294,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            const selectall=document.getElementById('selectall');
-            const numbers=document.querySelectorAll('.numbers');
+            const selectall = document.getElementById('selectall');
+            const numbers = document.querySelectorAll('.numbers');
             selectall.addEventListener('click', function () {
                 numbers.forEach(function (number) {
                     number.checked = selectall.checked;
                 });
             });
-
-
 
 
             const table = document.getElementById('myTable');
@@ -362,6 +377,8 @@
     <script src="{{asset('assets/plugins/modals/classie.js')}}"></script>
     <script src="{{asset('assets/plugins/modals/modalEffects.js')}}"></script>
     <!-- End Page Lavel Plugins
+
+
 
 
 

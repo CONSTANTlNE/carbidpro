@@ -14,9 +14,10 @@ class SmsController extends Controller
     public function allsms()
     {
         $depositNumbers = MobileNumbers::where('type', 'new_deposit')->get();
-        $customers = Customer::select('id', 'contact_name', 'phone', 'company_name')->get();
+        $customers      = Customer::select('id', 'contact_name', 'phone', 'company_name')->get();
+        $drafts         = SmsDraft::where('type', 'general')->where('is_active', 1) ->get();
 
-        return view('pages.sms.allSms', compact('depositNumbers', 'customers'));
+        return view('pages.sms.allSms', compact('depositNumbers', 'customers', 'drafts'));
     }
 
     public function sendAll(Request $request)
@@ -52,14 +53,6 @@ class SmsController extends Controller
         return back();
     }
 
-    public function selectedsms()
-    {
-        $customers = Customer::select('id', 'contact_name', 'phone', 'company_name')->get();
-
-
-        return view('pages.sms.selectedSms', compact('customers'));
-    }
-
     public function sendSelected(Request $request)
     {
         $request->validate([
@@ -77,15 +70,41 @@ class SmsController extends Controller
         return back();
     }
 
+    public function selectDraftHtmx(Request $request)
+
+    {
+        $draft = SmsDraft::where('id', request('draft'))->first();
+       return view('pages.htmx.htmxSmsDraft', compact('draft'));
+    }
+
     public function drafts()
     {
-        $drafts = SmsDraft::all();
+        $draftsSystem  = SmsDraft::where('type', null)->get();
+        $draftsGeneral = SmsDraft::where('type', 'general')
+            ->get();
 
-        return view('pages.sms.smsDrafts', compact('drafts'));
+
+        return view('pages.sms.smsDrafts', compact('draftsSystem', 'draftsGeneral'));
     }
 
     public function storeDraft(Request $request)
     {
+        if ($request->type === 'general') {
+            $request->validate([
+                'draft'              => 'required|string',
+                'action_description' => 'required|string',
+            ]);
+
+            $draft                     = new SmsDraft();
+            $draft->draft              = $request->draft;
+            $draft->type               = 'general';
+            $draft->action_description = $request->action_description;
+            $draft->save();
+
+            return back();
+        }
+
+
         $request->validate([
             'draft'              => 'required|string',
             'action_name'        => 'required|string',
@@ -134,9 +153,11 @@ class SmsController extends Controller
         return back();
     }
 
-    public function deleteDraft(Request $request) {
+    public function deleteDraft(Request $request)
+    {
         $draft = SmsDraft::where('id', request('id'))->first();
         $draft->delete();
+
         return back();
     }
 
@@ -174,4 +195,6 @@ class SmsController extends Controller
 
         return back();
     }
+
+
 }

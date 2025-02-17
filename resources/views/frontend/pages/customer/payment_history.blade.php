@@ -90,7 +90,10 @@
                     @foreach ($payment_report as $report)
                         <tr style="background-color: {{ $report->type === 'fill' ? '#82f98261' : '#ff898b61' }} ">
                             <td class="text-center">{{Carbon::parse($report->date)->format('d-m-Y') }}</td>
-                            <td class="text-center">{{$report->car?->vin }}</td>
+                            <td class="text-center">
+                                {{$report->car?->vin }}
+                                {{$report->type==='transfer_to_old_account'?'(Transfer to Old Account)':''}}
+                            </td>
                             <td class="text-center">${{ $report->amount }}</td>
                             <td class="text-center"> {{ $report->full_name }}</td>
                             <td class="text-center">{!! $report->is_approved == 1 ? '<span class="true">YES</span>' : '<span class="false">NO</span>' !!}</td>

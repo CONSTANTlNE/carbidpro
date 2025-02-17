@@ -71,7 +71,9 @@
                                class="form-control" name="container_cost" id="container_cost" required>
                     </th>
                     <th style="width: 10%;">
-                        <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;" required>
+                        <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;"
+                             {{empty($cargroup->photo) ? 'reqiored' : ''}}
+                        >
 
                         @if (!empty($cargroup->photo))
                             <a href="{{ Storage::url($cargroup->photo) }}" target="_blank">
@@ -84,6 +86,7 @@
                         <img id="preview_{{ $cargroup->id }}" src="" alt="Image preview"
                              style="display:none; max-width: 100px; margin-top:10px;">
                     </th>
+
                     <th style="width: 50%;">
                         <div class="d-flex" style="gap:10px;    flex-direction: column;">
                             <button
@@ -204,7 +207,6 @@
             <tbody>
             @foreach ($cargroup->cars as $cargroupindex => $car)
                 <tr>
-
                     <td>
                         {{ $car->id }}</td>
                     <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
@@ -214,7 +216,6 @@
                                value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                         <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
                         <td>@include('partials.container.table_content-parts.fuel-type')</td>
-
                         <td>
                             <label for="">Warehouse:</label>
                             <br>{{$car->warehouse}}<br>
@@ -245,7 +246,7 @@
 
                         <td>{{ $cargroup->cost }}</td>
                         <td></td>
-
+{{--                     replace or remove cars--}}
                         <td>
                             <button
                                     hx-get="{{route('container.htmx.select.car2')}}"

@@ -15,9 +15,9 @@
 @section('body-class', 'hold-transition sidebar-mini sidebar-collapse')
 
 <!--preloader-->
-<div id="preloader">
-    <div id="status"></div>
-</div>
+{{--<div id="preloader">--}}
+{{--    <div id="status"></div>--}}
+{{--</div>--}}
 
 <!-- Site wrapper -->
 <div class="wrapper">
@@ -87,6 +87,7 @@
                                         @endphp
 
                                         @foreach ($container_status as $status)
+
                                             @php
                                                 $hasError = '';
                                                 $groupCount = isset($groups) && is_object($groups) ? count($groups) : $status->container_status_count; // Ensure $groups is valid and countable
@@ -95,13 +96,20 @@
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"
                                                     class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
                                                     {{ $status->name }}
-                                                    {{ $status->slug != 'for-load' ? $groupCount : $status->container_status_count }}
                                                 </a>
                                             @elseif(!auth()->user()->hasRole('Finance'))
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"
                                                     class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
                                                     {{ $status->name }}
-                                                    {{ $status->slug != 'for-load' ? '' : $status->container_status_count }}
+
+                                                 {{-- Car and container counts--}}
+                                                    @if($status->slug == 'loading-pending')
+                                                     <span style="color: black;font-weight: bolder"> {{$pendingCount}}</span>
+                                                    @elseif($status->slug == 'loaded-payments')
+                                                        <span style="color: black;font-weight: bolder"> {{$loadingCount}}</span>
+                                                    @else
+                                                        <span style="color: black;font-weight: bolder"> {{$forLoadCount}}</span>
+                                                    @endif
                                                 </a>
                                             @endif
                                         @endforeach
@@ -119,7 +127,7 @@
                             </div>
 
 
-                            
+{{--                             INCLUDE PAGES ACCORDING TO STATUSES --}}
                             @if ($currentStatus == 'for-load')
                                 @include('partials.container.table-1', $cars)
                             @elseif($currentStatus == 'loading-pending')

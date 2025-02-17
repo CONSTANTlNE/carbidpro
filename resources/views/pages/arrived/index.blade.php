@@ -157,30 +157,41 @@
                                                                                    class="table table-bordered table-striped table-hover">
                                                                                 <thead class="back_table_color">
                                                                                 <tr class="info text-center">
-                                                                                    <th style="vertical-align: middle">ID</th>
-                                                                                    <th style="vertical-align: middle">CAR INFO</th>
-                                                                                    <th class="text-center">Amount Due</th>
-                                                                                    <th style="vertical-align: middle">Owner</th>
-                                                                                    <th style="vertical-align: middle">Car Photo</th>
-                                                                                    <th style="vertical-align: middle">Bll OF Loading</th>
-                                                                                    <th style="vertical-align: middle">Ready For Pickup</th>
-                                                                                    <th style="vertical-align: middle">Remark</th>
-                                                                                    <th style="vertical-align: middle">Action</th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        ID
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        CAR INFO
+                                                                                    </th>
+                                                                                    <th class="text-center">Amount Due
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Owner
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Car Photo
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Bll OF Loading
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Ready For Pickup
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Remark
+                                                                                    </th>
+                                                                                    <th style="vertical-align: middle">
+                                                                                        Action
+                                                                                    </th>
                                                                                 </tr>
                                                                                 </thead>
-
-
                                                                                 <tbody>
-
-                                                                                @foreach ($cargroup->cars as $car)
-{{--                                                                                    @dd($car->latestCredit)--}}
+                                                                                @foreach ($cargroup->cars as $carindex=> $car)
+                                                                                    {{--                                                                                    @dd($car->latestCredit)--}}
                                                                                     <div class="car-wrapper">
                                                                                         <tr class="info">
-                                                                                            <td>{{ $car->id }}
-                                                                                            </td>
-
+                                                                                            <td>{{ $car->id }} </td>
                                                                                             <td>
-
                                                                                                 <div>
                                                                                                     <strong>Model:<span>{{ $car->make_model_year }}</span></strong>
                                                                                                     <img src="/assets/dist/img/copy.svg"
@@ -194,7 +205,8 @@
                                                                                                          class="copy">
                                                                                                 </div>
                                                                                             </td>
-                                                                                            <td class="text-center" style="vertical-align: middle">
+                                                                                            <td class="text-center"
+                                                                                                style="vertical-align: middle">
                                                                                                 @if($car->latestCredit)
                                                                                                     <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))}}</span>
                                                                                                 @else
@@ -208,15 +220,10 @@
                                                                                                 <br>
                                                                                             </td>
                                                                                             <td>
-                                                                                                <div
-                                                                                                        class="upload__box">
-                                                                                                    <div
-                                                                                                            class="upload__btn-box">
-                                                                                                        <label
-                                                                                                                class="upload__btn">
-                                                                                                            <p>Car
-                                                                                                                Photo
-                                                                                                            </p>
+                                                                                                <div class="upload__box">
+                                                                                                    <div class="upload__btn-box">
+                                                                                                        <label class="upload__btn">
+                                                                                                            <p>Car Photo </p>
                                                                                                             <input
                                                                                                                     type="file"
                                                                                                                     multiple=""
@@ -258,28 +265,19 @@
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
-                                                                                                <div id="target{{$key}}">
-                                                                                                    <input type="hidden"
-                                                                                                           name="car_id"
-                                                                                                           id="car_id_{{$key}}"
-                                                                                                           value="{{$car->id}}">
-                                                                                                    <input type="hidden"
-                                                                                                           name="key"
-                                                                                                           id="key{{$key}}"
-                                                                                                           value="{{$key}}">
+                                                                                                <div id="target{{$carindex}}">
                                                                                                     @if($car->ready_for_pickup===0)
                                                                                                         <div hx-get="{{route('car.readyforpickup')}}"
-                                                                                                             hx-include="#car_id_{{$key}},#key{{$key}}"
-                                                                                                             hx-target="#target{{$key}}"
+                                                                                                             hx-vals='{"carindex": "{{$carindex}}","car_id": "{{$car->id}}"}'
+                                                                                                             hx-target="#target{{$carindex}}"
                                                                                                              class="btn btn-danger"
                                                                                                              type="button">
-                                                                                                            not
-                                                                                                            ready
+                                                                                                            not ready
                                                                                                         </div>
                                                                                                     @else
                                                                                                         <div hx-get="{{route('car.readyforpickup')}}"
-                                                                                                             hx-include="#car_id_{{$key}},#key{{$key}}"
-                                                                                                             hx-target="#target{{$key}}"
+                                                                                                             hx-vals='{"carindex": "{{$carindex}}","car_id": "{{$car->id}}"}'
+                                                                                                             hx-target="#target{{$carindex}}"
                                                                                                              class="btn btn-success"
                                                                                                              type="button">
                                                                                                             ready

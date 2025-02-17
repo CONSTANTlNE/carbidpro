@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('sms_drafts', function (Blueprint $table) {
             $table->id();
-            $table->string('action_name');
+            $table->string('action_name')->nullable();
             $table->string('action_description')->nullable();
             $table->text('draft');
             $table->boolean('is_active')->default(1);
+            $table->string('type')->nullable();
             $table->timestamps();
         });
     }

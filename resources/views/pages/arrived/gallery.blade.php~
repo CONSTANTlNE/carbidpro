@@ -49,7 +49,7 @@
                                     <img style="width: 100%; height: 100%; object-fit: cover;" src="{{ $image->getUrl() }}" alt="Bridge">
                                 </a>
 
-                            <form style="display: flex;justify-content: center!important;width:250px" action="{{route('arrived.image.delete')}}" method="post">
+                            <form style="display: flex;justify-content: center!important;" action="{{route('arrived.image.delete')}}" method="post">
                                 @csrf
                                 <input type="hidden" name="image_id" value="{{ $image->id }}">
                                 <button style="all:unset;cursor: pointer">

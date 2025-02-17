@@ -413,14 +413,28 @@
                                                 <h6>Existing Images</h6>
                                                 <div class="row mt-2">
                                                     @foreach ($car->getMedia('images') as $image)
-                                                        <div class="col-md-2">
-                                                            <div class="image-thumbnail mb-2">
+                                                        <div class=" col-sm-12 col-md-2">
+                                                            <div class="image-thumbnail mb-2 d-flex justify-content-center">
                                                                 <a href="{{ $image->getUrl() }}" target="_blank">
                                                                     <img src="{{ $image->getUrl() }}" class="img-fluid"
                                                                          alt="Uploaded Image">
                                                                 </a>
                                                             </div>
+                                                            <div style="display: flex;justify-content: center!important;">
+
+                                                                <button style="all:unset;cursor: pointer"
+                                                                 hx-post="{{route('arrived.image.delete')}}"
+                                                                 hx-vals='{ "image_id": "{{$image->id}}","_token": "{{csrf_token()}}" }'
+                                                                        onclick="window.location.reload()"
+                                                                >
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
+                                                                        <path fill="#b72525"
+                                                                              d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
                                                         </div>
+
                                                     @endforeach
                                                 </div>
                                             </div>
@@ -464,6 +478,8 @@
 
                                     <div class="reset-button">
                                         <button type="submit" class="btn btn-success"> Save</button>
+
+                                        <a href="{{route('cars.index')}}" type="submit" class="btn btn-primary"> Current Cars</a>
                                     </div>
                                 </form>
                             </div>

@@ -135,6 +135,10 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/fetch-from-states', 'fetchFromStates')->name('fetch.from.states');
         Route::get('/ready-for-pickup', 'readyForPickup')->name('car.readyforpickup');
         Route::get('/cars/archive/restore/{id}', 'restoreTrashed')->name('car.trashed.restore');
+        Route::post('/car/image/delete', 'deleteImage')->name('car.image.delete');
+
+
+
 
     });
 
@@ -156,6 +160,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/containers/replace-car', 'replaceCar')->name(name: 'container.replaceCar');
         Route::post('/containers/remove-from-list', 'removeFromList')->name(name: 'container.removeFromList');
         Route::post('/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
+        Route::get('/containers/delete/images/{car_id}/{image_type}', 'deleteImages')->name(name: 'container.images.delete');
 //        Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
         Route::get('/containers/htmx/select/car', 'htmxSelectCar')->name(name: 'container.htmx.select.car');
         Route::get('/containers/htmx/select/car2', 'htmxSelectForReplaceCar')->name(name: 'container.htmx.select.car2');
@@ -166,6 +171,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/arrived/container/{id}/save', 'update')->name(name: 'arrived.update');
         Route::post('/arrived/car/{id}/update', 'updateCar')->name(name: 'arrived.car-update');
         Route::get('/arrived/car/{id}/show-image/', 'showImages')->name(name: 'arrived.showImages');
+        Route::post('/arrived/image/delete', 'deleteImage')->name(name: 'arrived.image.delete');
+
     });
 
     // Port Emails
@@ -287,8 +294,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/sms/all','allsms')->name('sms.all');
         Route::post('/sms/all/send','sendAll')->name('sms.send.all');
         Route::post('/sms/recipient/send','sendRecipient')->name('sms.send.recipient');
-        Route::get('/sms/selected','selectedsms')->name('sms.selected');
         Route::post('/sms/selected/send','sendSelected')->name('sms.send.selected');
+        Route::get('/sms/selected/draft/htmx','selectDraftHtmx')->name('sms.draft.htmx');
 
         Route::post('/sms/newdeposit/number/update','updateDepositNumber')->name('sms.deposit.number.update');
 
