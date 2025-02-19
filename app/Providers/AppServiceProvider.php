@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(!app()->isProduction());
+        Model::preventAccessingMissingAttributes();
+
 
         Paginator::defaultView('vendor.pagination.bootstrap-4');
 

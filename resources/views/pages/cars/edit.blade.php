@@ -15,9 +15,9 @@
 
     @endphp
             <!--preloader-->
-{{--    <div id="preloader">--}}
-{{--        <div id="status"></div>--}}
-{{--    </div>--}}
+    {{--    <div id="preloader">--}}
+    {{--        <div id="status"></div>--}}
+    {{--    </div>--}}
 
     <!-- Site wrapper -->
     <div class="wrapper">
@@ -57,7 +57,7 @@
                                         margin: 0;
                                     }
                                 </style>
-                                <form action="{{ route('car.update', $car->id) }}" id="carForm" method="POST">
+                                <form   action="{{ route('car.update', $car->id) }}" id="carForm" method="POST">
                                     @csrf
                                     <div class="col-sm-12">
                                         <div class="row">
@@ -66,7 +66,8 @@
                                                 <select
                                                         hx-get="{{route('htmx.get.extraexpense')}}"
                                                         hx-target="#extraexpense"
-                                                        name="customer_id" class="form-control" id="customer_id" required>
+                                                        name="customer_id" class="form-control" id="customer_id"
+                                                        required>
                                                     <option value=""></option>
                                                     @foreach ($customers as $customer)
                                                         <option value="{{ $customer->id }}"
@@ -237,21 +238,22 @@
 
                                                     @foreach($extra_expenses as $index10 => $extraexpence)
                                                         @php
-                                                          $foundExpense = collect($customerExtraExpenses)->firstWhere('name', $extraexpence->name);
-                                                          // If found, get its value; otherwise default to an empty string
-                                                          $expenseValue = $foundExpense ? $foundExpense['value'] : '';
+                                                            $foundExpense = collect($customerExtraExpenses)->firstWhere('name', $extraexpence->name);
+                                                            // If found, get its value; otherwise default to an empty string
+                                                            $expenseValue = $foundExpense ? $foundExpense['value'] : '';
                                                         @endphp
 
                                                         <div class="col-md-2 form-group">
                                                             <div class="d-flex align-middle">
-                                                                <label style="max-width: max-content;" class="control-label">
+                                                                <label style="max-width: max-content;"
+                                                                       class="control-label">
                                                                     {{ $extraexpence->name }}
                                                                 </label>
                                                             </div>
                                                             <input type="text"
                                                                    class="form-control"
                                                                    value="{{ $expenseValue }}"
-                                                                    disabled>
+                                                                   disabled>
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -292,11 +294,13 @@
                                                                class="form-control"
                                                                x-init="item.date = item.date || new Date().toISOString().split('T')[0]">
                                                     </divgit>
-                                                    <div class="col-md-2">
-                                                        <button type="button" class="btn btn-danger"
-                                                                @click="confirmRemoveField(index)">Remove
-                                                        </button>
-                                                    </div>
+                                                    @can('CarUpdate')
+                                                        <div class="col-md-2">
+                                                            <button type="button" class="btn btn-danger"
+                                                                    @click="confirmRemoveField(index)">Remove
+                                                            </button>
+                                                        </div>
+                                                    @endcan
                                                 </div>
                                             </template>
 
@@ -332,7 +336,7 @@
                                                 <div class="col-md-4">
                                                     <label for="amountDue">Amount Due</label>
                                                     <input type="text"
-                                                           class="form-control"  readonly
+                                                           class="form-control" readonly
                                                            value="{{round($car->amount_due+round( ((new CreditService())->totalInterestFromLastCalc($car->id))) )}}">
                                                 </div>
                                             </div>
@@ -371,18 +375,22 @@
                                     <div class="container mb-3">
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <label style="padding: 10px;border-radius: 20px;text-align: center" class="border">
-                                                    <input @checked($car->record_color===null)  type="radio" name="record_color" value=" "> No Color
+                                                <label style="padding: 10px;border-radius: 20px;text-align: center"
+                                                       class="border">
+                                                    <input @checked($car->record_color===null)  type="radio"
+                                                           name="record_color" value=" "> No Color
                                                 </label>
                                             </div>
                                             <div class="col-md-2">
                                                 <label style="padding: 10px;color:white;border-radius: 20px;text-align: center;background: green">
-                                                    <input  @checked($car->record_color=='#82f98261') type="radio" name="record_color" value="#82f98261"> Green
+                                                    <input @checked($car->record_color=='#82f98261') type="radio"
+                                                           name="record_color" value="#82f98261"> Green
                                                 </label>
                                             </div>
                                             <div class="col-md-2">
                                                 <label style="padding: 10px;background:red;border-radius: 20px;text-align: center;color:white">
-                                                    <input @checked($car->record_color=='#F6CBCC') type="radio" name="record_color" value="#F6CBCC"> Red
+                                                    <input @checked($car->record_color=='#F6CBCC') type="radio"
+                                                           name="record_color" value="#F6CBCC"> Red
                                                 </label>
                                             </div>
                                         </div>
@@ -396,10 +404,11 @@
                                     </div>
 
                                     <div class="form-group" style="max-width: 100%">
-                                        <label>Images</label><br>
-                                        <input type="file" data-car_id="{{ $car->id }}" id="filepond"
-                                               name="images[]" multiple>
-
+                                        @can('CarUpdate')
+                                            <label>Images</label><br>
+                                            <input type="file" data-car_id="{{ $car->id }}" id="filepond"
+                                                   name="images[]" multiple>
+                                        @endcan
                                         <style>
                                             .img-fluid {
                                                 height: 150px;
@@ -420,19 +429,23 @@
                                                                          alt="Uploaded Image">
                                                                 </a>
                                                             </div>
-                                                            <div style="display: flex;justify-content: center!important;">
+                                                            @can('CarUpdate')
+                                                                <div style="display: flex;justify-content: center!important;">
 
-                                                                <button style="all:unset;cursor: pointer"
-                                                                 hx-post="{{route('arrived.image.delete')}}"
-                                                                 hx-vals='{ "image_id": "{{$image->id}}","_token": "{{csrf_token()}}" }'
-                                                                        onclick="window.location.reload()"
-                                                                >
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24">
-                                                                        <path fill="#b72525"
-                                                                              d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
-                                                                    </svg>
-                                                                </button>
-                                                            </div>
+                                                                    <button style="all:unset;cursor: pointer"
+                                                                            hx-post="{{route('arrived.image.delete')}}"
+                                                                            hx-vals='{ "image_id": "{{$image->id}}","_token": "{{csrf_token()}}" }'
+                                                                            onclick="window.location.reload()"
+                                                                    >
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             width="35"
+                                                                             height="35" viewBox="0 0 24 24">
+                                                                            <path fill="#b72525"
+                                                                                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                            @endcan
                                                         </div>
 
                                                     @endforeach
@@ -477,9 +490,12 @@
                                     </div>
 
                                     <div class="reset-button">
-                                        <button type="submit" class="btn btn-success"> Save</button>
-
-                                        <a href="{{route('cars.index')}}" type="submit" class="btn btn-primary"> Current Cars</a>
+                                        @can('CarUpdate')
+                                            <button type="submit" class="btn btn-success"> Save</button>
+                                        @endcan
+                                        <a href="{{route('cars.index')}}" type="submit" class="btn btn-primary">
+                                            Current Cars
+                                        </a>
                                     </div>
                                 </form>
                             </div>

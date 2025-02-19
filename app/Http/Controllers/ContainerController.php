@@ -58,7 +58,7 @@ class ContainerController extends Controller
 //  CONTAINER STATUS IS CHANGED ON CARS and thetn ContainerGroup is filtered according to cars which have cotainer_status
         if ($slug == 'for-load') {
             if (isset($_GET)) {
-                $query = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
+                $query = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port', 'groups.port'])
                     ->where('container_status', 1);
 
                 // Apply filters based on GET parameters if they exist
@@ -91,7 +91,7 @@ class ContainerController extends Controller
 
                 $cars = $query->paginate(50);
             } else {
-                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
+                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port' , 'groups.port'])
                     ->where('container_status', 1)->paginate(50);
             }
         } elseif ($slug == 'loading-pending') {
@@ -118,7 +118,7 @@ class ContainerController extends Controller
             $groups = $groupsQuery->get();
         } // LOADED PAYMENTS ,
         else {
-            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port')
+            $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port', 'port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status', 3); // Filter cars where container_status is 3
                 });

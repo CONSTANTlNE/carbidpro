@@ -5,17 +5,9 @@
             // Decode the JSON extra expenses, or default to an empty array if null
             $customerExtraExpenses = $selectedcustomer->extra_expenses ? json_decode($selectedcustomer->extra_expenses, true) : [];
         @endphp
-{{--        <form class="d-flex align-middle"--}}
-{{--              hx-get="{{route('htmx.get.selectextraexpense')}}"--}}
-{{--              hx-target="#alpinehtml"--}}
-{{--              hx-vals='{"customer_id": "{{ $selectedcustomer->id }}"}'--}}
-{{--              hx-trigger="change"--}}
-{{--        >--}}
             @foreach($extra_expenses as $index10 => $extraexpence)
 
                 @php
-//                    dd($extraexpence->name,$customerExpenses);
-                  // Use the collection's firstWhere method to find the expense by name
                   $foundExpense = collect($customerExtraExpenses)->firstWhere('name', $extraexpence->name);
                   // If found, get its value; otherwise default to an empty string
                   $expenseValue = $foundExpense ? $foundExpense['value'] : '';
@@ -25,8 +17,6 @@
                     <div class="d-flex align-middle">
                         <label style="max-width: max-content; cursor: pointer" class="control-label">
                             {{ $extraexpence->name }}
-{{--                            <input type="checkbox" name="expense_name[]" id="{{ $extraexpence->name }}"--}}
-{{--                                   value="{{ $extraexpence->name }}">--}}
                             <input type="checkbox" name="{{ $extraexpence->name }}" id="{{ $extraexpence->name }}"
                                    value="{{ ($match = collect($customerExpenses)->firstWhere('name', $extraexpence->name)) ? $match->value : 0 }}">
                         </label>
@@ -37,8 +27,15 @@
                            oninput="document.getElementById('{{ $extraexpence->name }}').value = this.value">
                 </div>
             @endforeach
-{{--        </form>--}}
+
     @endif
+        {{--Percent--}}
+        <div class="col-md-2 form-group">
+            <label>Percent <span style="color:blue">For Credit</span></label>
+            <input autocomplete="nope" type="text" name="percent"
+                   class="form-control"
+                   value="{{ old('percent') }}">
+        </div>
 </div>
 
 <div class="form-group" id="customercomment" hx-swap-oob="true">

@@ -73,11 +73,14 @@
 @yield('allsms')
 @yield('smsdrafts')
 @yield('selectedsms')
+@yield('roles')
+@yield('states')
 {{--Site Settings--}}
 @yield('sliders')
 @yield('announces')
 @yield('settings')
 @yield('services')
+
 
 
 <!-- jQuery -->

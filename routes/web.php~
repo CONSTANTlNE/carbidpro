@@ -26,7 +26,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SmsController;
-use App\Http\Controllers\StatesController;
 use App\Http\Controllers\UserController;
 use App\Models\Car;
 use App\Models\Customer;
@@ -248,12 +247,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     // States
-    Route::controller(StatesController::class)->group(function () {
-       route::get('states','index')->name('states');
-        route::post('state/store','store')->name('state.store');
-        route::post('state/update','update')->name('state.update');
-        route::post('state/delete','delete')->name('state.delete');
-    });
+
 
     // Countries
     Route::controller(CountriesController::class)->group(function () {

@@ -78,129 +78,128 @@
 
                                     <div class="col-sm-12">
                                         <div class="row">
-                                            <div class="form-group">
-                                                <label>Dealer</label>
-                                                <select
-                                                        hx-get="{{route('htmx.get.extraexpense')}}"
-                                                        hx-target="#extraexpense"
-                                                        autocomplete="nope"
-                                                        name="customer_id"
-                                                        class="form-control"
-                                                        id="customer_id" required>
-                                                    <option value=""></option>
-                                                    @foreach ($customers as $customer)
-                                                        <option value="{{ $customer->id }}"
-                                                                {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                                            <div class="row">
+                                                {{-- Dealer--}}
+                                                <div class="form-group">
+                                                    <label>Dealer</label>
+                                                    <select
+                                                            hx-get="{{route('htmx.get.extraexpense')}}"
+                                                            hx-target="#extraexpense"
+                                                            autocomplete="nope"
+                                                            name="customer_id"
+                                                            class="form-control"
+                                                            id="customer_id" required>
+                                                        <option value=""></option>
+                                                        @foreach ($customers as $customer)
+                                                            <option value="{{ $customer->id }}"
+                                                                    {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
 
-                                                            {{ $customer->contact_name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group" id="customercomment">
-                                                <label>Customer Comment</label>
-                                                <textarea disabled rows="3" class="form-control" id="extraexpense"></textarea>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Broker</label>
-                                                <select autocomplete="nope" name="dispatch_id" class="form-control"
-                                                        id="dispatch_id" required>
-                                                    <option value=""></option>
-                                                    @foreach ($dispatchers as $dispatch)
-                                                        <option value="{{ $dispatch->id }}"
-                                                                {{ old('dispatch_id') == $dispatch->id ? 'selected' : '' }}>
-                                                            {{ $dispatch->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label>Make/Model/Year</label>
-                                                <input autocomplete="nope" type="text" name="make_model_year"
-                                                       class="form-control"
-                                                       value="{{ old('make_model_year') }}" required>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Title</label>
-                                                <select autocomplete="nope" name="title" class="form-control" id="title"
-                                                        required>
-                                                    <option value=""></option>
-                                                    <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>NO
-                                                    </option>
-                                                    <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
-                                                        YES
-                                                    </option>
-                                                    <option value="bypost"
-                                                            {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST
-                                                    </option>
-                                                    <option value="pending"
-                                                            {{ old('title') == 'pending' ? 'selected' : '' }}>PENDING
-                                                    </option>
-                                                </select>
-
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label>Vin</label>
-                                                <input autocomplete="nope" type="text" name="vin" class="form-control"
-                                                       value="{{ old('vin') }}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Percent</label>
-                                                <input autocomplete="nope" type="text" name="percent"
-                                                       class="form-control"
-                                                       value="{{ old('percent') }}">
-                                            </div>
-
-
-                                            <div class="container mb-3">
-                                                <div class="row">
-
-
-                                                    <div class="col-md-4">
-                                                        <label>Lot</label>
-                                                        <input autocomplete="nope" type="text" name="lot"
-                                                               class="form-control"
-                                                               value="{{ old('lot') }}" required>
-                                                    </div>
-
-
-                                                    <div class="col-md-4">
-                                                        <label>Gate or Member</label>
-                                                        <input autocomplete="nope" type="text" name="gate_or_member"
-                                                               class="form-control"
-                                                               value="{{ old('gate_or_member') }}" required>
-                                                    </div>
-
-                                                    <div class="col-md-4 d-flex" style="align-items: center;">
-                                                        <label>Type of Fuel</label><br>
-
-                                                        <label class="radio-inline">
-                                                            <input autocomplete="nope" name="type_of_fuel"
-                                                                   value="Petrol" type="radio"
-                                                                   {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}
-                                                                   required>
-                                                            Petrol
-                                                        </label>
-
-                                                        <label class="radio-inline">
-                                                            <input autocomplete="nope" name="type_of_fuel"
-                                                                   value="Hybrid" type="radio"
-                                                                   {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}
-                                                                   required>
-                                                            Hybrid
-                                                        </label>
-                                                    </div>
-
-
+                                                                {{ $customer->contact_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                {{-- Broker--}}
+                                                <div class="form-group">
+                                                    <label>Broker</label>
+                                                    <select autocomplete="nope" name="dispatch_id" class="form-control"
+                                                            id="dispatch_id" required>
+                                                        <option value=""></option>
+                                                        @foreach ($dispatchers as $dispatch)
+                                                            <option value="{{ $dispatch->id }}"
+                                                                    {{ old('dispatch_id') == $dispatch->id ? 'selected' : '' }}>
+                                                                {{ $dispatch->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                {{-- car--}}
+                                                <div class="form-group">
+                                                    <label>Make/Model/Year</label>
+                                                    <input autocomplete="nope" type="text" name="make_model_year"
+                                                           class="form-control"
+                                                           value="{{ old('make_model_year') }}" required>
+                                                </div>
+                                                {{--Vin--}}
+                                                <div class="form-group">
+                                                    <label>Vin</label>
+                                                    <input autocomplete="nope" type="text" name="vin"
+                                                           class="form-control"
+                                                           value="{{ old('vin') }}">
                                                 </div>
                                             </div>
 
+                                            {{--Comment--}}
+                                            <div class="form-group" id="customercomment">
+                                                <label>Customer Comment</label>
+                                                <textarea disabled rows="3" class="form-control"
+                                                          id="extraexpense"></textarea>
+                                            </div>
 
+                                            <div class="row mb-5">
+                                                {{--lot--}}
+                                                <div class=" col-sm-6 col-md-6 col-lg-3">
+                                                    <label>Lot</label>
+                                                    <input autocomplete="nope" type="text" name="lot"
+                                                           class="form-control"
+                                                           value="{{ old('lot') }}" required>
+                                                </div>
+                                                {{--gate or member--}}
+                                                <div class=" col-sm-6 col-md-6 col-lg-3">
+                                                    <label>Gate or Member</label>
+                                                    <input autocomplete="nope" type="text" name="gate_or_member"
+                                                           class="form-control"
+                                                           value="{{ old('gate_or_member') }}" required>
+                                                </div>
+                                                {{--Title--}}
+                                                <div class=" col-sm-6 col-md-6 col-lg-3">
+                                                    <label>Title</label>
+                                                    <select autocomplete="nope" name="title" class="form-control"
+                                                            id="title"
+                                                            required>
+                                                        <option value=""></option>
+                                                        <option value="no" {{ old('title') == 'no' ? 'selected' : '' }}>
+                                                            NO
+                                                        </option>
+                                                        <option value="yes" {{ old('title') == 'yes' ? 'selected' : '' }}>
+                                                            YES
+                                                        </option>
+                                                        <option value="bypost"
+                                                                {{ old('title') == 'bypost' ? 'selected' : '' }}>BY POST
+                                                        </option>
+                                                        <option value="pending"
+                                                                {{ old('title') == 'pending' ? 'selected' : '' }}>
+                                                            PENDING
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+                                                {{--Fuel--}}
+                                                <div class=" col-sm-6 col-md-6 col-lg-3 "
+                                                     style="align-items: center; width: max-content">
+                                                    <label class="text-center">Type of Fuel</>
+
+                                                    <div class="d-flex justify-content-center align-middle text-center mt-3 ">
+                                                        <label style="margin-right: 0" class="radio-inline"
+                                                               for="petrol">
+                                                            Petrol
+                                                        </label>
+                                                        <input id="petrol" autocomplete="nope" name="type_of_fuel"
+                                                               value="Petrol" type="radio" style="margin-right: 10px"
+                                                               {{ old('type_of_fuel') == 'Petrol' ? 'checked' : '' }}
+                                                               required>
+
+
+                                                        <label style="margin-right: 0" class="radio-inline"
+                                                               for="hybrid">
+                                                            Hybrid
+                                                        </label>
+                                                        <input id="hybrid" autocomplete="nope" name="type_of_fuel"
+                                                               value="Hybrid" type="radio"
+                                                               {{ old('type_of_fuel') == 'Hybrid' ? 'checked' : '' }}
+                                                               required>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="container mb-3">
                                                 <div class="row">
                                                     <div class="col-md-2">
@@ -270,13 +269,10 @@
 
                                                 </div>
                                             </div>
-
-
                                         </div>
-
                                     </div>
 
-                                      {{-- Here Comes Content from HTMX alpine initialized--}}
+                                    {{-- Here Comes Content from HTMX alpine initialized--}}
                                     <div class="container" id="alpinehtml">
                                         <div x-data="$store.balanceAccountingStore" class="mt-4">
                                             <div class="d-flex" style="gap:10px">
@@ -342,7 +338,7 @@
                                                         <label for="payed">Payed</label>
                                                         <input type="text" name="payed"
                                                                id="payed" class="form-control" x-model="payed"
-                                                               x-on:input="validateNumber" >
+                                                               x-on:input="validateNumber">
                                                     </div>
 
                                                     <div class="col-md-4">
@@ -384,8 +380,9 @@
                                     <div class="container mb-3">
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <label style="padding: 10px;border-radius: 20px;text-align: center" class="border">
-                                                    <input checked  type="radio" name="record_color" value=" "> No Color
+                                                <label style="padding: 10px;border-radius: 20px;text-align: center"
+                                                       class="border">
+                                                    <input checked type="radio" name="record_color" value=" "> No Color
                                                 </label>
                                             </div>
                                             <div class="col-md-2">
@@ -395,7 +392,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <label style="padding: 10px;background:red;border-radius: 20px;text-align: center;color:white">
-                                                    <input  type="radio" name="record_color" value="#F6CBCC"> Red
+                                                    <input type="radio" name="record_color" value="#F6CBCC"> Red
                                                 </label>
                                             </div>
                                         </div>
@@ -444,7 +441,7 @@
                                             </div>
 
                                             <div class="col-md-4">
-                                                <label>Satart dispatch?</label>
+                                                <label>Start dispatch?</label>
                                                 <select name="is_dispatch" class="form-control" id="is_dispatch">
                                                     <option value="yes" selected>YES</option>
                                                     <option value="no">NO</option>
@@ -455,7 +452,9 @@
 
                                     </div>
                                     <div class="reset-button">
-                                        <button type="submit" class="btn btn-success"> Save</button>
+                                        @can('CarCreate')
+                                            <button type="submit" class="btn btn-success"> Save</button>
+                                        @endcan
                                     </div>
                                 </form>
                             </div>
@@ -562,60 +561,59 @@
                 document.addEventListener('alpine:init', () => {
 
 
+                    Alpine.store('balanceAccountingStore', {
 
-                Alpine.store('balanceAccountingStore', {
-
-                    balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
+                        balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
 
 
-                    addField() {
+                        addField() {
 
-                        initializeAutocomplete();
+                            initializeAutocomplete();
 
-                        this.balance_accounting.push({
-                            name: '',
-                            value: 0,
-                            date: ''
-                        });
-                    },
+                            this.balance_accounting.push({
+                                name: '',
+                                value: 0,
+                                date: ''
+                            });
+                        },
 
-                    // New method with confirmation
-                    confirmRemoveField(index) {
-                        if (confirm("Are you sure you want to remove this item?")) {
-                            this.removeField(index);
-                        }
-                    },
+                        // New method with confirmation
+                        confirmRemoveField(index) {
+                            if (confirm("Are you sure you want to remove this item?")) {
+                                this.removeField(index);
+                            }
+                        },
 
-                    removeField(index) {
-                        this.balance_accounting.splice(index, 1);
-                    },
+                        removeField(index) {
+                            this.balance_accounting.splice(index, 1);
+                        },
 
-                    calculateTotal() {
-                        return this.balance_accounting.reduce((total, item) => {
-                            return total + (parseFloat(item.value) || 0);
-                        }, 0);
-                    },
+                        calculateTotal() {
+                            return this.balance_accounting.reduce((total, item) => {
+                                return total + (parseFloat(item.value) || 0);
+                            }, 0);
+                        },
 
-                    // Update or add Shipping cost
-                    updateShippingCost(shippingCost) {
-                        let shippingFound = false;
+                        // Update or add Shipping cost
+                        updateShippingCost(shippingCost) {
+                            let shippingFound = false;
 
-                        for (let i = 0; i < this.balance_accounting.length; i++) {
-                            if (this.balance_accounting[i].name === 'Shipping cost') {
-                                this.balance_accounting[i].value = shippingCost;
-                                shippingFound = true;
-                                break;
+                            for (let i = 0; i < this.balance_accounting.length; i++) {
+                                if (this.balance_accounting[i].name === 'Shipping cost') {
+                                    this.balance_accounting[i].value = shippingCost;
+                                    shippingFound = true;
+                                    break;
+                                }
+                            }
+
+                            if (!shippingFound) {
+                                this.balance_accounting.push({
+                                    name: 'Shipping cost',
+                                    value: shippingCost
+                                });
                             }
                         }
-
-                        if (!shippingFound) {
-                            this.balance_accounting.push({
-                                name: 'Shipping cost',
-                                value: shippingCost
-                            });
-                        }
-                    }
-                });
+                    });
 
                 });
             </script>

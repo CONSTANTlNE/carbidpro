@@ -208,7 +208,6 @@ class CarController extends Controller
                 'customers',
                 'shipping_prices',
                 'extra_expenses',
-
             ),
         );
     }
@@ -368,7 +367,7 @@ class CarController extends Controller
             ])->get();
         }
 
-        if (auth()->user()->hasRole('Admin|Developer')) {
+        if (auth()->user()->hasRole('Admin|Developer') || auth()->user()->can('CarSee')) {
             $sortColumn    = $request->get('sort', 'customers.contact_name'); // Default sort by customer
             $sortDirection = $request->get('direction', 'asc'); // Default sorting direction
 

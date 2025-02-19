@@ -240,41 +240,42 @@ use Carbon\Carbon  ;
                     </div>
 
                     {{--Delete Button--}}
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                            data-target="#deleteCarModal{{$index}}" data-car-id="{{ $car->id }}">
-                        <i class="fa fa-trash-o"></i>
-                    </button>
-                    <div class="modal fade" id="deleteCarModal{{$index}}" tabindex="-1" role="dialog"
-                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header modal-header-primary">
-                                    <h3><i class="fa fa-user m-r-5"></i> Delete Car</h3>
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to
-                                        {!!  request()->has('archive') ? '<span class="text-danger">PERMANENTLY</span>' : ''!!}
-                                        delete this Car?</p>
-                                    <p>{{$car->vin}}</p>
-                                    <form action="{{ route('car.destroy', $car->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $car->id }}">
-                                        <div class="form-group user-form-group">
-                                            <div class="float-right">
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                        data-dismiss="modal">NO
-                                                </button>
-                                                <button type="submit" class="btn btn-add btn-sm">YES</button>
+                    @can('CarUpdate')
+                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                data-target="#deleteCarModal{{$index}}" data-car-id="{{ $car->id }}">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                        <div class="modal fade" id="deleteCarModal{{$index}}" tabindex="-1" role="dialog"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header modal-header-primary">
+                                        <h3><i class="fa fa-user m-r-5"></i> Delete Car</h3>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to
+                                            {!!  request()->has('archive') ? '<span class="text-danger">PERMANENTLY</span>' : ''!!}
+                                            delete this Car?</p>
+                                        <p>{{$car->vin}}</p>
+                                        <form action="{{ route('car.destroy', $car->id) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $car->id }}">
+                                            <div class="form-group user-form-group">
+                                                <div class="float-right">
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                            data-dismiss="modal">NO
+                                                    </button>
+                                                    <button type="submit" class="btn btn-add btn-sm">YES</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    @endcan
                     {{--credit recalculation--}}
                     @role('Developer')
                     @if($car->latestCredit)
