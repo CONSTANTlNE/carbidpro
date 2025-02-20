@@ -4,21 +4,21 @@
         <!-- sidebar menu -->
         <ul class="sidebar-menu">
 
+            @hasanyrole('Admin|Developer')
             <li class="{{ Route::is('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}"><i class="fa fa-tachometer"></i><span>Dashboard</span>
                     <span class="pull-right-container"></span>
                 </a>
             </li>
-            @hasrole('Dispatch')
-            <li class="{{ Route::is('car.showStatus') ? 'active' : '' }}">
-                <a href="/dashboard/cars/status/for-dispatch">
-                    <i class="fa fa-automobile"></i><span>Cars</span>
-                    <span class="pull-right-container"></span>
-                </a>
-            </li>
-            @endrole
+            @endhasanyrole
 
-
+{{--            @hasanyrole('Dispatch')--}}
+{{--            <li class="{{ Route::is('cars.index') ? 'active' : '' }}">--}}
+{{--                <a href="{{ route('cars.index') }}"><i class="fa fa-tachometer"></i><span>Cars</span>--}}
+{{--                    <span class="pull-right-container"></span>--}}
+{{--                </a>--}}
+{{--            </li>--}}
+{{--            @endhasanyrole--}}
             <li class="treeview active {{request()->routeIs('cars.index') || request()->routeIs('carpayment.index') ? 'active' : ''}}">
 
                 <a href="#">
@@ -29,39 +29,38 @@
                 </a>
 
                 <ul class="treeview-menu">
-                    @can('CarCreate')
-                        <li class="{{ Route::is('car.create') ? 'active' : '' }}">
-                            <a href="{{ route('car.create') }}">
-                                <span>Add Car</span>
-                                <span class="pull-right-container"></span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('CarSee')
-                        <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
-                            <a href="{{ route('cars.index') }}">
-                                <span>Current Cars</span>
-                                <span class="pull-right-container"></span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('Admin')
-                        <li class="{{ Route::is('cars.index.trashed') ? 'active' : '' }}">
-                            <a href="{{ route('cars.index.trashed', ['archive' => 'archive']) }}">
-                                <span>Archived Cars</span>
-                                <span class="pull-right-container"></span>
-                                @if($archivedCount>0)
-                                    <span style="background: red!important;color: white!important"
-                                          class="pull-right badge">{{$archivedCount}}</span>
-                                @endif
-                            </a>
-                        </li>
-                    @endcan
+                    @hasanyrole('Admin|Developer')
+                    <li class="{{ Route::is('car.create') ? 'active' : '' }}">
+                        <a href="{{ route('car.create') }}">
+                            <span>Add Car</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
+                    @endhasanyrole
+                    @hasanyrole('Admin|Developer')
+                    <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
+                        <a href="{{ route('cars.index') }}">
+                            <span>Current Cars</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
+                    @endhasanyrole
+                    @hasanyrole('Admin|Developer')
+                    <li class="{{ Route::is('cars.index.trashed') ? 'active' : '' }}">
+                        <a href="{{ route('cars.index.trashed', ['archive' => 'archive']) }}">
+                            <span>Archived Cars</span>
+                            <span class="pull-right-container"></span>
+                            @if($archivedCount>0)
+                                <span style="background: red!important;color: white!important"
+                                      class="pull-right badge">{{$archivedCount}}</span>
+                            @endif
+                        </a>
+                    </li>
+                    @endhasanyrole
                 </ul>
             </li>
 
             @hasanyrole('Admin|Developer')
-
             <li class="treeview active {{request()->routeIs('customer.balance.index') || request()->routeIs('carpayment.index') ? 'active' : ''}}">
                 <a href="#">
                     <i class="fa fa-money"></i><span>Payments</span>
@@ -88,7 +87,6 @@
                     </li>
                 </ul>
             </li>
-
             <li class="treeview {{request()->routeIs('users.index') || request()->routeIs('customers.index') || request()->routeIs('customers.archived') ? 'active' : ''}}">
                 <a href="#">
                     <i class="fa fa-user-circle"></i><span>Users</span>

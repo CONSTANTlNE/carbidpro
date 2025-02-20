@@ -77,7 +77,7 @@
     <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
         <thead class="back_table_color">
         <tr class="info">
-            <th></th>
+
             <th>ID</th>
             <th>CAR INFO</th>
             <th>Car type</th>
@@ -92,12 +92,13 @@
 
         @foreach ($cars as $car)
             <tr>
+
                 <td>
-                    <input type="checkbox" class="car_ids" name="car_ids[]" value="{{ $car->id }}">
-                    {{ $car->model }}<br>
+                    <label for="{{$car->vin}}" style="cursor:pointer">
+                        <input id="{{$car->vin}}" type="checkbox" class="car_ids" name="car_ids[]" value="{{ $car->id }}">
+                        {{ $car->id }}
+                    </label>
                 </td>
-                <td>
-                    {{ $car->id }}</td>
                 <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                 <input type="hidden" name="status"
                        value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">

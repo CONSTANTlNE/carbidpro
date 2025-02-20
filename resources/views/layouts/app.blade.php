@@ -58,7 +58,7 @@
 </head>
 
 {{--<body class="@yield('body-class', '')">--}}
-<body class="sidebar-mini  pace-done">
+<body class="sidebar-mini  pace-done sidebar-collapse">
 
 <div id="htmxerrors"></div>
 @yield('content')

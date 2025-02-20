@@ -44,6 +44,7 @@ class ContainerController extends Controller
             $container_status = ContainerStatus::withCount('cars')->get();
         } else {
             $container_status = ContainerStatus::withCount([
+                'containerStatus',
                 'cars' => function ($query) {
                     $query->where('dispatch_id', auth()->id());
                 },

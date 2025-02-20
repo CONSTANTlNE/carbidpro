@@ -106,7 +106,9 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
     // Dasboard Analitics
     Route::controller(AdminController::class)->group(function () {
-        Route::get('/', 'adminIndex')->name('dashboard');
+        Route::get('/', 'adminIndex')
+            ->middleware('role:Admin|Developer')
+            ->name('dashboard');
     });
 
     // Users
@@ -138,6 +140,9 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/ready-for-pickup', 'readyForPickup')->name('car.readyforpickup');
         Route::get('/cars/archive/restore/{id}', 'restoreTrashed')->name('car.trashed.restore');
         Route::post('/car/image/delete', 'deleteImage')->name('car.image.delete');
+        Route::get('/car/payment/image/delete/{id}', 'deletePaymentImage')->name('car.paymentImage.delete');
+        Route::post('/car/change/status', 'changeCarStatus')->name('car.change.status');
+
 
 
 
@@ -174,6 +179,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/arrived/car/{id}/update', 'updateCar')->name(name: 'arrived.car-update');
         Route::get('/arrived/car/{id}/show-image/', 'showImages')->name(name: 'arrived.showImages');
         Route::post('/arrived/image/delete', 'deleteImage')->name(name: 'arrived.image.delete');
+        Route::get('/arrived/delete/images/{car_id}', 'deleteBolImage')->name(name: 'arrived.images.delete');
+
 
     });
 

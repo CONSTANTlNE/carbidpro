@@ -8,6 +8,7 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Services\smsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ArrivedController extends Controller
@@ -144,11 +145,21 @@ class ArrivedController extends Controller
         }
 
         if ($request->hasFile('bill_of_loading')) {
+
+            //  if changed file by user , delete previous file from storage
+            if ($car->bill_of_loading!==null){
+                $filepath='public/'.$car->bill_of_loading;
+                if (Storage::exists($filepath)) {
+                    Storage::delete($filepath);
+                }
+            }
+
             // Get the uploaded file (single file)
             $photo = $request->file('bill_of_loading');
 
             // Store the file in 'public/payment_photos' directory
             $path = $photo->store('bill_of_loading', 'public');
+
             // Save the path in the database
             $car->bill_of_loading = $path;
         }
@@ -156,8 +167,7 @@ class ArrivedController extends Controller
         if ($request->hasFile('container_images')) {
             foreach ($request->file('container_images') as $image) {
                 // Add each image to the media collection
-                $car
-                    ->addMedia($image)
+                $car->addMedia($image)
                     ->toMediaCollection('container_images');
             }
         }
@@ -190,5 +200,25 @@ class ArrivedController extends Controller
         $image->delete();
 
         return back();
+    }
+
+    public function deleteBolImage($id)
+    {
+        $car=Car::where('id', $id)->first();
+
+        if ($car){
+            $filename = $car->bill_of_loading;
+            $filepath='public/'.$filename;
+
+            if (Storage::exists($filepath)) {
+                Storage::delete($filepath);
+                $car->bill_of_loading = null;
+                $car->save();
+                return back()->with('success', 'Image deleted successfully.');
+            } else {
+                return back()->with('error', 'File not found.');
+            }
+        }
+        return back()->with('error', 'Group not found.');
     }
 }

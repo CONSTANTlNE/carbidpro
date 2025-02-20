@@ -90,7 +90,7 @@
 
                                             @php
                                                 $hasError = '';
-                                                $groupCount = isset($groups) && is_object($groups) ? count($groups) : $status->container_status_count; // Ensure $groups is valid and countable
+//                                                $groupCount = isset($groups) && is_object($groups) ? count($groups) : $status->container_status_count; // Ensure $groups is valid and countable
                                             @endphp
                                             @if (auth()->user()->hasRole('Finance') && $status->slug == 'loaded-payments')
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"

@@ -19,6 +19,9 @@
         <thead class="back_table_color">
         <tr class="info">
             <th>ID</th>
+            @hasanyrole('Admin|Developer')
+            <th>Change Status</th>
+            @endhasanyrole
             <th>CAR INFO</th>
             <th>FROM-TO</th>
 
@@ -51,6 +54,22 @@
 
                 <td>
                     {{ $car->id }}</td>
+                @hasanyrole('Admin|Developer')
+                <td>
+                    <div class="col-12">
+                        <label>CAR Status</label>
+                        <select name="status" class="form-control" id="customer_id"
+                                hx-post="{{route('car.change.status')}}"
+                                hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
+                                onchange="setTimeout(() => { window.location.reload() }, 200)"
+                        >
+                            @foreach($statuses as $statusindex => $status)
+                                <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </td>
+                @endhasanyrole
                 <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                 <form action="{{ route('car.listupdate', $car->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -93,14 +112,14 @@
                         <div style="display: flex;flex-direction: column;gap: 10px; justify-content: center;height: 100%!important">
                             <!-- Button to open the modal -->
                             <button type="button"
-                                    class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                    class="btn btn-sm {{ !$car->getMedia('images')->isNotEmpty() ? 'btn-danger' : 'btn-success' }}"
                                     data-toggle="modal" data-target="#imageUploadModal-{{ $car->id }}"
                                     data-record-id="{{ $car->id }}">
                                 Upload Car Photo
                             </button>
 
                             <button type="button"
-                                    class="btn  btn-sm  {{ !$car->getMedia('bl_images')->isNotEmpty() ? 'btn-danger' : 'btn-primary' }}"
+                                    class="btn  btn-sm  {{ !$car->getMedia('bl_images')->isNotEmpty() ? 'btn-danger' : 'btn-success' }}"
                                     data-toggle="modal"
                                     data-target="#blimage{{ $car->id }}">
                                 Upload BL Photo
@@ -128,7 +147,7 @@
                                                    id="filepond" name="images[]" multiple>
 
                                             <!-- Section to display existing images -->
-                                            @if ($car->getMedia('images')->isNotEmpty())
+                                            @if ($car->getMedia('bl_images')->isNotEmpty())
                                                 <div class="existing-images mt-4">
                                                     <h6>Existing Images</h6>
                                                     <div class="row mt-2">
@@ -138,6 +157,18 @@
                                                                     <img src="{{ $image->getUrl() }}" class="img-fluid"
                                                                          style="max-height: 100px; object-fit: cover;"
                                                                          alt="Uploaded Image">
+                                                                    <button style="margin-left: 20px"
+                                                                            hx-post="{{route('car.image.delete')}}"
+                                                                            hx-vals='{"image_id": "{{ $image->id }}", "_token": "{{ csrf_token() }}" }'
+                                                                            class="btn btn-sm"
+                                                                            type="button"
+                                                                            onclick="setTimeout( ()=> { this.parentElement.remove() }, 200) ">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                             height="24" viewBox="0 0 24 24">
+                                                                            <path fill="#ce0909"
+                                                                                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                        </svg>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -181,6 +212,18 @@
                                                                     <img src="{{ $image->getUrl() }}" class="img-fluid"
                                                                          style="max-height: 100px; object-fit: cover;"
                                                                          alt="Uploaded Image">
+                                                                    <button style="margin-left: 20px"
+                                                                            hx-post="{{route('car.image.delete')}}"
+                                                                            hx-vals='{"image_id": "{{ $image->id }}", "_token": "{{ csrf_token() }}" }'
+                                                                            class="btn btn-sm"
+                                                                            type="button"
+                                                                            onclick="setTimeout( ()=> { this.parentElement.remove() }, 200) ">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                             height="24" viewBox="0 0 24 24">
+                                                                            <path fill="#ce0909"
+                                                                                  d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                        </svg>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         @endforeach

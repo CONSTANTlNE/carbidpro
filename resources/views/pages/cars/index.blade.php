@@ -62,12 +62,15 @@
                                         @if(!request()->has('archive'))
                                             <div class="buttonexport">
                                                 @hasanyrole('Admin|Developer')
-                                                <a href="{{ route('car.create') }}" class="btn btn-add"><i
-                                                            class="fa fa-plus"></i>
-                                                    Add Car</a>
+                                                <a href="{{ route('car.create') }}" class="btn btn-add">
+                                                    <i class="fa fa-plus"></i>
+                                                    Add Car
+                                                </a>
+                                                <a href="{{ route('cars.index') }}" class="btn btn-primary">
+                                                    <i class="fa fa-automobile"></i>
+                                                    Current Cars
+                                                </a>
                                                 @endhasanyrole
-
-
 
                                                 @foreach ($car_status as $status)
                                                     @php
@@ -116,7 +119,8 @@
                                                     @endphp
                                                     <a href="{{ route('car.showStatus', $status->slug) }}"
                                                        class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-                                                        {{ $status->name }} {{ $status->id == 7 ?  $errorCount :  $status->cars_count }}
+{{--                                                        {{ $status->name }} {{ $status->id == 7 ?  $errorCount :  $status->cars_count }}--}}
+                                                        {{ $status->name }} {{ $status->cars_count }}
                                                     </a>
                                                 @endforeach
                                             </div>

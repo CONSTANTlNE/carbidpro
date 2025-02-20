@@ -781,7 +781,7 @@ class CarController extends Controller
     {
         $car = Car::where('id', $request->car_id)->first();
         if ($car) {
-            $car->car_status_id = $request->status;
+            $car->car_status_id = $request->car_status_id;
             $car->save();
 
             return back()->with('success', 'Car status changed successfully.');

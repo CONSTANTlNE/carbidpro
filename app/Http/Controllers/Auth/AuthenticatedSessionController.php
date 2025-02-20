@@ -29,6 +29,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if (auth()->user()->hasRole('Dispatch')) {
+            return to_route('cars.index');
+        }
+
+        if (auth()->user()->hasRole('Loader')) {
+            return to_route('container.showStatus','for-load');
+        }
+
+        if (auth()->user()->hasRole('Terminal Agent')) {
+            return to_route('arrived.index');
+        }
+
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

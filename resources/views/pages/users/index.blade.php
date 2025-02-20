@@ -212,7 +212,7 @@
                                                                                 @csrf
                                                                                 <input type="hidden" id="userId"
                                                                                        name="id"
-                                                                                       value="{{$user->user_id}}">
+                                                                                       value="{{$user->id}}">
                                                                                 <!-- Hidden field for user ID -->
                                                                                 <div class="row">
                                                                                     <!-- Text input for User Name -->

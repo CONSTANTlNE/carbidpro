@@ -3,6 +3,9 @@
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
+                @hasanyrole('Admin|Developer')
+                <th>Change Status</th>
+                @endhasanyrole
                 <th>CAR INFO</th>
                 <th>FROM-TO</th>
 
@@ -18,7 +21,24 @@
                 <tr>
 
                     <td>
-                        {{ $car->id }}</td>
+                        {{ $car->id }}
+                    </td>
+                    @hasanyrole('Admin|Developer')
+                    <td>
+                        <div class="col-12">
+                            <label>CAR Status</label>
+                            <select name="status" class="form-control" id="customer_id"
+                                    hx-post="{{route('car.change.status')}}"
+                                    hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
+                                    onchange="setTimeout(() => { window.location.reload() }, 200)"
+                            >
+                                @foreach($statuses as $statusindex => $status)
+                                    <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </td>
+                    @endhasanyrole
                     <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf

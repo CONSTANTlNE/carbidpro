@@ -187,7 +187,7 @@
                                                                                 </thead>
                                                                                 <tbody>
                                                                                 @foreach ($cargroup->cars as $carindex=> $car)
-                                                                                    {{--                                                                                    @dd($car->latestCredit)--}}
+                                                                                    {{-- @dd($car->latestCredit) --}}
                                                                                     <div class="car-wrapper">
                                                                                         <tr class="info">
                                                                                             <td>{{ $car->id }} </td>
@@ -261,15 +261,21 @@
                                                                                                         <img src="https://cdn-icons-png.freepik.com/256/10106/10106255.png?semt=ais_hybrid"
                                                                                                              style="max-width: 25px; margin-top:10px"
                                                                                                              alt="Receipt">
-                                                                                                    </a>
+                                                                                                        {{-- delete bol image--}}
+                                                                                                        <a href="{{route('arrived.images.delete',$car->id)}}">
+                                                                                                            <svg style="margin-top: 5px!important;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                                                                                                                <path fill="#b72525"
+                                                                                                                      d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                                                            </svg>
+                                                                                                        </a>
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
-                                                                                                <div id="target{{$carindex}}">
+                                                                                                <div id="target{{$car->vin}}">
                                                                                                     @if($car->ready_for_pickup===0)
                                                                                                         <div hx-get="{{route('car.readyforpickup')}}"
                                                                                                              hx-vals='{"carindex": "{{$carindex}}","car_id": "{{$car->id}}"}'
-                                                                                                             hx-target="#target{{$carindex}}"
+                                                                                                             hx-target="#target{{$car->vin}}"
                                                                                                              class="btn btn-danger"
                                                                                                              type="button">
                                                                                                             not ready
@@ -277,7 +283,7 @@
                                                                                                     @else
                                                                                                         <div hx-get="{{route('car.readyforpickup')}}"
                                                                                                              hx-vals='{"carindex": "{{$carindex}}","car_id": "{{$car->id}}"}'
-                                                                                                             hx-target="#target{{$carindex}}"
+                                                                                                             hx-target="#target{{$car->vin}}"
                                                                                                              class="btn btn-success"
                                                                                                              type="button">
                                                                                                             ready
