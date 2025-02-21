@@ -59,17 +59,17 @@
             }
         </style>
     @endpush
-    <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-             data-background="/frontendAssets/images/cargo.jpeg"
-             style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
-        <span class="background_overlay"></span>
-        <div class="container">
-            <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{{Cache::get('dashboardStatics' . session()->get('locale'))['Payment History'] }}</h2>
+{{--    <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"--}}
+{{--             data-background="/frontendAssets/images/cargo.jpeg"--}}
+{{--             style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">--}}
+{{--        <span class="background_overlay"></span>--}}
+{{--        <div class="container">--}}
+{{--            <div class="ft-breadcrumb-content headline text-center position-relative">--}}
+{{--                <h2 style="margin-top: 80px;padding: 0;">{{Cache::get('dashboardStatics' . session()->get('locale'))['Payment History'] }}</h2>--}}
 
-            </div>
-        </div>
-    </section>
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </section>--}}
 
     <div class="container">
         @include('frontend.components.customer-nav-links')

@@ -159,7 +159,6 @@ class CustomerBalanceController extends Controller
             'amount' => 'required|numeric|min:1',
         ]);
 
-
         $car = car::find($request->car_id);
 
         // Return error message if Payment is more that total amount Due
@@ -204,7 +203,7 @@ class CustomerBalanceController extends Controller
             $content = [
                 'dealer_name'  => auth()->user()->contact_name,
                 'dealer_email' => auth()->user()->email,
-                'car_model'    => $car->make,
+                'car_model'    => $car->make_model_year,
                 'car_vin'      => $car->vin,
                 'payed'        => $request->amount,
             ];

@@ -92,22 +92,22 @@ $creditService = new CreditService();
 
         </style>
     @endpush
-    <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"
-             data-background="/frontendAssets/images/cargo.jpeg"
-             style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">
-        <span class="background_overlay"></span>
-        <div class="container">
-            <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">
-                    @if(request()->routeIs('customer.dashboard'))
-                    {{$dashboardStatics['My Cars']}}
-                    @elseif(request()->routeIs('customer.archivedcars'))
-                        {{$dashboardStatics['Car History']}}
-                    @endif
-                </h2>
-            </div>
-        </div>
-    </section>
+{{--    <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"--}}
+{{--             data-background="/frontendAssets/images/cargo.jpeg"--}}
+{{--             style="background-image: url(&quot;/assets/images/cargo.jpeg&quot;);">--}}
+{{--        <span class="background_overlay"></span>--}}
+{{--        <div class="container">--}}
+{{--            <div class="ft-breadcrumb-content headline text-center position-relative">--}}
+{{--                <h2 style="margin-top: 80px;padding: 0;">--}}
+{{--                    @if(request()->routeIs('customer.dashboard'))--}}
+{{--                    {{$dashboardStatics['My Cars']}}--}}
+{{--                    @elseif(request()->routeIs('customer.archivedcars'))--}}
+{{--                        {{$dashboardStatics['Car History']}}--}}
+{{--                    @endif--}}
+{{--                </h2>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </section>--}}
 
     <div class="container">
 
@@ -121,22 +121,22 @@ $creditService = new CreditService();
                     <table id="myTable" class="display m-auto compact">
                         <thead>
                         <tr class="text-center">
-                            <th class="text-center">{{$dashboardStatics['Date']}}</th>
-                            <th class="text-center">{{$dashboardStatics['Make/Model/Year']}}</th>
-                            <th class="text-center">{{$dashboardStatics['VIN / CONTAINER']}}</th>
+                            <th >{{$dashboardStatics['Date']}}</th>
+                            <th >{{$dashboardStatics['Make/Model/Year']}}</th>
+                            <th >{{$dashboardStatics['VIN / CONTAINER']}}</th>
                             {{-- {{Cache::get('dashboardStatics'.session()->get('locale'))['']}} --}}
                             @if (!auth()->user()->hasRole('portmanager'))
-                                <th class="text-center">{{$dashboardStatics['Release car to']}}</th>
+                                <th >{{$dashboardStatics['Release car to']}}</th>
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
                                 @if (session()->get('auth')->child_of <= 0)
-                                    <th class="text-center">{{$dashboardStatics['Add Team']}}</th>
+                                    <th >{{$dashboardStatics['Add Team']}}</th>
                                 @else
                                     <th></th>
                                 @endif
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
-                                <th class="text-center">{{$dashboardStatics['Payment']}}</th>
+                                <th >{{$dashboardStatics['Payment']}}</th>
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
                                 <th class="text-center">{{$dashboardStatics['Action']}}</th>
@@ -181,30 +181,29 @@ $creditService = new CreditService();
                                       }
                             @endphp
 
-                            <tr style="background-color: {{ $color }}" class="text-center">
-                                <td style="font-size: 14px;min-width: 90px"
-                                    class="text-center">
+                            <tr style="background-color: {{ $color }}">
+                                <td style="font-size: 14px;min-width: 90px">
                                     {{ $car->created_at->format('d-m-Y') }}
                                     <span>Days:  {{ $car->created_at->diffInDays(now())}}</span>
                                 </td>
-                                <td class="text-center">{{ $car->make_model_year }}</td>
+                                <td >{{ $car->make_model_year }}</td>
                                 {{-- Car VIN AND CONTAINER --}}
-                                <td class="text-center">
-                                    <div class="d-flex flex-column text-center gap-2">
-                                        <div class="d-flex justify-content-center align-items-middle gap-2">
+                                <td >
+                                    <div class="d-flex flex-column  gap-2">
+                                        <div class="d-flex justify-content-start align-items-middle gap-2">
                                             <span class="d-flex align-middle">{{$car->media->isNotEmpty() ? '📷' : ''}}</span>
                                             VIN:
                                             <a style="color: #1a7fca;font-size: 15px;" target="_blank"
                                                href="{{route('customer.car-info', $car->vin)}}">
-                                                {{ $car->vin}}
+                                                {{$car->vin}}
                                             </a>
                                             <span style="cursor: pointer;" class="p-cursor"
                                                   onclick="navigator.clipboard.writeText('{{ $car->vin }}')">
                                               <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
                                             </span>
                                         </div>
-                                        <div class="d-flex justify-content-center align-items-middle gap-2">
-                                            @if($car->groups->first())
+                                        <div class="d-flex justify-content-start align-items-middle gap-2">
+                                            @if($car->groups->first()?->container_id )
                                                 CONTAINER :
                                                 <a style="color: #1a7fca;font-size: 15px; " target="_blank"
                                                    @if($car->groups->first()?->thc_agent==='MAERSK')
@@ -225,7 +224,7 @@ $creditService = new CreditService();
                                                    @if($car->groups->first()?->thc_agent==='One net-Wilhelmsen')
                                                        href="{{'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking' }}
                                                 " {{$car->groups->first()?->container_id}}
-                                                        @endif
+                                                    @endif
                                                 >{{$car->groups->first()?->container_id}}</a>
                                                 <span style="cursor: pointer;" class="p-cursor"
                                                       onclick="navigator.clipboard.writeText('{{ $car->groups->first()->container_id}}')">
@@ -237,8 +236,8 @@ $creditService = new CreditService();
                                 </td>
                                 {{-- Car Owner To--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
-                                    <td class="text-center" style="min-width: 160px">
-                                        <div class="my-cars__td-relase-car-to-item  d-flex align-items-center justify-content-center"
+                                    <td  style="min-width: 160px">
+                                        <div style="cursor: pointer" class="  d-flex align-items-start justify-content-center"
                                              onclick="
                                     tglbtn= document.getElementById('release_to_{{ $car->id }}');
                                     if(tglbtn.style.display == 'none'){
@@ -307,16 +306,16 @@ $creditService = new CreditService();
                                 {{-- Add Team--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
                                     @if (session()->get('auth')->child_of <= 0)
-                                        <td style="min-width: 150px" class="text-center">
-                                            <form action="{{route('customer.addTeamToCar')}}" method="post">
+                                        <td style="width: 160px!important"   >
+                                            <form style="width: 160px!important" action="{{route('customer.addTeamToCar')}}" method="post">
                                                 @csrf
                                                 <input type="hidden" name="car_id" class="car_id"
                                                        value="{{ $car->id }}">
-                                                <select name="team_id" class="form-control team_id" id="team_id"
+                                                <select style="max-width: 150px!important"   name="team_id" class="form-control team_id" id="team_id"
                                                         onchange="this.form.submit()">
                                                     <option value="remove_team"></option>
                                                     @foreach ($teams as $team)
-                                                        <option value="{{ $team->id }}"
+                                                        <option  value="{{ $team->id }}"
                                                                 {{ $car->team_id == $team->id ? 'selected' : '' }}>
                                                             {{ $team->contact_name }}
                                                         </option>
@@ -329,7 +328,7 @@ $creditService = new CreditService();
                                     @endif
                                 @endif
                                 {{-- Payments Column--}}
-                                @if (session()->get('auth')->child_of <= 0)
+{{--                                @if (auth()->user()->child_of <= 0)--}}
                                     @if (!auth()->user()->hasRole('portmanager'))
                                         <td style="text-align: left">
                                             {{-- Total Cost incl interest if credit granted--}}
@@ -361,7 +360,7 @@ $creditService = new CreditService();
                                             </div>
                                         </td>
                                     @endif
-                                @endif
+{{--                                @endif--}}
                                 {{-- Invoice payment and credit info--}}
                                 @if (!auth()->user()->hasRole('portmanager'))
                                     <td style="min-width: 200px">
@@ -475,7 +474,7 @@ $creditService = new CreditService();
                                             @endif
                                         </div>
                                         {{--Invoice--}}
-                                        <form target="_blank" action="{{route('customer.generate_invoice')}}"
+                                        <form class="d-flex justify-content-center" target="_blank" action="{{route('customer.generate_invoice')}}"
                                               method="get">
 
                                             <input type="hidden" value="{{ $car->id }}" name="car_id">
@@ -489,11 +488,11 @@ $creditService = new CreditService();
                                             <div style="display: flex;justify-content: center;height: 30px">
                                                 <form action="{{route('customer.set_amount')}}" method="post">
                                                     @csrf
-                                                    <input type="hidden" value="{{ $car->id }}" name="car_id">
-                                                    <input style="width: 80px;height: 100%;border-radius: 5px;"
+                                                    <input  type="hidden" value="{{ $car->id }}" name="car_id">
+                                                    <input style="width: 65px;height: 27px;border-radius: 5px;"
                                                            type="text"
                                                            name="amount">
-                                                    <button style="width: 80px;border: none;border-radius: 5px;padding: 2px;background: #00b050;color: white">
+                                                    <button style="width: 65px;border: none;border-radius: 5px;padding: 2px;background: #00b050;color: white">
                                                         {{$dashboardStatics['Pay']}}
                                                     </button>
                                                 </form>

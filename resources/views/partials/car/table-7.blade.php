@@ -252,8 +252,8 @@
                             </option>
                         </select>
 
-                        <label for="payment_company">Company Name</label>
-                        <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
+                        <label for="payment_company">Receiver Name</label>
+                        <input type="text" value="{{ $car->payment_company }}" placeholder="Receiver Name"
                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
 
                         <label for="payment_address">Payment Address</label>

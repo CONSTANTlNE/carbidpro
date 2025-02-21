@@ -399,12 +399,12 @@
                                     </div>
 
 
-                                    <div class="form-group" style="max-width: 100%">
-                                        <label>Container #</label><br>
-                                        <input name="container_number" class="form-control" id="container_number"
-                                               type="text">
+{{--                                    <div class="form-group" style="max-width: 100%">--}}
+{{--                                        <label>Container #</label><br>--}}
+{{--                                        <input name="container_number" class="form-control" id="container_number"--}}
+{{--                                               type="text">--}}
 
-                                    </div>
+{{--                                    </div>--}}
 
                                     <div class="form-group" style="max-width: 100%">
                                         <label>Images</label><br>
@@ -445,11 +445,9 @@
                                                 <select name="is_dispatch" class="form-control" id="is_dispatch">
                                                     <option value="yes" selected>YES</option>
                                                     <option value="no">NO</option>
-
                                                 </select>
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="reset-button">
                                         @can('CarCreate')

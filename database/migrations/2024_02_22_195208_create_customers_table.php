@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('unhashed_password')->nullable();
             $table->string('image')->nullable();
+            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });

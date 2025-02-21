@@ -33,7 +33,8 @@
         <span class="background_overlay"></span>
         <div class="container">
             <div class="ft-breadcrumb-content headline text-center position-relative">
-                <h2 style="margin-top: 80px;padding: 0;">{!! $tr->translate('Car') !!}: {{ $car->vin }}</h2>
+{{--                {!! $tr->translate('Car') !!}--}}
+                <h2 style="margin-top: 80px;padding: 0;">VIN: {{ $car->vin }}</h2>
 
             </div>
         </div>
@@ -41,8 +42,8 @@
 
     <div class="container">
         <div class="car-information__back-button text-center">
-            <a href="{{ route('customer.dashboard') }}">
-                < Back to my cars </a>
+{{--            <a href="{{ route('customer.dashboard') }}">--}}
+{{--                < Back to my cars </a>--}}
         </div>
         <div class="row">
                 <div class="col-lg-5 mt-5 mb-5">
@@ -81,8 +82,8 @@
                         <a class="d-flex justify-content-center mt-3"
                            href="{{ route('customer.download_images', $car->vin) }}">
                             <img width="20px" src="https://www.svgrepo.com/show/140007/download-button.svg">
-                            Download
-                            Images</a>
+                            Download Images
+                        </a>
                     @endif
                 </div>
                 <div class="col-lg-7 mt-5 mb-5">

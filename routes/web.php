@@ -457,6 +457,10 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 });
 
 // ====  Dealer dashboard  ROUTES  ====
+
+Route::get('/car-info/{vin?}', [CustomerController::class,'showCar'])->name('customer.car-info');
+Route::get('/container/tracking', [CustomerController::class,'trackContainer'])->name('guest.track.container');
+
 Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
     Route::get('/calculator', [calculatorController::class, 'index'])->name('calculator.index');
@@ -470,7 +474,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
         Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
 
-        Route::get('/car-info/{vin}', 'showCar')->name('customer.car-info');
+
 
         Route::post('/save-release', 'saveRelease')->name('saveRelease');
 

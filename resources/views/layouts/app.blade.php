@@ -58,11 +58,11 @@
 </head>
 
 {{--<body class="@yield('body-class', '')">--}}
-<body class="sidebar-mini  pace-done sidebar-collapse">
+<body class="sidebar-mini  pace-done">
 
 <div id="htmxerrors"></div>
-@yield('content')
 
+@yield('content')
 @yield('auctions')
 @yield('locations')
 @yield('load-types')
@@ -75,7 +75,7 @@
 @yield('selectedsms')
 @yield('roles')
 @yield('states')
-{{--Site Settings--}}
+{{-- Site Settings --}}
 @yield('sliders')
 @yield('announces')
 @yield('settings')

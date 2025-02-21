@@ -80,7 +80,7 @@
                         @include('partials.car.table_content-parts.car-price')
                     </td>
                     <td>
-                        <label for="company_name">Company name:</label><br>
+                        <label for="company_name">Receiver Name:</label><br>
                         {{ $car->company_name }}
                         <br>
                         <label for="contact_info">Contact info:</label><br>
@@ -250,18 +250,18 @@
                             </option>
                         </select>
 
-                        <label for="payment_company">Company Name</label>
-                        <input type="text" value="{{ $car->payment_company }}" placeholder="Company Name"
+                        <label for="payment_company">Receiver Name</label>
+                        <input type="text" value="{{ $car->payment_company }}" placeholder="Receiver Name"
                                name="payment_company" id="payment_company" class="mt-1 form-control" required>
 
                         <label for="payment_address">Payment Address</label>
                         <input type="text" value="{{ $car->payment_address }}" name="payment_address"
                                id="payment_address" class="form-control" required>
 
-
                         <div class="record-row">
                             <label for="payment_photo_1">Recipte</label>
-                            <input type="file" id="payment_photo_1" name="payment_photo" required
+                            <input type="file" id="payment_photo_1" name="payment_photo"
+                                   {{empty($car->payment_photo) ? 'required' : ''}}
                                    accept="image/*" onchange="previewImage(event, 'preview_{{ $car->id }}')">
                             <br>
                             <br>

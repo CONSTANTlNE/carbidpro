@@ -6,6 +6,7 @@ use App\Mail\ContactMail;
 use App\Mail\RegisterMail;
 use App\Mail\SampleMail;
 use App\Mail\teamRegisterMail;
+use App\Models\ContainerGroup;
 use App\Models\Extraexpence;
 use Illuminate\Support\Facades\Mail;
 
@@ -130,29 +131,35 @@ class CustomerController extends Controller
         return back()->with('success', 'Car details updated successfully.');
     }
 
-    public function showCar($vin)
+    public function showCar(Request $request, $vin = null)
     {
-        $customer = auth()->user();
+        if ($request->search) {
+            $vin = $request->search;
+        }
 
-        $car = Car::with(['state', 'toPort', 'loadType', 'auction', 'media'])->where('vin', $vin)->where('is_active',
-            1)->where('customer_id', $customer->id)->first();
+
+        $car = Car::with(['state', 'toPort', 'loadType', 'auction', 'media'])->where('vin', $vin)
+            ->where('is_active', 1)->first();
+
 
         if (!$car) {
-            return redirect(route('customer.dashboard'));
+            return back()->with('error', 'Car not found');
         }
 
-        if (Session::has('locale')) {
-            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
-            $tr->setSource('en'); // Translate from English
-            $tr->setSource(); // Detect language automatically
-            $tr->setTarget(Session::get('locale')); // Translate to Georgian
-        } else {
-            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
-            $tr->setSource('en'); // Translate from English
-            Session::put('locale', 'en');
-        }
 
-        return view('frontend.pages.customer.car-info', compact('tr', 'car'));
+//        if (Session::has('locale')) {
+//            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+//            $tr->setSource('en'); // Translate from English
+//            $tr->setSource(); // Detect language automatically
+//            $tr->setTarget(Session::get('locale')); // Translate to Georgian
+//
+//        } else {
+//            $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+//            $tr->setSource('en'); // Translate from English
+//            Session::put('locale', 'en');
+//        }
+
+        return view('frontend.pages.customer.car-info', compact('car'));
     }
 
     public function download($vin)
@@ -304,8 +311,7 @@ class CustomerController extends Controller
             return redirect()->back()->withErrors($validator);
         }
 
-        $customer = Customer::find($id);
-        $customer->assignRole($request->role);
+        $customer                 = Customer::find($id);
         $customer->contact_name   = $request->input('contact_name');
         $customer->company_name   = "";
         $customer->phone          = $request->input('phone');
@@ -614,14 +620,12 @@ class CustomerController extends Controller
             $customer->is_active         = 1; // Set account as active by default
             $customer->child_of          = $current->id; // assign main dealer ID as parent if subdealer is registered by a main dealer
             // Extra is a Dealer profit added for subdealer transactions or we can set manually and give either discount or different price for particular dealers
-            $customer->extra_for_team = isset($request->extra_for_team) ? $request->extra_for_team : 0;
-            $customer->comment          = $request->input('comment');
-            $customer->	newwebsitecustomer=1;
+            $customer->extra_for_team     = isset($request->extra_for_team) ? $request->extra_for_team : 0;
+            $customer->comment            = $request->input('comment');
+            $customer->newwebsitecustomer = 1;
             $customer->save();
 
             $customer->save();
-
-            $customer->assignRole($request->role);
 
             $content = [
                 'contact_name'  => $customer->contact_name,
@@ -664,7 +668,7 @@ class CustomerController extends Controller
                     ]);
                     if ($request->input($extraexpense->name) > 0) {
                         $extraExpenseArray[] = [
-                            'name' => $extraexpense->name,
+                            'name'  => $extraexpense->name,
                             'value' => $request->input($extraexpense->name),
                         ];
                     }
@@ -684,8 +688,6 @@ class CustomerController extends Controller
             if (!isset($request->admin)) {
                 Mail::to(config('carbiddata.email'))->send(new RegisterMail($content));
             }
-
-            $customer->assignRole('dealer');
         }
 
         if (isset($request->admin)) {
@@ -698,5 +700,25 @@ class CustomerController extends Controller
         }
 
         return redirect(route('customer.login.get'))->with('success', 'Your account will be activated.');
+    }
+
+    // for main page search by container
+    public function trackContainer(Request $request)
+    {
+        $container = ContainerGroup::where('container_id', $request->container)->first();
+
+        $url = match ($container->thc_agent) {
+            'MAERSK' => 'https://www.maersk.com/tracking/'.$container->container_id,
+            'Hapag-Eisa' => 'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container='.$container->container_id,
+            'COSCO' => 'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number='.$container->container_id,
+            'Turkon-DTS' => 'https://my.turkon.com/container-tracking',
+            'One net-Wilhelmsen' => 'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking',
+        };
+
+        if (!$container) {
+            return back()->with('container_error', 'Container not found');
+        }
+
+        return redirect($url);
     }
 }

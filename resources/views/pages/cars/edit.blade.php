@@ -361,12 +361,19 @@
                                                        name="owner_id_number" id="owner_id_number" class="form-control">
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <div class="col-md-2">
                                                 <label for="owner_phone_number">Owner Phone number
                                                 </label>
                                                 <input type="text" value="{{ $car->owner_phone_number }}"
                                                        name="owner_phone_number" id="owner_phone_number"
                                                        class="form-control">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label>Container #</label><br>
+                                                <input name="container_number" class="form-control" id="container_number"
+                                                       value="{{$container_id}}"
+                                                       disabled
+                                                       type="text">
                                             </div>
 
                                         </div>
@@ -394,13 +401,6 @@
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div class="form-group" style="max-width: 100%">
-                                        <label>Container #</label><br>
-                                        <input name="container_number" class="form-control" id="container_number"
-                                               type="text">
-
                                     </div>
 
                                     <div class="form-group" style="max-width: 100%">

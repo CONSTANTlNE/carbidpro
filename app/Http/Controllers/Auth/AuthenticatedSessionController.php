@@ -41,7 +41,6 @@ class AuthenticatedSessionController extends Controller
             return to_route('arrived.index');
         }
 
-
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

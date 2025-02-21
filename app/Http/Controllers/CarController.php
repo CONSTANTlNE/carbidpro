@@ -84,7 +84,7 @@ class CarController extends Controller
                     ->orderBy('dispatcher.name', $sortDirection);
             } elseif ($sortColumn == 'car_statuses.name') {
                 $cars = $cars
-                    ->join('car_statuses', 'cars.status', '=', 'car_statuses.id')
+                    ->join('car_statuses', 'cars.car_status_id', '=', 'car_statuses.id')
                     ->select('cars.*', 'car_statuses.name as status_name') // Select the status name for sorting
                     ->orderBy('car_statuses.name', $sortDirection);
             } else {
@@ -477,6 +477,8 @@ class CarController extends Controller
     {
         $car        = Car::findOrFail($request->id);
         $car_status = CarStatus::get();
+        $container_id=$car->groups->first()?->container_id;
+
 
         $extra_expenses    = Extraexpence::all();
         $auctions          = Auction::all();
@@ -504,6 +506,7 @@ class CarController extends Controller
                 'shipping_prices',
                 'extra_expenses',
                 'selectedcustomer',
+                'container_id'
             ),
         );
     }

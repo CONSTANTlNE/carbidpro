@@ -422,8 +422,7 @@
                                                                                                disabled="" type="text">
                                                                                     </div>
                                                                                     <div class="col-md-3 form-group text-center">
-                                                                                        <label class="text-center">Total
-                                                                                            Due
+                                                                                        <label class="text-center">Total Due
                                                                                             <span style="font-size: 8px">(till today)</span>
                                                                                         </label>
                                                                                         <input value=""
@@ -444,11 +443,9 @@
                                                                                     </div>
                                                                                     <div class="col-md-8 form-group text-center">
                                                                                         <label class="text-center">Comment</label>
-                                                                                        <input style="width: 100%" value="{{($payment_report->Comment1)}}"
+                                                                                        <input style="width: 100%" value="{{($payment_report->comment)}}"
                                                                                                name="comment"
                                                                                                type="text">
-
-
                                                                                     </div>
                                                                                 </div>
                                                                                 <div>

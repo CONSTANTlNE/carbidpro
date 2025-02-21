@@ -49,11 +49,13 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request)
     {
+        $user = User::findOrFail($request->id);
+
         $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:users,email,'.$user->id,
+//            'email'    => 'required|email|max:255|unique:users,email,'.$user->id,
             // Ensure the email is unique, except for this user
             'password' => 'nullable|confirmed|min:6',
             // Validate password and confirmation, but it's optional (nullable)
