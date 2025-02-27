@@ -7,8 +7,11 @@ use App\Models\Car;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
 use App\Models\Extraexpence;
+use App\Models\Title;
+use App\Services\CreditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -23,10 +26,36 @@ class AdminController extends Controller
         $totalCarsPaid = Car::where('amount_due', 0)->count();
         $totalCarsDue = Car::where('amount_due', '!=', 0)->count();
 
+        $cars = Car::with('latestCredit')->get();
+
+        // gela task ... shipping cost is deducted from amount due
+        $totalAmountDue = $cars->sum(function ($car) {
+            // Get initial due amount
+            $amountDue = $car->latestCredit
+                ? round($car->latestCredit->credit_amount + app(CreditService::class)->totalInterestFromLastCalc($car->id))
+                : round($car->amount_due);
+
+            // Decode balance_accounting JSON
+            $balanceAccounting = json_decode($car->balance_accounting, true);
+
+            // Deduct Shipping Cost if it exists
+            if (is_array($balanceAccounting)) {
+                foreach ($balanceAccounting as $entry) {
+                    if ($entry['name'] === 'Shipping cost') {
+                        $amountDue -= (float) $entry['value'];
+                        break; // Stop loop once shipping cost is found
+                    }
+                }
+            }
+            return $amountDue;
+        });
+
+
+
 
         $totalDeposits =  number_format(CustomerBalance::where('type', 'fill')->sum('amount'), 0, '.', ',');
-        $totalAmountDue = number_format(Car::where('amount_due', '!=', 0)->sum('amount_due'), 0, '.', ',');
-        $totalSpent = number_format(CustomerBalance::where('type', 'car_payment')->sum('amount')*-1, 0, '.', ',');  ;
+//        $totalAmountDue = number_format(Car::where('amount_due', '!=', 0)->sum('amount_due'), 0, '.', ',');
+        $totalSpent = number_format(CustomerBalance::where('type', 'car_payment')->sum('amount')*-1, 0, '.', ',');
 
 
         return view('dashboard', compact('totalCustomers', 'totalCars', 'totalCarsPaid', 'totalCarsDue', 'totalDeposits', 'totalAmountDue', 'totalSpent'));
@@ -36,6 +65,11 @@ class AdminController extends Controller
     {
         $perpage = $request->input('perpage', 50);
         $extraexpences=Extraexpence::all();
+
+//        dd(cache::get('titles'));
+
+
+
 
         if ($request->has('auction') && $request->auction === 'all') {
             return to_route('locations.index');
@@ -222,5 +256,22 @@ class AdminController extends Controller
         return to_route('customer.dashboard');
 
     }
+
+
+    public function customerTitles(Request $request){
+
+        $customer=Customer::find($request->id);
+
+        if (cache::get('titles')){
+            $titles=cache::get('titles');
+        } else{
+            $titles=Title::all();
+            cache::forever('titles', $titles);
+        }
+
+        return view('pages.htmx.customerTitles',compact('customer','titles'));
+    }
+
+
 
 }

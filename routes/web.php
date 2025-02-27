@@ -27,17 +27,21 @@ use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\StatesController;
+use App\Http\Controllers\TitleController;
 use App\Http\Controllers\UserController;
 use App\Models\Car;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
 use App\Models\SmsDraft;
 use App\Models\State;
+use App\Models\Title;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 
 // Just example not using in this project .. but using in old
@@ -107,12 +111,13 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Dasboard Analitics
     Route::controller(AdminController::class)->group(function () {
         Route::get('/', 'adminIndex')
-            ->middleware('role:Admin|Developer')
+            ->middleware('customRole')
+//            ->middleware('role:Admin|Developer')
             ->name('dashboard');
     });
 
     // Users
-    Route::controller(UserController::class)->group(function () {
+    Route::controller(UserController::class)->middleware('role:Admin') ->group(function () {
         Route::get('/users', 'index')->name('users.index');
         Route::post('/users/store', 'store')->name('users.store');
         Route::post('/users/update', 'update')->name('users.update');
@@ -120,7 +125,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     // Cars
-    Route::controller(CarController::class)->group(function () {
+    Route::controller(CarController::class)->middleware('customRole')->group(function () {
         Route::get('/cars', 'index')->name('cars.index');
         Route::get('/cars/archive', 'index')->name('cars.index.trashed');
         Route::get('/car/create', 'create')->name(name: 'car.create');
@@ -143,17 +148,13 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/car/payment/image/delete/{id}', 'deletePaymentImage')->name('car.paymentImage.delete');
         Route::post('/car/change/status', 'changeCarStatus')->name('car.change.status');
 
-
-
-
-
     });
 
     Route::post('/upload-images', [ImageUploadController::class, 'store'])->name('upload.images.spatie');
     Route::post('/upload-images2', [ImageUploadController::class, 'storeBlImages'])->name('upload.bl.images');
 
     // Containers
-    Route::controller(ContainerController::class)->group(function () {
+    Route::controller(ContainerController::class)->middleware('customRole')->group(function () {
         // Creates ContainerGroup
         Route::post('/container/group-create', 'groupSelectedCars')->name(name: 'container.selected');
         Route::post('/containers/update/group', 'updateGroup')->name(name: 'container.updateGroup');
@@ -174,13 +175,13 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     Route::controller(ArrivedController::class)->group(function () {
+
         Route::get('/arrived/index', 'index')->name(name: 'arrived.index');
         Route::post('/arrived/container/{id}/save', 'update')->name(name: 'arrived.update');
         Route::post('/arrived/car/{id}/update', 'updateCar')->name(name: 'arrived.car-update');
         Route::get('/arrived/car/{id}/show-image/', 'showImages')->name(name: 'arrived.showImages');
         Route::post('/arrived/image/delete', 'deleteImage')->name(name: 'arrived.image.delete');
         Route::get('/arrived/delete/images/{car_id}', 'deleteBolImage')->name(name: 'arrived.images.delete');
-
 
     });
 
@@ -285,6 +286,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/customers', 'customerIndex')->name('customers.index');
         Route::get('/archived-customers', 'customerIndex')->name('customers.archived');
         Route::get('/archived-customers/restore/{id}', 'restore')->name('customers.restore');
+        Route::get('/customers/titles', 'customerTitles')->name('customer.titles.htmx');
+
 //        Route::post('/customers/store', 'store')->name('customers.store');
         Route::post('/customers/activate', 'customerActivate')->name('customer.activate');
         Route::post('/customers/destroy', 'delete')->name('customers.delete');
@@ -331,6 +334,15 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         route::post('/role/permission/remove','rolePermissionRemove')->name('role.permission.remove');
 
 
+    });
+
+    // Titles
+    Route::controller(TitleController::class)->group(function () {
+        route::get('titles','index')->name('titles.index');
+        route::post('title/activate','active')->name('title.activate');
+        route::post('title/update','update')->name('title.update');
+        route::post('title/create','store')->name('title.store');
+        route::post('title/delete','delete')->name('title.delete');
     });
 
     //    ======= Website Management Routes =======
@@ -389,33 +401,62 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
 
 
-    foreach ($data[2]['data'] as $customer){
+        foreach ($data[2]['data'] as $customer){
 
-        Customer::create([
-            'id'=>$customer['id'],
-            'company_name'=>$customer['company_name'],
-            'contact_name'=>$customer['contact_name'],
-            'email'=>$customer['email'],
-            'phone'=>$customer['phone'],
-            'is_active'=>$customer['is_active'],
-            'number_of_cars'=>$customer['number_of_cars'],
-            'password'=>$customer['password'],
-            'child_of'=>$customer['parent_of'],
-            'personal_number'=>$customer['personal_number'],
-            'extra_for_team'=>$customer['extra_for_team'],
-            'username'=>$customer['username'],
-            'created_at'=>$customer['created_at'],
-            'updated_at'=>$customer['updated_at'],
-            'deleted_at'=>$customer['deleted_at'],
-            'image'=>$customer['image'],
-        ]);
-    }
+            Customer::create([
+                'id'=>$customer['id'],
+                'company_name'=>$customer['company_name'],
+                'contact_name'=>$customer['contact_name'],
+                'email'=>$customer['email'],
+                'phone'=>$customer['phone'],
+                'is_active'=>$customer['is_active'],
+                'number_of_cars'=>$customer['number_of_cars'],
+                'password'=>$customer['password'],
+                'child_of'=>$customer['parent_of'],
+                'personal_number'=>$customer['personal_number'],
+                'extra_for_team'=>$customer['extra_for_team'],
+                'username'=>$customer['username'],
+                'created_at'=>$customer['created_at'],
+                'updated_at'=>$customer['updated_at'],
+                'deleted_at'=>$customer['deleted_at'],
+                'image'=>$customer['image'],
+            ]);
+        }
 
 
 
         return view('testfile',compact('data'));
 
     })->name('customer.upload');
+    route::post('/uploadtitles', function (Request $request) {
+
+        $storedFile = $request->file->store('public');
+        $filePath = storage_path('app/' . $storedFile);
+        $jsonContents = file_get_contents($filePath);
+        $data = json_decode($jsonContents, true); // Use `true` to get an associative array
+
+        $batchSize = 500; // Adjust based on your server capacity
+        $chunks = array_chunk($data['Sheet1'], $batchSize);
+
+//        dd($data);
+
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $row) {
+                if (!isset($row['TITLE']) || !isset($row['STATUS'])) {
+                    continue;
+                }
+
+                // Use Eloquent `create()` to trigger boot() slug logic
+                Title::create([
+                    'name' => trim($row['TITLE']),
+                    'status' => trim($row['STATUS']),
+                ]);
+            }
+        }
+
+
+    })->name('titles.upload');
+
     route::post('/uploadusers', function (Request $request) {
 
         $storedFile = $request->file->store('public');
@@ -474,8 +515,6 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
         Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
 
-
-
         Route::post('/save-release', 'saveRelease')->name('saveRelease');
 
         Route::get('/payment-registration', 'showPaymentRequest')->name('customer.payment_registration');
@@ -495,6 +534,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::post('/car-assing-team', 'addTeamToCar')->name('customer.addTeamToCar');
 
         Route::post('/add-invoice-price', 'addInvoicePrice')->name('customer.addInvoicePrice');
+
     });
 
     Route::controller(CustomerBalanceController::class)->group(function () {

@@ -29,8 +29,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (auth()->user()->hasRole('Dispatch')) {
-            return to_route('cars.index');
+        if (auth()->user()->hasRole('Broker')) {
+            return to_route('car.showStatus',['slug' => 'for-dispatch']);
         }
 
         if (auth()->user()->hasRole('Loader')) {
@@ -40,6 +40,7 @@ class AuthenticatedSessionController extends Controller
         if (auth()->user()->hasRole('Terminal Agent')) {
             return to_route('arrived.index');
         }
+
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }

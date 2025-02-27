@@ -238,6 +238,13 @@
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
+                    <li class="">
+                        <a href="{{ route('titles.index') }}">
+                            <span>Titles</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
+
                     @endhasanyrole
                     @can('StatesAdd')
                         <li class="">

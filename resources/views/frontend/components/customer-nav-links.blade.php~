@@ -3,7 +3,7 @@
         <div class="d-flex mt-4 justify-content-between align-middle flex-column flex-md-row">
 
             <ul style="padding-left: 0">
-                @if(auth()->user()->newwebsitecustomer===0)
+                @if(auth()->user()->newwebsitecustomer===1)
                 <li class="tabs__item ">
                     <form class="m-auto m-md-0" action="{{route('generate.link')}}" target="_blank">
                         <input type="hidden" name="customer_id" value="{{auth()->user()->id}}">

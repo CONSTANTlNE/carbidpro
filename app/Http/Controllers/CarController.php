@@ -103,6 +103,37 @@ class CarController extends Controller
         return view('pages.cars.index', compact('cars', 'car_status'));
     }
 
+
+//    public function calculateShippingCost(Request $request)
+//    {
+//        // Validate incoming request
+//        $request->validate([
+//            'load_type'  => 'required|integer',
+//            'from_state' => 'required|integer',
+//            'to_port_id' => 'required|integer',
+//        ]);
+//
+//        // Fetch values
+//        $loadTypePrice = LoadType::where('id', $request->load_type)->pluck('price')->first();
+//
+//        $shippingPrice = ShippingPrice::where('from_location_id', $request->from_state)
+//            ->where('to_port_id', $request->to_port_id)
+//            ->first();
+//
+//        $port = Port::where('id', $request->to_port_id)->first();
+//
+//
+//        // Example additional costs (for demo purposes)
+//        $customerExtra = 0; // Some extra cost, replace as per your logic
+//
+//        // Calculate the total shipping cost
+//        $shippingCost = isset($shippingPrice->price)
+//            ? $shippingPrice->price + $port->price + $customerExtra + $loadTypePrice
+//            : 0;
+//
+//        // Return the calculated shipping cost
+//        return response()->json(['shipping_cost' => $shippingCost]);
+//    }
     public function calculateShippingCost(Request $request)
     {
         // Validate incoming request
@@ -112,22 +143,47 @@ class CarController extends Controller
             'to_port_id' => 'required|integer',
         ]);
 
+        $auctionId = $request->get('auction');
+        $locationId = $request->get('from_state');
+        $portId = $request->get('to_port_id');
+
+
         // Fetch values
         $loadTypePrice = LoadType::where('id', $request->load_type)->pluck('price')->first();
 
-        $shippingPrice = ShippingPrice::where('from_location_id', $request->from_state)
+
+//        $total_inside = ShippingPrice::where('from_location_id', $locationId)
+//            ->where('to_port_id', $portId)
+//            ->whereJsonContains('auction_id', $auctionId)->first();
+
+        $total_inside =  ShippingPrice::where('from_location_id', $request->from_state)
             ->where('to_port_id', $request->to_port_id)
             ->first();
+
+        if (empty($total_inside)) {
+            $difflocation = Location::where('name', trim($request->get('location_name')))
+                ->where('id', '!=', $locationId)->where('is_active', 1)
+                ->first();
+            $total_inside = ShippingPrice::where('from_location_id', $difflocation->id)
+                ->where('to_port_id', $portId)
+                ->whereJsonContains('auction_id', $auctionId)
+                ->first();
+        }
+
+
+
 
         $port = Port::where('id', $request->to_port_id)->first();
 
 
         // Example additional costs (for demo purposes)
-        $customerExtra = 0; // Some extra cost, replace as per your logic
+//        $customerExtra = 0; // Some extra cost, replace as per your logic
+
+        $customerExtra = Customer::where('id', $request->customer_id)->pluck('extra_for_team')->first();
 
         // Calculate the total shipping cost
-        $shippingCost = isset($shippingPrice->price)
-            ? $shippingPrice->price + $port->price + $customerExtra + $loadTypePrice
+        $shippingCost = isset($total_inside->price)
+            ? $total_inside->price + $port->price + $customerExtra + $loadTypePrice
             : 0;
 
         // Return the calculated shipping cost
@@ -141,13 +197,35 @@ class CarController extends Controller
             'from_state_id' => 'required|integer',
         ]);
 
-        // Fetch to_port_ids based on the selected from_state_id (location_id)
-        $fromLocationIds = ShippingPrice::where('from_location_id', $request->from_state_id)
-            ->pluck('to_port_id')
-            ->toArray();
+        $auctionId = $request->get('auction_id');
+        if ($auctionId && !$request->get('location_id')) {
+            $result = Location::where('auction_id', $auctionId)->where('is_active', 1)->orderBy('name')->get();
+            if (empty($result['items'])) {
+                $difflocation = Location::where('name', trim($request->get('location_name')))->where('id', '!=',
+                    $auctionId)->where('is_active', 1)->orderBy('name')->first();
+            }
+        }
 
-        // Fetch the port names where the IDs match the to_port_ids
-        $ports = Port::whereIn('id', $fromLocationIds)->pluck('name', 'id');
+        $from_location_ids = ShippingPrice::where('from_location_id',
+            $request->from_state_id)->pluck('to_port_id')->toArray();
+
+        if (empty($from_location_ids) && isset($difflocation)) {
+            $from_location_ids = ShippingPrice::where('from_location_id',
+                $difflocation->id)->pluck('to_port_id')->toArray();
+        }
+
+        $ports = Port::whereIn('id', $from_location_ids)->pluck('name', 'id');
+
+
+//
+//        // Fetch to_port_ids based on the selected from_state_id (location_id)
+//        $fromLocationIds = ShippingPrice::where('from_location_id', $request->from_state_id)
+//            ->pluck('to_port_id')
+//            ->toArray();
+
+//        // Fetch the port names where the IDs match the to_port_ids
+//        $ports = Port::whereIn('id', $fromLocationIds)->pluck('name', 'id');
+
 
         // Return the ports as a JSON response
         return response()->json(['ports' => $ports]);
@@ -193,7 +271,7 @@ class CarController extends Controller
         $locations       = Location::all();
         $shipping_prices = ShippingPrice::all();
         $customers       = Customer::get();
-        $dispatchers     = User::role('Dispatch')->get();
+        $dispatchers     = User::role('Broker')->get();
         $extra_expenses  = Extraexpence::all();
         $car_status      = CarStatus::with('cars')->get();
 
@@ -360,7 +438,7 @@ class CarController extends Controller
             $car_status = CarStatus::with('cars')->withCount('cars')->get();
         }
 
-        if (auth()->user()->hasRole('Dispatch')) {
+        if (auth()->user()->hasRole('Broker')) {
             $car_status = CarStatus::with('cars')->withCount([
                 'cars' => function ($query) {
                     $query->where('dispatch_id', auth()->user()->id);
@@ -475,9 +553,9 @@ class CarController extends Controller
      */
     public function edit(Request $request)
     {
-        $car        = Car::findOrFail($request->id);
-        $car_status = CarStatus::get();
-        $container_id=$car->groups->first()?->container_id;
+        $car          = Car::findOrFail($request->id);
+        $car_status   = CarStatus::get();
+        $container_id = $car->groups->first()?->container_id;
 
 
         $extra_expenses    = Extraexpence::all();
@@ -488,7 +566,7 @@ class CarController extends Controller
         $shipping_prices   = ShippingPrice::all();
         $balanceAccounting = json_decode($car->balance_accounting, true); // Decode the JSON
         $customers         = Customer::get();
-        $dispatchers       = User::where('role', 'Dispatch')->get();
+        $dispatchers       = User::where('role', 'Broker')->get();
         $selectedcustomer  = Customer::find($car->customer_id);
 
         return view(
@@ -506,7 +584,7 @@ class CarController extends Controller
                 'shipping_prices',
                 'extra_expenses',
                 'selectedcustomer',
-                'container_id'
+                'container_id',
             ),
         );
     }
@@ -759,7 +837,6 @@ class CarController extends Controller
     }
 
     public function deletePaymentImage($id)
-
     {
         $car = Car::where('id', $id)->first();
 
@@ -771,16 +848,17 @@ class CarController extends Controller
                 Storage::delete($filepath);
                 $car->payment_photo = null;
                 $car->save();
+
                 return back()->with('success', 'Image deleted successfully.');
             } else {
                 return back()->with('error', 'File not found.');
             }
         }
+
         return back()->with('error', 'Group not found.');
     }
 
     public function changeCarStatus(Request $request)
-
     {
         $car = Car::where('id', $request->car_id)->first();
         if ($car) {

@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Bind the composer to a specific view
         View::composer(['partials.aside', 'partials.header'], function (BaseView $view) {
+            $startTime = microtime(true);
             $balancecomposers = CustomerBalance::where('type', 'fill')
                 ->with('customer')
                 ->where('is_approved', 0)->get();
@@ -44,6 +45,12 @@ class AppServiceProvider extends ServiceProvider
             $newcustomers   = Customer::where('is_active', 0)->get();
             $customerscount = $newcustomers->count();
             $archivedCount  = Car::onlyTrashed()->count();
+
+            $endTime = microtime(true);
+            $executionTime = $endTime - $startTime;
+
+//            dd($executionTime);
+
 
 
             $view

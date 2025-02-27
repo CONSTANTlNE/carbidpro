@@ -113,8 +113,7 @@
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
             let table = new DataTable('#myTable', {
-                order: [] , // Prevents DataTables from applying an initial sort order
-                pageLength: 50
+                order: [] // Prevents DataTables from applying an initial sort order
             });
 
             let text = document.querySelector('[for="dt-length-0"]');

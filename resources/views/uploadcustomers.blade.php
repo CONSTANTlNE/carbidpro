@@ -9,19 +9,31 @@
 </head>
 <body>
 
+
 <form action="{{route('customer.upload')}}" method="post" enctype="multipart/form-data">
     @csrf
     <label for="customers">Customers</label>
-    <input id="customers" type="file" name="file">
+    <input accept=".json" id="customers" type="file" name="file">
 
     <button>upload</button>
     <br><br><br>
 </form>
 
+
+
 <form action="{{route('user.upload')}}" method="post" enctype="multipart/form-data">
     @csrf
     <label for="users">Users</label>
-    <input id="users" type="file" name="file">
+    <input  accept=".json" id="users" type="file" name="file">
+
+    <button>upload</button>
+    <br><br><br>
+</form>
+
+<form action="{{route('titles.upload')}}" method="post" enctype="multipart/form-data">
+    @csrf
+    <label for="users">Titles</label>
+    <input  accept=".json" id="users" type="file" name="file">
 
     <button>upload</button>
     <br><br><br>

@@ -225,7 +225,8 @@ $creditService = new CreditService();
                                                        href="{{'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking' }}
                                                 " {{$car->groups->first()?->container_id}}
                                                     @endif
-                                                >{{$car->groups->first()?->container_id}}</a>
+                                                >{{$car->groups->first()?->container_id}}
+                                                </a>
                                                 <span style="cursor: pointer;" class="p-cursor"
                                                       onclick="navigator.clipboard.writeText('{{ $car->groups->first()->container_id}}')">
                                               <img width="30px" src="https://vsbrothers.com/img/copy_icon.svg">
@@ -260,12 +261,27 @@ $creditService = new CreditService();
                                             style="display: none;">
                                             <form action="{{route('saveRelease')}}" method="post">
                                                 @csrf
-                                                <li
-                                                        class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_user">
+                                                <li class="mb-2 my-cars__td-relase-car-to-inputs-item my-cars__td-relase-car-to-inputs-item_user">
+                                                    <span id="vehicleOwnerNameError{{$key}}" style="color: red; display: none;"></span>
                                                     <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} class="release_to form-control"
                                                            name="vehicle_owner_name"
                                                            placeholder="Full name"
-                                                           required value="{{ $car->vehicle_owner_name }}">
+                                                           required value="{{ $car->vehicle_owner_name }}"
+                                                           {{--  accept only latin characters for full name--}}
+                                                           oninput="
+                                                             regex = /^[A-Za-z\s]*$/;
+                                                             errorElement = document.getElementById('vehicleOwnerNameError{{$key}}');
+                                                            // If the input doesn't match the allowed characters:
+                                                            if (!regex.test(this.value)) {
+                                                              errorElement.innerText = 'Only Latin characters';
+                                                              errorElement.style.display = 'inline';
+                                                              this.value = this.value.replace(/[^A-Za-z\s]+/g, '');
+                                                            } else {
+                                                              errorElement.innerText = '';
+                                                              errorElement.style.display = 'none';
+                                                            }
+                                                        " >
+
                                                     <input {{ $car->created_at->diffInDays(now())>5 ? 'readonly' : ''}} type="hidden"
                                                            class="car_id" name="car_id"
                                                            required value="{{ $car->id }}">
@@ -417,8 +433,7 @@ $creditService = new CreditService();
                                                                             Total Amount
                                                                         </th>
                                                                         <th class="p-1 text-center" style="width: 60px">
-                                                                            Paid
-                                                                            Amount
+                                                                            Paid Amount
                                                                         </th>
                                                                     </tr>
                                                                     </thead>
@@ -523,7 +538,8 @@ $creditService = new CreditService();
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
             let table = new DataTable('#myTable', {
-                order: [[0, 'desc']]
+                order: [[0, 'desc']],
+                pageLength: 50
             });
 
             document.getElementById('myTable_wrapper').children[0].style.width = '100%';

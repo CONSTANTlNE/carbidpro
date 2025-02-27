@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <h2>Payment Request:</h2>
+    <h2>Deposit Request:</h2>
 
     <p>Dealer Company Name: {{ $company_name }}</p>
     <p>Dealer Name: {{ $dealer_name }}</p>

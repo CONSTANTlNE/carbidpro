@@ -94,7 +94,8 @@
                                                             <option value="{{ $customer->id }}"
                                                                     {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
 
-                                                                {{ $customer->contact_name }}</option>
+                                                                {{ $customer->contact_name }} Extra : {{ $customer->extra_for_team }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -128,7 +129,7 @@
                                             </div>
 
                                             {{--Comment--}}
-                                            <div class="form-group" id="customercomment">
+                                            <div style="max-width: 500px!important" class="form-group" id="customercomment">
                                                 <label>Customer Comment</label>
                                                 <textarea disabled rows="3" class="form-control"
                                                           id="extraexpense"></textarea>
@@ -818,7 +819,7 @@
 
                     $('#fromState').change(function () {
                         var fromStateId = $(this).val(); // Get the selected from_state ID
-
+                         console.log($('#fromState option:selected').text())
                         if (fromStateId) {
                             // Send AJAX request to get to_port_ids based on from_state_id
                             $.ajax({
@@ -826,9 +827,12 @@
                                 method: 'POST',
                                 data: {
                                     _token: '{{ csrf_token() }}', // CSRF token
-                                    from_state_id: fromStateId // Send selected from_state ID
+                                    from_state_id: fromStateId, // Send selected from_state ID
+                                    auction_id: $('#auction').val(),
+                                    location_name:$('#fromState option:selected').text()
                                 },
                                 success: function (response) {
+                                    console.log(response)
                                     // Populate the to_port_id dropdown with the received ports
                                     $('#to_port_id').empty(); // Clear the existing options
                                     $('#to_port_id').append(
@@ -861,6 +865,8 @@
                         var load_type = $('#loadType').val();
                         var from_state = $('#fromState').val();
                         var to_port_id = $('#to_port_id').val();
+                        var customer_id = $('#customer_id').val();
+                        console.log(customer_id)
 
                         // Send AJAX request to calculate shipping cost
                         $.ajax({
@@ -871,11 +877,14 @@
                                 auction: auction,
                                 load_type: load_type,
                                 from_state: from_state,
-                                to_port_id: to_port_id
+                                to_port_id: to_port_id,
+                                location_name:$('#fromState option:selected').text(),
+                                customer_id: customer_id
                             },
                             success: function (response) {
                                 // Update the shipping cost on the page
                                 $('#shippingCost').text(response.shipping_cost);
+                                console.log(response.shipping_price)
 
                                 // Ensure the Alpine store is accessed correctly
                                 try {
@@ -1078,7 +1087,35 @@
                 });
 
                 $(document).ready(function () {
-                    $('.select2').select2();
+                    // $('.select2').select2();
+                    $('.select2').select2({
+                        matcher: function(params, data) {
+                            if ($.trim(params.term) === '') {
+                                return data;
+                            }
+
+                            if (!data.text) {
+                                return null;
+                            }
+
+                            // Convert search term & option text to lowercase
+                            let term = params.term.toLowerCase().replace(/\s+/g, ''); // Remove spaces
+                            let text = data.text.toLowerCase().replace(/\s+/g, ''); // Remove spaces
+
+                            // Allow partial substring matching (even in the middle of words)
+                            if (text.includes(term)) {
+                                return data;
+                            }
+
+                            // Allow matches where letters appear in the same order
+                            let regex = new RegExp(term.split("").join(".*"), "i");
+                            if (regex.test(text)) {
+                                return data;
+                            }
+
+                            return null;
+                        }
+                    });
                 });
 
 

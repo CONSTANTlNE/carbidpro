@@ -141,6 +141,7 @@ class CustomerBalanceController extends Controller
             ];
 
             Mail::to(config('carbiddata.email'))->send(new SampleMail($content));
+
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
@@ -255,7 +256,9 @@ class CustomerBalanceController extends Controller
             ->where('is_approved', 1)
             ->sum('amount');
 
-        if ($payment->amount > $currentDeposit) {
+        // only alert for approved deposits (dont allow deposit deletion if amount is already spent on cars)
+
+        if ($payment->amount > $currentDeposit && $payment->is_approved===1) {
             return back()->with('error',
                 'Requested amount '.$payment->amount.' is already spent on cars , Maximum amount to be deleted is '.$currentDeposit);
         }

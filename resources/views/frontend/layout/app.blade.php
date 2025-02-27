@@ -34,6 +34,8 @@
     <link rel="stylesheet" href="{{asset('frontendAssets/css/main.css?v=')}}{{ time() }}">
     @stack('style')
 
+
+
 </head>
 
 <body>

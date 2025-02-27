@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\ShippingPrice;
+use App\Models\Title;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Stichoza\GoogleTranslate\GoogleTranslate;
@@ -32,14 +33,16 @@ class calculatorController extends Controller
             Session::put('locale', 'en');
         }
 
+
 //        dd(auth()->user()->extra_for_team);
 
+        $titles=Title::all();
         $auctions = Auction::all();
         $loadtypes = LoadType::all();
         $countries = Country::all();
         $user = auth()->user();
 
-        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries', 'user'));
+        return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries', 'user','titles'));
     }
 
     public function calculate(Request $request)
@@ -62,6 +65,7 @@ class calculatorController extends Controller
             if (empty($from_location_ids) && isset($difflocation)) {
                 $from_location_ids = ShippingPrice::where('from_location_id', $difflocation->id)->pluck('to_port_id')->toArray();
             }
+
             $result = Port::whereIn('id', $from_location_ids)->get();
 
         }

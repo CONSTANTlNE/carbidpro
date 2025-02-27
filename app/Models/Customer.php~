@@ -32,8 +32,4 @@ class Customer extends Authenticatable implements HasMedia
     {
         return $this->hasMany(CustomerBalance::class);
     }
-
-    public function titles(){
-        return $this->belongsToMany(Title::class);
-    }
 }

@@ -18,8 +18,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
+use LaravelDaily\Invoices\Classes\Buyer;
+use LaravelDaily\Invoices\Classes\InvoiceItem;
+use LaravelDaily\Invoices\Facades\Invoice;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
+use Yajra\DataTables\Html\Column;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redirect;
 use Spatie\MediaLibrary\Support\MediaStream;
@@ -724,6 +729,4 @@ class CustomerController extends Controller
 
         return redirect($url);
     }
-
-
 }

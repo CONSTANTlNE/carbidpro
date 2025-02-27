@@ -56,6 +56,7 @@
                                         <a href="#" class="btn btn-add" data-toggle="modal" data-target="#addModal">
                                             <i class="fa fa-plus"></i> Add Car Payment
                                         </a>
+
                                     </div>
                                     {{-- Add Carpayment Modal--}}
                                     <div class="modal fade" id="addModal" tabindex="-1"
@@ -192,6 +193,7 @@
                                     <a href="{{route('carpayment.index')}}" style="color: white;max-width: 50px" type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">
                                         All
                                     </a>
+
                                 </div>
 
 
@@ -627,6 +629,7 @@
                                                 </td>
                                             </tr>
                                         @endforeach
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -635,6 +638,7 @@
                     </div>
                 </div>
             </section>
+            <!-- /.content -->
         </div>
 
 

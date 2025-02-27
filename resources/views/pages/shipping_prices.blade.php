@@ -243,7 +243,6 @@
                                                                        name="id">
                                                                 <div class="modal-body" style="overflow: visible">
                                                                     <div style="display: flex;gap:20px">
-
                                                                         <input type="text"
                                                                                hx-vals='{"index": {{$index}}}'
                                                                                hx-trigger="input"
@@ -338,8 +337,8 @@
                                                                             <fieldset>
                                                                                 <div class="col-md-12 form-group user-form-group">
                                                                                     <label class="control-label">Delete
-                                                                                        Auction
-                                                                                        : {{$shippingprice->name}}
+                                                                                        Price
+                                                                                        :
                                                                                         ?</label>
                                                                                     <div class="flex justify-content-center mt-3">
                                                                                         <button type="button"

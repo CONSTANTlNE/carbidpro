@@ -41,7 +41,15 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+$app    ->withExceptions(function (Exceptions $exceptions) {
 
+    $exceptions->report(function (Throwable $exception) {
+        // send exeptions by email
+        Notification::route('mail', 'webmenu01@gmail.com')
+            ->notify(new ErrorOccurred($exception));
+    });
+
+})->create();
 
 /*
 |--------------------------------------------------------------------------
