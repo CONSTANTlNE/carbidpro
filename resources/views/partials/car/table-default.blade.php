@@ -77,7 +77,8 @@ use Carbon\Carbon  ;
                             Edit
                         </button>
                     </a>
-                    @if(!$car->latestCredit && $car->amount_due > 0)
+                    {{-- give credit --}}
+                @if(!$car->latestCredit && $car->amount_due > 0)
                         <button type="button" class="btn btn-primary  btn-sm"
                                 data-toggle="modal"
                                 data-target="{{$car->latestCredit? '' : '#creditmodal'.$index}}">
@@ -201,10 +202,10 @@ use Carbon\Carbon  ;
                                                 <td class="p-1 text-center" style="width:min-content!important">
                                                     {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
                                                 </td>
-                                                <td class="p-1 text-center">{{$credit->credit_days}}</td>
-                                                <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}}</td>
+                                                <td class="p-1 text-center">{{$credit->credit_days}} </td>
+                                                <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}} </td>
                                                 @if($index2-1>=0)
-                                                    <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}}</td>
+                                                    <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}} </td>
                                                 @endif
                                                 <td class="p-1 text-center"
                                                     style="width: 60px!important">{{$credit->paid_amount}}
@@ -217,7 +218,7 @@ use Carbon\Carbon  ;
                                                 <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
                                                 <td></td>
                                                 <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id,)) }}</td>
+                                                <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id)) }}</td>
                                                 <td></td>
                                                 <td></td>
                                             </tr>

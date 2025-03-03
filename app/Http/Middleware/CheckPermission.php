@@ -16,15 +16,15 @@ class CheckPermission
         $currentRoute = $request->route();
         $currentRouteName = $currentRoute ? $currentRoute->getName() : null;
 
-        if ($user->hasRole('Dispatch') && !$user->hasRole('Admin') && $currentRouteName !== 'car.showStatus') {
+        if ($user->hasRole('Dispatch') && !$user->hasAnyRole(['Admin', 'Developer']) && $currentRouteName !== 'car.showStatus') {
             return redirect()->route('car.showStatus',['slug' => 'for-dispatch']);
         }
 
-        if ($user->hasRole('Loader') && !$user->hasRole('Admin') && $currentRouteName !== 'container.showStatus') {
+        if ($user->hasRole('Loader') && !$user->hasAnyRole(['Admin', 'Developer']) && $currentRouteName !== 'container.showStatus') {
             return redirect()->route('container.showStatus',['slug' => 'for-dispatch']);
         }
 
-        if ($user->hasRole('Terminal Agent') && !$user->hasRole('Admin') && $currentRouteName !== 'arrived.index') {
+        if ($user->hasRole('Terminal Agent') && !$user->hasAnyRole(['Admin', 'Developer']) && $currentRouteName !== 'arrived.index') {
             return redirect()->route('arrived.index');
         }
 

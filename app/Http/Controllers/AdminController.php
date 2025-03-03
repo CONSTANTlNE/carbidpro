@@ -257,10 +257,9 @@ class AdminController extends Controller
 
     }
 
-
     public function customerTitles(Request $request){
 
-        $customer=Customer::find($request->id);
+        $customer=Customer::with('titles')->find($request->id);
 
         if (cache::get('titles')){
             $titles=cache::get('titles');
@@ -269,9 +268,52 @@ class AdminController extends Controller
             cache::forever('titles', $titles);
         }
 
+
         return view('pages.htmx.customerTitles',compact('customer','titles'));
     }
 
+    public function addCustomerTitle(Request $request){
 
+        $customer=Customer::find($request->id);
+
+        $request->validate([
+            'title_id'=>'required',
+            'title_for_customer'=>'required'
+        ]);
+
+        if ($customer){
+            $customer->titles()->attach($request->title_id, ['title_for_customer' => $request->title_for_customer]);
+            return back();
+        }
+        return back()->with('error', 'Customer not found');
+    }
+
+    public function updateCustomerTitle(Request $request){
+
+        $request->validate([
+            'title_id'=>'required',
+            'title_for_customer'=>'required'
+        ]);
+
+        $customer=Customer::find($request->id);
+        if ($customer){
+            $customer->titles()->updateExistingPivot($request->title_id, ['title_for_customer' => $request->title_for_customer]);
+        }
+        return response()->noContent();
+    }
+
+    public function deleteCustomerTitle(Request $request){
+
+        $request->validate([
+            'title_id'=>'required',
+        ]);
+
+        $customer=Customer::find($request->id);
+
+        $customer->titles()->detach($request->title_id);
+
+        return back();
+
+    }
 
 }

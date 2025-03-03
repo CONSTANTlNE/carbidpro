@@ -34,6 +34,6 @@ class Customer extends Authenticatable implements HasMedia
     }
 
     public function titles(){
-        return $this->belongsToMany(Title::class);
+        return $this->belongsToMany(Title::class)->withPivot('title_for_customer')->withTimestamps();
     }
 }

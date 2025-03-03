@@ -6,7 +6,16 @@
         <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
         <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
               rel="stylesheet"/>
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+        <style>
+            .ts-wrapper {
+                min-width: 250px;
+                padding: 0;
+            }
+        </style>
     @endpush
+
     @section('body-class', 'hold-transition sidebar-mini')
 
     <!--preloader-->
@@ -88,7 +97,7 @@
                                                             autocomplete="nope"
                                                             name="customer_id"
                                                             class="form-control"
-                                                            id="customer_id" required>
+                                                            id="customerTomSelect" required>
                                                         <option value=""></option>
                                                         @foreach ($customers as $customer)
                                                             <option value="{{ $customer->id }}"
@@ -129,9 +138,9 @@
                                             </div>
 
                                             {{--Comment--}}
-                                            <div style="max-width: 500px!important" class="form-group" id="customercomment">
+                                            <div  class="form-group" id="customercomment">
                                                 <label>Customer Comment</label>
-                                                <textarea disabled rows="3" class="form-control"
+                                                <textarea style="color:red" disabled rows="3" class="form-control"
                                                           id="extraexpense"></textarea>
                                             </div>
 
@@ -1153,4 +1162,16 @@
             </script>
         @endpush
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                new TomSelect("#customerTomSelect", {
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            }, 200)
+        })
+    </script>
 @endsection

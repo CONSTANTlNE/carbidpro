@@ -605,6 +605,13 @@
                         </div>
                     </div>
                 </div>
+                <div style="display: flex;justify-content: center;gap: 10px;margin-top: 10px;margin-bottom: 15px">
+                    <button type="button"
+                            data-dismiss="modal"
+                            class="btn btn-danger btn-sm">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>

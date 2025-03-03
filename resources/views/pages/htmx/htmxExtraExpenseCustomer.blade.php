@@ -41,7 +41,7 @@
 
 <div style="max-width: 500px!important" class="form-group" hx-swap-oob="true" id="customercomment">
     <label>Customer Comment</label>
-    <textarea disabled rows="3" class="form-control" id="extraexpense">{{$selectedcustomer->comment}}</textarea>
+    <textarea style="color:red" disabled rows="3" class="form-control" id="extraexpense">{{$selectedcustomer->comment}}</textarea>
 </div>
 
 <div class="container" id="alpinehtml" hx-swap-oob="true">

@@ -117,7 +117,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     // Users
-    Route::controller(UserController::class)->middleware('role:Admin') ->group(function () {
+    Route::controller(UserController::class)->middleware('role:Admin|Developer') ->group(function () {
         Route::get('/users', 'index')->name('users.index');
         Route::post('/users/store', 'store')->name('users.store');
         Route::post('/users/update', 'update')->name('users.update');
@@ -287,6 +287,9 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::get('/archived-customers', 'customerIndex')->name('customers.archived');
         Route::get('/archived-customers/restore/{id}', 'restore')->name('customers.restore');
         Route::get('/customers/titles', 'customerTitles')->name('customer.titles.htmx');
+        Route::post('/customers/custom/title/add', 'addCustomerTitle')->name('customer.titles.add');
+        Route::post('/customers/custom/title/update', 'updateCustomerTitle')->name('customer.titles.update');
+        Route::post('/customers/custom/title/delete', 'deleteCustomerTitle')->name('customer.titles.delete');
 
 //        Route::post('/customers/store', 'store')->name('customers.store');
         Route::post('/customers/activate', 'customerActivate')->name('customer.activate');
@@ -667,6 +670,13 @@ route::get('/smstest', function () {
 
     return $message;
 });
+
+route::get('/session', function () {
+    dd(config('session.lifetime')); // Returns session expiration in minutes
+
+
+});
+
 
 // TEST ROUTES
 

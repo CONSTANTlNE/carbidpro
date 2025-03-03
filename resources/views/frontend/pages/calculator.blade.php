@@ -32,9 +32,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
     <style>
-        .ts-wrapper{
+        .ts-wrapper {
             min-width: 250px;
-            padding:0;
+            padding: 0;
         }
     </style>
 @endpush
@@ -182,6 +182,7 @@
                         </div>
                     @endif
                 </div>
+                {{--  titles--}}
                 <div style="display: flex;flex-direction: column; align-content: center!important;justify-content: center;margin-top: 30px">
                     <div style="align-self: center" class="flex-col justify-content-center">
                         <p class="text-center" style="margin-bottom: 0">Check TITLE</p>
@@ -195,7 +196,8 @@
                     </div>
                     <div style="align-self: center" class="flex-col  justify-content-center mt-3">
                         <p class="text-center" style="margin-bottom: 0">Status</p>
-                        <input id="titleStatus" disabled class="input-group-first text-center" style="max-width: 150px" type="text">
+                        <input id="titleStatus" disabled class="input-group-first text-center" style="max-width: 150px"
+                               type="text">
                     </div>
                 </div>
             </div>
@@ -206,33 +208,6 @@
             integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
             crossorigin="anonymous"></script>
 
-
-{{--    title select script--}}
-    <script>
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                new TomSelect("#select-beast", {
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    }
-                });
-            },200)
-        })
-
-        const titles={!! $titles !!};
-
-
-      function titleStatus(id){
-         titles.forEach((title)=>{
-            if(title['id']==id){
-                document.getElementById('titleStatus').value=title['status']
-            }
-         })
-      }
-
-    </script>
 
     <div class="bigsuvinfo">
         <div class="closebtn">X</div>
@@ -359,6 +334,53 @@
             }
         }
     </style>
+
+    {{--    title select script--}}
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                new TomSelect("#select-beast", {
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            }, 200)
+        })
+
+        const titles = {!! $titles !!};
+        const userTitles = {!! $user->titles !!};
+        console.log(userTitles)
+
+        function titleStatus(id) {
+            titles.forEach((title) => {
+
+                if (title['id'] == id) {
+                    let found = false;
+                    // if  user has custom title status
+                    if (userTitles.length > 0) {
+                        userTitles.forEach((usertitle) => {
+                            if (!found && id == usertitle['id']) {
+                                document.getElementById('titleStatus').value = usertitle['pivot']['title_for_customer'];
+                                found = true; // Prevents further changes
+                            } else if (!found) {
+                                document.getElementById('titleStatus').value = title['status'];
+                            }
+                        });
+
+                    } else {
+                        // if user does not have custom title status
+                        document.getElementById('titleStatus').value = title['status']
+                    }
+                }
+            })
+        }
+
+    </script>
+
+
+    {{--    big suv info--}}
     <script>
         $('#bigsuvinfo').on('click', function () {
             var bigsuvinfo = $('.bigsuvinfo');
@@ -381,7 +403,7 @@
         });
     </script>
 
-
+    {{--calculation--}}
     <script>
 
 
@@ -390,7 +412,7 @@
 
         @if($user->extra_expenses != null)
         const extras = {!!$user->extra_expenses !!};
-        console.log(extras);
+        // console.log(extras);
 
         const checkboxes = document.querySelectorAll('.extra-checkbox');
         checkboxes.forEach((checkbox) => {

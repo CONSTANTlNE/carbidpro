@@ -184,7 +184,7 @@ $creditService = new CreditService();
                             <tr style="background-color: {{ $color }}">
                                 <td style="font-size: 14px;min-width: 90px">
                                     {{ $car->created_at->format('d-m-Y') }}
-                                    <span>Days:  {{ $car->created_at->diffInDays(now())}}</span>
+                                    <span>Days:  {{ round($car->created_at->diffInDays(now()))}}</span>
                                 </td>
                                 <td >{{ $car->make_model_year }}</td>
                                 {{-- Car VIN AND CONTAINER --}}

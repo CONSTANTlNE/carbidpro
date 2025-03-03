@@ -40,13 +40,16 @@ class calculatorController extends Controller
         $auctions = Auction::all();
         $loadtypes = LoadType::all();
         $countries = Country::all();
-        $user = auth()->user();
+        $user = Customer::where('id', auth()->user()->id)->with('titles')->first();
+
 
         return view('frontend.pages.calculator', compact('loadtypes', 'auctions', 'tr', 'countries', 'user','titles'));
     }
 
     public function calculate(Request $request)
     {
+
+
         $auctionId = $request->get('auction_id');
         $locationId = $request->get('location_id');
         $portId = $request->get('port_id');
@@ -83,7 +86,7 @@ class calculatorController extends Controller
             $total_inside = ShippingPrice::where('from_location_id', $locationId)->where('to_port_id', $portId)->whereJsonContains('auction_id', $auctionId)->first();
             if (empty($total_inside)) {
                 $difflocation = Location::where('name', trim($request->get('location_name')))->where('id', '!=', $locationId)->where('is_active', 1)->first();
-                $total_inside = ShippingPrice::where('from_location_id', $difflocation->id)->where('to_port_id', $portId)->whereJsonContains('auction_id', $auctionId)->first();
+                $total_inside = ShippingPrice::where('from_location_id', $difflocation?->id)->where('to_port_id', $portId)->whereJsonContains('auction_id', $auctionId)->first();
             }
 
             $to_port = Port::where('id', $portId)->first();
@@ -105,8 +108,8 @@ class calculatorController extends Controller
                 $parent_extra = auth()->user()->extra_for_team;;
             }
 
-            $result = $total_inside->price +
-                $to_port->price +
+            $result = $total_inside?->price +
+                $to_port?->price +
                 $request->get('loadtype') +
                 $parent_extra;
             // $result = isset($total_inside->price) ? $total_inside->price : 0 + $to_port->price + $request->get('loadtype') + session()->get('auth')->extra_for_team;
@@ -115,7 +118,7 @@ class calculatorController extends Controller
 
             
             return response()->json([
-                'ground_rate' => $total_inside->price + $parent_extra,
+                'ground_rate' => $total_inside?->price + $parent_extra,
                 // 'ground_rate' => isset($total_inside->price) ? $total_inside->price + session()->get('auth')->extra_for_team : 0,
                 'total' => $result,
             ]);

@@ -165,6 +165,28 @@
 
     }
 </script>
+
+{{--<script>--}}
+{{--    let sessionLifetime = 120; // Minutes (from Laravel)--}}
+{{--    let refreshTime = (sessionLifetime - 5) * 60 * 1000; // Convert to ms--}}
+{{--    let countdownSeconds = refreshTime / 1000; // Convert to seconds--}}
+
+{{--    function updateCountdown() {--}}
+{{--        let minutes = Math.floor(countdownSeconds / 60);--}}
+{{--        let seconds = countdownSeconds % 60;--}}
+{{--        document.getElementById("countdown").innerText = `Refreshing in ${minutes}m ${seconds}s`;--}}
+
+{{--        if (countdownSeconds > 0) {--}}
+{{--            countdownSeconds--;--}}
+{{--            setTimeout(updateCountdown, 1000); // Update every second--}}
+{{--        } else {--}}
+{{--            location.reload(); // Refresh page when countdown reaches zero--}}
+{{--        }--}}
+{{--    }--}}
+
+{{--    updateCountdown(); // Start countdown--}}
+{{--</script>--}}
+
 @stack('js')
 </body>
 

@@ -96,7 +96,7 @@ class CarController extends Controller
         }
 
         // Select cars columns only to avoid ambiguity
-        $cars = $cars->paginate(50);
+        $cars =  $cars->orderBy('cars.created_at', 'desc')->paginate(50);
 
         $car_status = CarStatus::with('cars')->withCount('cars')->get();
 
