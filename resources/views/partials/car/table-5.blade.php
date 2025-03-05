@@ -48,9 +48,9 @@
                                 hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
                                 onchange="setTimeout(() => { window.location.reload() }, 200)"
                         >
-                          @foreach($statuses as $statusindex => $status)
+                            @foreach($statuses as $statusindex => $status)
                                 <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
-                          @endforeach
+                            @endforeach
                         </select>
                     </div>
                 </td>
@@ -120,13 +120,15 @@
                                 data-target="#blimage{{ $car->id }}">
                             BOL Images
                         </button>
+
+
                         <!-- Modal  BL Images -->
                         <div class="modal fade" id="blimage{{ $car->id }}" tabindex="-1"
                              role="dialog" aria-labelledby="blimage" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title"> BL Images</h5>
+                                        <h5 class="modal-title"> BOL Images</h5>
                                         <button type="button" class="close" data-dismiss="modal"
                                                 aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
@@ -139,7 +141,8 @@
 
                                         <!-- FilePond input for multiple image uploads -->
                                         <input type="file" data-car_id="{{ $car->id }}" class="filepond2"
-                                               id="filepond" name="images[]" multiple>
+                                               id="filepond" name="images[]" multiple
+                                        >
 
                                         <!-- Section to display existing images -->
                                         @if ($car->getMedia('bl_images')->isNotEmpty())
@@ -257,8 +260,15 @@
                     </td>
 
                     <td>
-                        <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm">
-                            Next
+                        <button type="submit" id="submit-btn-{{ $car->id }}" class="btn btn-success btn-sm"
+
+                                @if(!$car->getMedia('bl_images')->isNotEmpty())
+                                    onclick="
+                                    event.preventDefault();
+                                    alert('Please upload BOL Images')
+                                  "
+                                @endif >
+                                Next
                         </button>
 
                         <br>
@@ -276,6 +286,7 @@
 </div>
 
 @push('js')
+
     <!-- FilePond JS -->
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 
@@ -395,7 +406,12 @@
                         revert: null, // Revert uploaded image if necessary
                     }
                 });
-
+                pond.on('processfiles', () => {
+                    console.log('All files uploaded! Reloading...');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000); // Optional delay
+                });
 
                 // Disable submit button initially
 

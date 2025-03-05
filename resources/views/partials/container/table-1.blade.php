@@ -91,61 +91,61 @@
         <tbody>
 
         @foreach ($cars as $car)
-            <tr>
+                <tr>
+                    <td>
+                        <label for="{{$car->vin}}" style="cursor:pointer">
+                            <input id="{{$car->vin}}" type="checkbox" class="car_ids" name="car_ids[]"
+                                   value="{{ $car->id }}">
+                            {{ $car->id }}
+                        </label>
+                    </td>
+                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
+                    <input type="hidden" name="status"
+                           value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
+                    <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
+                    <td>
+                        @include('partials.container.table_content-parts.fuel-type')
+                    </td>
+                    <td>
+                        <label for="">Warehouse:</label>
+                        <br>{{$car->warehouse}}<br>
+                        <label for="">Port:</label>
+                        {{ !empty($car->port) ? $car->port->name : '' }}
+                        <br>
+                        <br>
+                        <label for="">Dest Port:</label>
+                        <br>
+                        POTI
+                        <br>
+                    </td>
+                    <td>
+                        <label class="mt-2" for="title">Title</label>
+                        <select name="title" class="form-control title" data-car-id="{{ $car->id }}"
+                                id="title" required>
+                            <option value=""></option>
+                            <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
+                            </option>
+                            <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO</option>
+                        </select>
+                    </td>
+                    <td>
+                        {{ $car->vehicle_owner_name }}<br>
+                        {{ $car->owner_id_number }}<br>
+                        {{ $car->owner_phone_number }}<br>
+                    </td>
+                    <td>
+                        @php
+                            $updatedAt = $car->updated_at;
+                            $daysGone = \Carbon\Carbon::parse($updatedAt->startOfDay())->startOfDay()->diffInDays(\Carbon\Carbon::now()->startOfDay());
+                        @endphp
 
-                <td>
-                    <label for="{{$car->vin}}" style="cursor:pointer">
-                        <input id="{{$car->vin}}" type="checkbox" class="car_ids" name="car_ids[]" value="{{ $car->id }}">
-                        {{ $car->id }}
-                    </label>
-                </td>
-                <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
-                <input type="hidden" name="status"
-                       value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
-                <td>
-                    @include('partials.container.table_content-parts.fuel-type')
-                </td>
-                <td>
-                    <label for="">Warehouse:</label>
-                    <br>{{$car->warehouse}}<br>
-                    <label for="">Port:</label>
-                    {{ !empty($car->port) ? $car->port->name : '' }}
-                    <br>
-                    <br>
-                    <label for="">Dest Port:</label>
-                    <br>
-                    POTI
-                    <br>
-                </td>
-                <td>
-                    <label class="mt-2" for="title">Title</label>
-                    <select name="title" class="form-control title" data-car-id="{{ $car->id }}"
-                            id="title" required>
-                        <option value=""></option>
-                        <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
-                        </option>
-                        <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO</option>
-                    </select>
-                </td>
-                <td>
-                    {{ $car->vehicle_owner_name }}<br>
-                    {{ $car->owner_id_number }}<br>
-                    {{ $car->owner_phone_number }}<br>
-                </td>
-                <td>
-                    @php
-                        $updatedAt = $car->updated_at;
-                        $daysGone = \Carbon\Carbon::parse($updatedAt)->diffInDays(\Carbon\Carbon::now());
-                    @endphp
-
-                    {{ $daysGone }} Day
-                    <br>
-                    <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
-                    <br>
-                    <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
-                </td>
-            </tr>
+                        {{ $daysGone }} Day
+                        <br>
+                        <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
+                        <br>
+                        <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
+                    </td>
+                </tr>
         @endforeach
 
         </tbody>

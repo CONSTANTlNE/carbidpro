@@ -399,15 +399,12 @@
                                                            value="{{round($car->amount_due+round( ((new CreditService())->totalInterestFromLastCalc($car->id))) )}}">
                                                 </div>
                                                 {{--Percent--}}
-                                                @if(!$car->latestCredit)
-                                                    <div class="col-md-2 form-group">
-                                                        <label>Percent <span
-                                                                    style="color:blue">For Credit</span></label>
-                                                        <input autocomplete="nope" type="text" name="percent"
-                                                               class="form-control"
-                                                               value="{{ old('percent') }}">
-                                                    </div>
-                                                @endif
+                                                <div class="col-md-2 form-group">
+                                                    <label>Percent <span style="color:blue">For Credit</span></label>
+                                                    <input autocomplete="nope" type="text" name="percent"
+                                                           class="form-control"
+                                                           value="{{ old('percent') }}">
+                                                </div>
                                             </div>
 
                                         </div>

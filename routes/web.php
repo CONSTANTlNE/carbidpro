@@ -105,8 +105,11 @@ Route::prefix('dealer')->group(function () {
     });
 });
 
+
 // =======  ADMIN ROUTES  ========
 Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function () {
+
+
 
     // Dasboard Analitics
     Route::controller(AdminController::class)->group(function () {
@@ -302,6 +305,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     Route::controller(CreditController::class)->group(function () {
         Route::post('/give.credit', 'giveCredit')->name('give.credit');
         Route::post('/total-recalculation', 'totalRecalc')->name('credit.total.recalc');
+        Route::post('/change-percent','newPercent')->name('credit.percent.change');
     });
 
     // SMS
@@ -459,7 +463,6 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
 
     })->name('titles.upload');
-
     route::post('/uploadusers', function (Request $request) {
 
         $storedFile = $request->file->store('public');
@@ -497,6 +500,31 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         return view('testfile',compact('data'));
 
     })->name('user.upload');
+
+
+    route::get('/addid',function(){
+
+        $cars = Car::all(); // Fetch all cars
+
+        foreach ($cars as $car) {
+            // Decode the JSON balance_accounting column into an array
+            $balanceAccounting = json_decode($car->balance_accounting, true);
+
+            // Add a random ID to each item in balance_accounting
+            foreach ($balanceAccounting as &$charges) {
+                $charges['id'] = random_int(10000, 99999);  // Add a random ID
+            }
+
+            // Re-encode the balance_accounting array back to JSON
+            $car->balance_accounting = json_encode($balanceAccounting);
+
+            // Save the updated Car model
+            $car->save();
+        }
+
+    });
+
+
 
 });
 
@@ -544,14 +572,11 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
         // Dealer pays for a particular car from General balance
         Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
-
     });
 
-    route::controller(InvoiceController::Class)->group(function (){
+    route::controller(InvoiceController::class)->group(function (){
         Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
     });
-
-
 
     // Make deposit transfer call to Old Website
     Route::get('/transfer/deposit', function (Request $request) {
@@ -603,7 +628,6 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         return  redirect()->to($oldSite);
 
     })->name('transfer.to.old');
-
 
 });
 

@@ -58,7 +58,7 @@ class ContainerController extends Controller
         if ($slug == 'for-load') {
             if (isset($_GET)) {
                 $query = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port', 'groups.port'])
-                    ->where('container_status', 1);
+                    ->where('container_status_id', 1);
 
                 // Apply filters based on GET parameters if they exist
                 if ($request->has('to_port_id') && !empty($request->to_port_id)) {
@@ -91,12 +91,12 @@ class ContainerController extends Controller
                 $cars = $query->paginate(50);
             } else {
                 $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port' , 'groups.port'])
-                    ->where('container_status', 1)->paginate(50);
+                    ->where('container_status_id', 1)->paginate(50);
             }
         } elseif ($slug == 'loading-pending') {
             $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port', 'port')
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 2); // Filter cars where container_status is 2
+                    $query->where('container_status_id', 2); // Filter cars where container_status is 2
                 });
 
             // Apply search filter if $request->search is provided
@@ -119,7 +119,7 @@ class ContainerController extends Controller
         else {
             $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType', 'cars.port', 'port')
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 3); // Filter cars where container_status is 3
+                    $query->where('container_status_id', 3); // Filter cars where container_status is 3
                 });
 
             // Apply search filter if $request->search is provided
@@ -149,18 +149,18 @@ class ContainerController extends Controller
         $pendingCount = $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType',
             'cars.port', 'port')
             ->whereHas('cars', function ($query) {
-                $query->where('container_status', 2); // Filter cars where container_status is 2
+                $query->where('container_status_id', 2); // Filter cars where container_status is 2
             })->count();
 
         $loadingCount = $groupsQuery = ContainerGroup::with('cars.customer', 'cars.Auction', 'cars.loadType',
             'cars.port', 'port')
             ->whereHas('cars', function ($query) {
-                $query->where('container_status', 3); // Filter cars where container_status is 2
+                $query->where('container_status_id', 3); // Filter cars where container_status is 2
             })->count();
 
 
         $forLoadCount = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port'])
-            ->where('container_status', 1)->count();
+            ->where('container_status_id', 1)->count();
 
 
         return view(
@@ -222,7 +222,7 @@ class ContainerController extends Controller
         $group->update(['trt' => $cars[0]->warehouse]);
 
 
-        Car::whereIn('id', $car_ids_array)->increment('container_status', 1);
+        Car::whereIn('id', $car_ids_array)->increment('container_status_id', 1);
         $availableCars = Car::whereNotIn('id', $car_ids_array)->get();
 
         $group->cars()->attach($car_ids_array); // Laravel will create separate rows for each car ID
@@ -271,8 +271,8 @@ class ContainerController extends Controller
         if ($request->hasFile('bol_photo')) {
 
             //  if changed file by user , delete previous file from storage
-            if ($container->bol_photo!==null){
-                $filepath='public/'.$container->bol_photo;
+            if ($container->photo!==null){
+                $filepath='public/'.$container->photo;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -383,7 +383,7 @@ class ContainerController extends Controller
 
         $container->save();
 
-        Car::whereIn('id', $car_ids)->update(['container_status' => 3]);
+        Car::whereIn('id', $car_ids)->update(['container_status_id' => 3]);
 
 
         return redirect()->route('container.showStatus',
@@ -426,11 +426,11 @@ class ContainerController extends Controller
         // Fetch the original car
         $container                = ContainerGroup::findOrFail($request->container_id);
         $oldcar                   = Car::where('id', $request->oldcar_id)->first();
-        $oldcar->container_status = 1;
+        $oldcar->container_status_id = 1;
         $oldcar->save();
 
         $newcar                   = Car::where('id', $newcarid)->first();
-        $newcar->container_status = 2;
+        $newcar->container_status_id = 2;
         $newcar->save();
 
         // Detach the old car from the group
@@ -449,7 +449,7 @@ class ContainerController extends Controller
         $key                   = $request->key;
         $carid                 = $request->input('car_id'.$key);
         $car                   = Car::find($carid);
-        $car->container_status = 2;
+        $car->container_status_id = 2;
         $car->save();
 
         $containerGroup->cars()->attach($carid);
@@ -466,7 +466,7 @@ class ContainerController extends Controller
         $car         = Car::where('id', $request->carId)->first();
         // Detach the old car from the group
         $originalCar->cars()->detach($car->id);
-        $car->container_status      = 1;
+        $car->container_status_id      = 1;
         $originalCar->is_email_sent = 0;
         $originalCar->save();
         $car->save();
@@ -526,7 +526,7 @@ class ContainerController extends Controller
         $con      = ContainerGroup::where('id', $request->container_id)->first();
         $getEmail = PortEmail::where('port_id', $con->to_port_id)->first();
 
-        Mail::to($getEmail->email)->send(new CarGroupEmail($cars));
+        Mail::to($getEmail?->email)->send(new CarGroupEmail($cars));
 
         // Return a response for AJAX
         return view('pages.htmx.htmxSendEmailContainers', compact('container'));
@@ -537,7 +537,7 @@ class ContainerController extends Controller
         $key         = $request->key;
         $carstoadd   = Car::where('to_port_id', $request->to_port_id)
             ->where('warehouse', $request->trt)
-            ->where('container_status', 1)
+            ->where('container_status_id', 1)
             ->get();
         $containerid = $request->container_id;
 
@@ -551,7 +551,7 @@ class ContainerController extends Controller
 //dd($request->all());
         $carstoadd = Car::where('to_port_id', $request->to_port_id)
             ->where('warehouse', $request->trt)
-            ->where('container_status', 1)
+            ->where('container_status_id', 1)
             ->get();
 
         $containerid = $request->container_id;

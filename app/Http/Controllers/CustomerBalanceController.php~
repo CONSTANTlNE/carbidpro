@@ -170,7 +170,7 @@ class CustomerBalanceController extends Controller
                 }
             }
             $amountDue = round($car->latestCredit->credit_amount + (new CreditService())->totalInterestFromLastCalc($car->id)) + $creditExcludedCost;
-
+            dd($amountDue ,$request->amount);
             if ($amountDue < $request->amount) {
                 return back()->with('error', 'You can not pay more than amount due');
             }

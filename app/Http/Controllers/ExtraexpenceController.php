@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
 use App\Models\Extraexpence;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,7 @@ class ExtraexpenceController extends Controller
     public function htmxGetExtraExpense(Request $request)
     {
         $selectedcustomer = Customer::where('id', $request->customer_id)->first();
+        $deposit=CustomerBalance::where('customer_id', $request->customer_id)->where('is_approved', 1)->sum('amount');
 
         if ($selectedcustomer) {
             $extra_expenses = Extraexpence::all();
@@ -21,18 +23,21 @@ class ExtraexpenceController extends Controller
             if ($customerExpenses !== null) {
 
                 foreach ($customerExpenses as $expense) {
-                    $expense->date = now()->format('Y-m-d');  // Add date to each expense
+                    $expense->date = now()->format('Y-m-d');
+                    $expense->id= random_int(10000,99999);
+                    $expense->forcredit=1;
                 }
+
 //                $balanceAccounting = $customerExpenses;
 
             } else {
-                return view('pages.htmx.htmxExtraExpenseCustomer', compact('selectedcustomer'));
+                return view('pages.htmx.htmxExtraExpenseCustomer', compact('selectedcustomer' , 'deposit'));
             }
 
 
 
             return view('pages.htmx.htmxExtraExpenseCustomer',
-                compact('selectedcustomer', 'extra_expenses', 'customerExpenses'));
+                compact('selectedcustomer', 'extra_expenses', 'customerExpenses', 'deposit'));
         }
 
     }

@@ -57,6 +57,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'car_changes' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/car_changes.log'),
+            'level' => 'debug',
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

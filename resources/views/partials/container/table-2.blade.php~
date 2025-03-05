@@ -236,8 +236,8 @@
                         <td>
                             @php
                                 $updatedAt = $car->updated_at;
-                                $daysGone = \Carbon\Carbon::parse($updatedAt->startOfDay())->diffInDays(
-                                    \Carbon\Carbon::now()->startOfDay(),
+                                $daysGone = \Carbon\Carbon::parse($updatedAt)->diffInDays(
+                                    \Carbon\Carbon::now(),
                                 );
                             @endphp
                             {{ $daysGone }} Day

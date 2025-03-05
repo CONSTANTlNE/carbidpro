@@ -16,9 +16,11 @@ use App\Models\PortCity;
 use App\Models\ShippingPrice;
 use App\Models\User;
 use App\Services\CreditService;
+use App\Services\FinancialLogService;
 use App\Services\smsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -42,11 +44,20 @@ class CarController extends Controller
             ]);
         } else {
             $cars = Car::with([
-                'dispatch', 'customer', 'state', 'CarStatus', 'firstCredit', 'Auction', 'groups',
+                'dispatch',
+                'customer',
+                'state',
+                'CarStatus',
+                'firstCredit',
+                'Auction',
+                'groups',
                 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
-                }, 'latestCredit',
-            ]);
+                },
+                'latestCredit'
+            ])->withSum(['payments as total_payments' => function ($query) {
+                $query->where('type', 'car_payment');
+            }], 'amount');
         }
         // Base query with eager loading
 
@@ -96,7 +107,7 @@ class CarController extends Controller
         }
 
         // Select cars columns only to avoid ambiguity
-        $cars =  $cars->orderBy('cars.created_at', 'desc')->paginate(50);
+        $cars = $cars->orderBy('cars.created_at', 'desc')->paginate(50);
 
         $car_status = CarStatus::with('cars')->withCount('cars')->get();
 
@@ -134,6 +145,7 @@ class CarController extends Controller
 //        // Return the calculated shipping cost
 //        return response()->json(['shipping_cost' => $shippingCost]);
 //    }
+
     public function calculateShippingCost(Request $request)
     {
         // Validate incoming request
@@ -143,9 +155,9 @@ class CarController extends Controller
             'to_port_id' => 'required|integer',
         ]);
 
-        $auctionId = $request->get('auction');
+        $auctionId  = $request->get('auction');
         $locationId = $request->get('from_state');
-        $portId = $request->get('to_port_id');
+        $portId     = $request->get('to_port_id');
 
 
         // Fetch values
@@ -156,7 +168,7 @@ class CarController extends Controller
 //            ->where('to_port_id', $portId)
 //            ->whereJsonContains('auction_id', $auctionId)->first();
 
-        $total_inside =  ShippingPrice::where('from_location_id', $request->from_state)
+        $total_inside = ShippingPrice::where('from_location_id', $request->from_state)
             ->where('to_port_id', $request->to_port_id)
             ->first();
 
@@ -169,8 +181,6 @@ class CarController extends Controller
                 ->whereJsonContains('auction_id', $auctionId)
                 ->first();
         }
-
-
 
 
         $port = Port::where('id', $request->to_port_id)->first();
@@ -271,7 +281,7 @@ class CarController extends Controller
         $locations       = Location::all();
         $shipping_prices = ShippingPrice::all();
         $customers       = Customer::get();
-        $dispatchers     = User::role('Broker')->get();
+        $brokers     = User::role('Broker')->get();
         $extra_expenses  = Extraexpence::all();
         $car_status      = CarStatus::with('cars')->get();
 
@@ -279,7 +289,7 @@ class CarController extends Controller
             'pages.cars.create',
             compact(
                 'auctions',
-                'dispatchers',
+                'brokers',
                 'load_types',
                 'car_status',
                 'ports',
@@ -303,12 +313,9 @@ class CarController extends Controller
             'status'          => 'required',
         ]);
 
-//        dd($request->images2);
 
-        // Create new car
         $car = new Car();
 
-        // Assign fields from the request to the Car model attributes
         $car->customer_id        = $request->input('customer_id');
         $car->make_model_year    = $request->input('make_model_year');
         $car->dispatch_id        = $request->input('dispatch_id');
@@ -330,62 +337,47 @@ class CarController extends Controller
         $car->warehouse          = $request->input('warehouse');
         $car->comment            = $request->input('comment');
         $car->record_color       = $request->input('record_color');
-//      $car->balance = $request->input('balance');  ?? whyyy????
-
-        // Debit changed to total_cost
-//        $car->total_cost    = $request->input('total_cost');
         $car->car_status_id = $request->input('status');
 
 
-//        if ($request->input('payed')) {
-//            // At this point percent on credit (if any) is not included
-//            $car->amount_due = $request->input('total_cost') - $request->input('payed');
-//        } else {
-//            $car->amount_due = $request->input('total_cost');
-//        }
 
-
-        // Add Extra expense (which is granted to customer)
+        // Add Extra expense (which is granted to customer) to balance_accounting ( i.e total costs)
         $balanceAccounting = $request->input('balance_accounting');
         $extraexpenses     = Extraexpence::all();
-
         foreach ($extraexpenses as $extraexpense) {
             if ($request->has($extraexpense->name) && $request->input($extraexpense->name) > 0) {
                 $balanceAccounting[] = [
                     'name'  => $extraexpense->name,
                     'value' => $request->input($extraexpense->name),
                     'date'  => now()->format('Y-m-d'),
+                    'id'=> random_int(10000,99999),
+                    'forcredit'=>  true,
                 ];
             }
         }
         $balanceAccounting = json_encode($balanceAccounting);
         // Handle balance_accounting array
         if ($request->has('balance_accounting')) {
-            // Assuming balance_accounting is a JSON field in the database
             $car->balance_accounting = $balanceAccounting;
         }
 
-
+        // SUM OF ALL COSTS
         $sum             = array_sum(array_map(fn($item) => $item->value, json_decode($balanceAccounting)));
+
+        if ($request->input('payed')) {
+            // not creating credit payment because issuing and payment date are same
+            $car->amount_due = $sum - $request->input('payed');
+            $creditable=$sum - $request->input('payed');
+        } else {
+            $car->amount_due = $sum;
+            $creditable=$sum;
+        }
         $car->total_cost = $sum;
-        $car->amount_due = $sum;
+
 
         $car->save();
 
-        // Change customer Extra expenses also if change during car addition ????
-//        $extraexpenses = Extraexpence::all();
-//        $extraExpenseArray = [];
-//        $customer = Customer::find($request->customer_id);
-//        foreach ($extraexpenses as $extraexpense) {
-//            if ($request->has($extraexpense->name)) {
-//                $extraExpenseArray[$extraexpense->name] = $request->input($extraexpense->name);
-//            }
-//        }
-//        $customer->extra_expenses = json_encode($extraExpenseArray);
-//        $customer->save();
-
-
-        // Handle images array
+        //  save images if uploaded
         if ($request->has('images2')) {
             // Assuming images is a JSON field in the database
             $car->images = json_encode($request->input('images2'));
@@ -395,14 +387,24 @@ class CarController extends Controller
             }
         }
 
+
+          // issue credit if percent is indicated during Car creation
         if ($request->input('percent') > 0) {
-            $credit = Credit::create([
+
+            foreach (json_decode($balanceAccounting,true) as $item) {
+                if ($item['forcredit']==0) {
+                    $creditable-=$item['value'];
+                }
+            }
+
+              Credit::create([
                 'customer_id'           => $request->customer_id,
-                'credit_amount'         => $car->total_cost,
+                'credit_amount'         => $creditable,
                 'car_id'                => $car->id,
                 'monthly_percent'       => $request->input('percent') / 100,
                 'issue_or_payment_date' => Carbon::now(),
             ]);
+
         }
 
 
@@ -421,8 +423,8 @@ class CarController extends Controller
             $balance->save();
         }
 
+        // inform customer that car has been added to his cabinet via SMS
         $phone = Customer::where('id', $request->input('customer_id'))->first()->phone;
-
         (new smsService())->newCarAdded($phone, $car);
 
         // Redirect or return a response after saving
@@ -484,10 +486,10 @@ class CarController extends Controller
                         ->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
                         ->orderBy('dispatcher.name', $sortDirection);
                 } else {
-                    $cars = $cars->orderBy('cars.created_at', 'desc');
+                    $cars = $cars->orderBy('cars.updated_at', 'desc');
                 }
             } else {
-                $cars = $cars->orderBy('cars.created_at', 'desc');
+                $cars = $cars->orderBy('cars.updated_at', 'desc');
             }
 
 
@@ -532,10 +534,10 @@ class CarController extends Controller
                         ->join('users as dispatcher', 'cars.dispatch_id', '=', 'dispatcher.id')
                         ->orderBy('dispatcher.name', $sortDirection);
                 } else {
-                    $cars = $cars->orderBy('cars.created_at', 'desc');
+                    $cars = $cars->orderBy('cars.updated_at', 'desc');
                 }
             } else {
-                $cars = $cars->orderBy('cars.created_at', 'desc');
+                $cars = $cars->orderBy('cars.updated_at', 'desc');
             }
 
             // Select cars columns only to avoid ambiguity
@@ -556,6 +558,8 @@ class CarController extends Controller
         $car          = Car::findOrFail($request->id);
         $car_status   = CarStatus::get();
         $container_id = $car->groups->first()?->container_id;
+        $payment=CustomerBalance::where('car_id', $car->id)->where('type','car_payment')->sum('amount');
+
 
 
         $extra_expenses    = Extraexpence::all();
@@ -566,7 +570,9 @@ class CarController extends Controller
         $shipping_prices   = ShippingPrice::all();
         $balanceAccounting = json_decode($car->balance_accounting, true); // Decode the JSON
         $customers         = Customer::get();
-        $dispatchers       = User::where('role', 'Broker')->get();
+        $brokers     = User::role('Broker')->get();
+
+
         $selectedcustomer  = Customer::find($car->customer_id);
 
         return view(
@@ -575,7 +581,7 @@ class CarController extends Controller
                 'car',
                 'balanceAccounting',
                 'auctions',
-                'dispatchers',
+                'brokers',
                 'car_status',
                 'load_types',
                 'ports',
@@ -585,6 +591,7 @@ class CarController extends Controller
                 'extra_expenses',
                 'selectedcustomer',
                 'container_id',
+                'payment',
             ),
         );
     }
@@ -592,21 +599,33 @@ class CarController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request)
     {
         $car = Car::findOrFail($request->id);
 
-//       dd($request->all());
+        // ======= LOG  changes in balance_accounting  ==========
 
-        //  if new costs were added recalculate credit
-        if ($request->has('balance_accounting')) {
-            $costs = $request->input('balance_accounting');
-            (new CreditService())->reCalculateOnDeleteOrAdd($car, null, $costs);
-        }
-
+        (new FinancialLogService())->log($car,collect( json_decode($car->balance_accounting, true)),
+            collect($request->input('balance_accounting')));
 
         $car->balance_accounting = json_encode($request->input('balance_accounting'));
-        $car->customer_id        = $request->input('customer_id');
+
+        // log customer change
+        if ($car->customer_id != $request->input('customer_id')) {
+            $firstDealer  = Customer::find($car->customer_id);
+            $secondDealer = Customer::find($request->input('customer_id'));
+            Log::channel('car_changes')
+                ->info('მანქანა '.$car->vin.' დილერის ცვლილება', [
+                    'შეიცვალა დილერი'       => $firstDealer->company_name.' / '.$firstDealer->contact_name,
+                    'ახალი დილერი'          => $secondDealer->company_name.' / '.$secondDealer->contact_name,
+                    'ოპერაცია განახორციელა' => auth()->user()->name,
+                ]);
+        }
+
+        $car->customer_id = $request->input('customer_id');
+
+
         $car->make_model_year    = $request->input('make_model_year');
         $car->dispatch_id        = $request->input('dispatch_id');
         $car->lot                = $request->input('lot');
@@ -638,11 +657,12 @@ class CarController extends Controller
         $car->car_status_id = $request->input('status');
 
 
-        // in payments may be also Interest payments , so total payments might be greater that total cost
+        // in payments may be also Interest payments , so total payments might be greater than total cost
         $totalpayed = -CustomerBalance::where('car_id', $car->id)
             ->where('type', 'car_payment')
             ->sum('amount');
 
+        // needed if removed any cost
         if ($request->input('total_cost') - $totalpayed > 0) {
             $car->amount_due = $request->input('total_cost') - $totalpayed;
         } else {
@@ -651,13 +671,74 @@ class CarController extends Controller
 
         $car->save();
 
+        $balanceAccounting = json_encode($request->input('balance_accounting'));
+        // SUM OF ALL COSTS
+        $creditable=array_sum(array_map(fn($item) => $item->value, json_decode($balanceAccounting)));
+
+
+        // issue credit if percent is indicated during Car creation
+        if ($request->input('percent') > 0) {
+
+            foreach ( json_decode($balanceAccounting) as $item) {
+                if ($item->forcredit==0) {
+                    $creditable-=$item->value;
+                }
+            }
+
+            Credit::create([
+                'customer_id'           => $request->customer_id,
+                'credit_amount'         => $creditable,
+                'car_id'                => $car->id,
+                'monthly_percent'       => $request->input('percent') / 100,
+                'issue_or_payment_date' => Carbon::now(),
+            ]);
+
+        }
+
+        if($car->latestCredit){
+            (new CreditService())->recalc($car->id);
+        }
+
 
         return redirect()->route('cars.index')->with('success', 'Car updated successfully.');
     }
 
+
     public function listUpdate(Request $request)
     {
         $car = Car::with('CarStatus')->findOrFail($request->id);
+
+        if ($request->has('storage')) {
+            $car->storage = $request->storage;
+        }
+
+        if ( $request->cost > 0 && $car->storage_cost ===null) {
+
+            $storageValue = $request->cost;
+            $newElement   = [
+                "name"  => "Storage",
+                "value" => $storageValue,
+                'date'  => now()->format('Y-m-d'),
+                'id'=>random_int(100000, 999999),
+                'forcredit' => 1
+            ];
+
+            $balanceAccounting = json_decode($car->balance_accounting, true); // Decode as associative array
+            $balanceAccounting[] = $newElement; // Append new element
+            $updatedJsonString = json_encode($balanceAccounting); // Re-encode to JSON
+
+           // dd($updatedJsonString);
+
+            // Output the updated JSON
+            $car->balance_accounting = $updatedJsonString;
+            $car->storage_cost       = $request->cost;
+//            $car->amount_due         = $car->amount_due + $request->cost;
+            $car->total_cost         = $car->total_cost + $request->cost;
+            $car->save();
+            //  add storage amount to credit amount (applied only if credit is granted)
+
+            (new CreditService())->recalc($car->id);
+        }
 
         if ($request->has('warehouse')) {
             $car->warehouse = $request->warehouse;
@@ -724,51 +805,26 @@ class CarController extends Controller
 
         if ($request->onlytitl_delivery) {
             $car->save();
-
             return true;
         }
 
 
         $car->car_status_id = $car->car_status_id + 1;
 
+        // when status is dispatched , set container status to for_load (6 because we are adding 1 to current status)
         if ($car->car_status_id == 7) {
-            $car->container_status = 1;
+            $car->container_status_id = 1;
         }
 
+
+
+        $car->updated_at = now();
         $car->save();
 
-        if ($request->has('storage')) {
-            $car->storage = $request->storage;
-            $car->save();
-        }
 
-        if ($request->has('cost') && $request->cost > 0) {
-            $array = json_decode($car->balance_accounting, true);
 
-            $storageValue = $request->cost;
-            $newElement   = [
-                "name"  => "Storage",
-                "value" => $storageValue,
-                'date'  => now()->format('Y-m-d'),
-            ];
 
-            // Append the new element to the array
-            $array[] = $newElement;
 
-            // Encode the array back into JSON
-            $updatedJsonString = json_encode($array);
-
-            // Output the updated JSON
-            $car->balance_accounting = $updatedJsonString;
-            $car->storage_cost       = $request->cost;
-            $car->amount_due         = $car->amount_due + $request->cost;
-            $car->total_cost         = $car->total_cost + $request->cost;
-            $car->save();
-            //  add storage amount to credit amount (applied only if credit is granted)
-            $newCredit = (new CreditService())->addNewAmountToCredit($car, $request->cost);
-
-            (new CreditService())->reCalculateOnDeleteOrAdd($car);
-        }
 
 
         return redirect()->back()->with('success', 'Car updated successfully.');
@@ -862,6 +918,10 @@ class CarController extends Controller
     {
         $car = Car::where('id', $request->car_id)->first();
         if ($car) {
+            // if changed from dispatched to other status change remove container status as well
+            if ($car->car_status_id == 7 ) {
+                $car->container_status_id = null;
+            }
             $car->car_status_id = $request->status;
             $car->save();
 

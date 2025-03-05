@@ -26,7 +26,6 @@
                 <input type="hidden" name="status"
                        value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
                 <tr>
-
                     <td>
                         {{ $car->id }}
                     </td>
@@ -48,7 +47,6 @@
                     @endhasanyrole
                     <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
 
-
                     <td>@include('partials.car.table_content-parts.field-from')</td>
 
                     <td>
@@ -68,10 +66,10 @@
                     <td>{{ $car->title }}</td>
                     <td>
                         <label for="company_name">Storage:</label><br>
-                        <input type="text" name="storage" class="form-control storage" id="storage" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
+                        <input value="{{$car->storage}}" type="text" name="storage" class="form-control storage" id="storage" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                         <br>
                         <label for="contact_info">Cost:</label><br>
-                        <input type="number" class="form-control" name="cost" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
+                        <input value="{{$car->storage_cost}}" type="number" class="form-control" name="cost" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces">
                     </td>
                     <td>
                         <button type="submit" id="submit-btn-{{ $car->id }}"
@@ -84,13 +82,10 @@
                         <br>
                         <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
                         <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
-
                     </td>
-
                 </tr>
             </form>
         @endforeach
-
         </tbody>
     </table>
 </div>

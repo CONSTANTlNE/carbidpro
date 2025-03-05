@@ -57,7 +57,7 @@ class InvoiceController extends Controller
         $payment=CustomerBalance::where('car_id',$car->id)
         ->where('type','car_payment')->sum('amount');
 
-        $totalinterest=round( ((new CreditService())->totalAccruedInterestTillToday($car)));
+        $totalinterest=round( ((new CreditService())->totalAccruedInterestTillToday($car->id)));
 
 
         return view('frontend.pages.invoice', compact('car', 'invNumber', 'customer','costs','payment','totalinterest'));

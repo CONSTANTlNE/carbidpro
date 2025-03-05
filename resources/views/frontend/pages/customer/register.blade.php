@@ -56,7 +56,6 @@
             <div class="col-lg-12">
                 <br>
                 <div class="auth_page_wrapper">
-
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -68,7 +67,7 @@
                     @endif
                     <form action="{{ route('customer.register.post') }}" method="post">
                         @csrf
-
+                        <input type="hidden" name="must_fill">
                         <div class="form-group mb-3">
                             <label for="number_of_cars">{{ $registerStatics['car_numbers'] }}</label>
 

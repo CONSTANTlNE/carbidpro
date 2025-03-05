@@ -90,7 +90,7 @@
                                     @endif
                                 </li>
                                 @if(!auth()->check())
-                                <li  >
+                                <li>
                                     <a href="{{ route('customer.register.get') }}">{{ $headerStatics['Register'] }}</a>
                                 </li>
                                 @endif

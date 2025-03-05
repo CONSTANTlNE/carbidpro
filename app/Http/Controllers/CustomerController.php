@@ -589,6 +589,12 @@ class CustomerController extends Controller
 
     public function register(Request $request)
     {
+
+        if ($request->filled('must_fill')) {
+            return response()->json(['message' => 'Success'], 200);
+        }
+
+
         $current       = session()->get('auth');
         $extraexpenses = Extraexpence::all();
 

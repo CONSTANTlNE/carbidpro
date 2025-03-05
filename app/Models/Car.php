@@ -99,6 +99,7 @@ class Car extends Model implements HasMedia, Sortable
     public function credit() {
 
         return $this->hasMany(Credit::class);
+
     }
 
     /**

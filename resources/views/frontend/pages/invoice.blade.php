@@ -179,7 +179,7 @@
                                     <p class="cs-secondary_color cs-text_right cs-f15">Total: <span
                                                 id="total" class="cs-ml30 cs-primary_color cs-semi_bold">636.4</span>
                                     </p>
-                                    <p class="cs-secondary_color cs-text_right cs-f15 backgrounds">Payment:
+                                    <p class="cs-secondary_color cs-text_right cs-f15 backgrounds">Payed:
                                         <input id="payment"
                                                style="all:unset;max-width: 50px;color: black;font-weight: bold;margin-left: 25px;background: yellow"
                                                value="${{-$payment}}">

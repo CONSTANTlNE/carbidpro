@@ -42,6 +42,20 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class=" col-sm-6 col-md-6 col-lg-4">
+                        <div style="background: black!important;" id="cardbox1">
+                            <div style="background: black!important;" class="statistic-box">
+                                <i class="fa fa-user-plus fa-3x"></i>
+                                <div class="counter-number pull-right">
+                                    <span class="count-number"></span>
+                                    <span class="slight"><i class="fa fa-play fa-rotate-270"> </i>
+                                </span>
+                                </div>
+                                <h3>Total Shipping <span style="color: darkorange">{{$totalShipping}}</span></h3>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {{--Payments--}}
                 <div class="row px-5">

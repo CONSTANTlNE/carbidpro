@@ -10,7 +10,7 @@
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
         <style>
             .ts-wrapper {
-                min-width: 250px;
+                max-width: 250px;
                 padding: 0;
             }
         </style>
@@ -103,7 +103,8 @@
                                                             <option value="{{ $customer->id }}"
                                                                     {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
 
-                                                                {{ $customer->contact_name }} Extra : {{ $customer->extra_for_team }}
+                                                                {{ $customer->contact_name }} Extra
+                                                                : {{ $customer->extra_for_team }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -114,10 +115,11 @@
                                                     <select autocomplete="nope" name="dispatch_id" class="form-control"
                                                             id="dispatch_id" required>
                                                         <option value=""></option>
-                                                        @foreach ($dispatchers as $dispatch)
-                                                            <option value="{{ $dispatch->id }}"
-                                                                    {{ old('dispatch_id') == $dispatch->id ? 'selected' : '' }}>
-                                                                {{ $dispatch->name }}</option>
+                                                        @foreach ($brokers as $broker)
+                                                            <option value="{{ $broker->id }}"
+                                                                    {{ old('dispatch_id') == $broker->id ? 'selected' : '' }}>
+                                                                {{ $broker->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -128,7 +130,7 @@
                                                            class="form-control"
                                                            value="{{ old('make_model_year') }}" required>
                                                 </div>
-                                                {{--Vin--}}
+                                                {{--vin--}}
                                                 <div class="form-group">
                                                     <label>Vin</label>
                                                     <input autocomplete="nope" type="text" name="vin"
@@ -137,10 +139,10 @@
                                                 </div>
                                             </div>
 
-                                            {{--Comment--}}
-                                            <div  class="form-group" id="customercomment">
+                                            {{--comment--}}
+                                            <div style="max-width: 500px" class="form-group" id="customercomment">
                                                 <label>Customer Comment</label>
-                                                <textarea style="color:red" disabled rows="3" class="form-control"
+                                                <textarea style="color:red;" disabled rows="3" class="form-control"
                                                           id="extraexpense"></textarea>
                                             </div>
 
@@ -185,7 +187,7 @@
                                                 {{--Fuel--}}
                                                 <div class=" col-sm-6 col-md-6 col-lg-3 "
                                                      style="align-items: center; width: max-content">
-                                                    <label class="text-center">Type of Fuel</>
+                                                    <label class="text-center">Type of Fuel</label>
 
                                                     <div class="d-flex justify-content-center align-middle text-center mt-3 ">
                                                         <label style="margin-right: 0" class="radio-inline"
@@ -295,29 +297,52 @@
                                             <!-- Repeater Fields in One Row -->
                                             <template x-for="(item, index) in balance_accounting" :key="index">
                                                 <div class="row repeater-item mt-2 align-items-center">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-2 col-6">
                                                         <input type="text" :name="`balance_accounting[${index}][name]`"
                                                                x-model="item.name"
                                                                class="name-autocomplete form-control"
                                                                placeholder="Enter item name" required>
                                                     </div>
-                                                    <div class="col-md-4">
+
+                                                    <div class="col-md-2 col-6">
                                                         <input type="number"
                                                                :name="`balance_accounting[${index}][value]`"
                                                                x-model.number="item.value" class="form-control"
                                                                placeholder="Enter item value" required>
                                                     </div>
                                                     {{-- DATE--}}
-                                                    <div style="display: none" class="col-md-4">
+                                                    <div
+                                                            style="display: none"
+                                                            class="col-md-4">
                                                         <input type="date" :name="`balance_accounting[${index}][date]`"
                                                                x-model="item.date" class="form-control"
                                                                x-init="item.date = item.date || '{{ now()->format('Y-m-d') }}'">
                                                     </div>
-                                                    <div class="col-md-2">
+                                                    {{-- cost id--}}
+                                                    <div
+                                                            style="display: none"
+                                                            class="col-md-4 ">
+                                                        <input type="number" :name="`balance_accounting[${index}][id]`"
+                                                               x-model="item.id" class="form-control"
+                                                               x-init="item.id = item.id || Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000">
+                                                    </div>
+                                                    {{-- include charge for credit --}}
+                                                    <div class="col-md-1 col-4 text-center mt-1">
+                                                        <input type="hidden" :name="`balance_accounting[${index}][forcredit]`" x-init="item.forcredit = item.forcredit || 1" x-model.number="item.forcredit"  >
+
+                                                        <input type="checkbox"
+                                                               style="max-width: 50px"
+                                                               :name="`balance_accounting[${index}][forcredit]`"
+                                                               x-model="item.forcredit"
+                                                               class="form-control"
+                                                               @change="item.forcredit = $event.target.checked ? 1 : 0"
+                                                               :checked="1">
+                                                    </div>
+
+                                                    <div class="col-md-2 col-4 mt-1">
                                                         <button type="button" class="btn btn-danger"
                                                                 @click="confirmRemoveField(index)">Remove
                                                         </button>
-
                                                     </div>
                                                 </div>
                                             </template>
@@ -409,12 +434,12 @@
                                     </div>
 
 
-{{--                                    <div class="form-group" style="max-width: 100%">--}}
-{{--                                        <label>Container #</label><br>--}}
-{{--                                        <input name="container_number" class="form-control" id="container_number"--}}
-{{--                                               type="text">--}}
+                                    {{--                                    <div class="form-group" style="max-width: 100%">--}}
+                                    {{--                                        <label>Container #</label><br>--}}
+                                    {{--                                        <input name="container_number" class="form-control" id="container_number"--}}
+                                    {{--                                               type="text">--}}
 
-{{--                                    </div>--}}
+                                    {{--                                    </div>--}}
 
                                     <div class="form-group" style="max-width: 100%">
                                         <label>Images</label><br>
@@ -564,6 +589,8 @@
             </script>
 
 
+
+
             <script id="alpinetarget">
 
                 document.addEventListener('alpine:init', () => {
@@ -571,7 +598,8 @@
 
                     Alpine.store('balanceAccountingStore', {
 
-                        balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'']]), // Load existing data or default
+                        {{--balance_accounting: @json($balanceAccounting ?? [['name' => '', 'value' => 0,'date'=>'', 'id'=>'']]), // Load existing data or default--}}
+                        balance_accounting: {!! json_encode($balanceAccounting ?? [['name' => '', 'value' => 0, 'date' => '', 'id' => '' , 'forcredit' => '']]) !!},
 
 
                         addField() {
@@ -581,7 +609,9 @@
                             this.balance_accounting.push({
                                 name: '',
                                 value: 0,
-                                date: ''
+                                date: '',
+                                id: '',
+                                forcredit: ''
                             });
                         },
 
@@ -625,6 +655,9 @@
 
                 });
             </script>
+
+
+            <script id="checkdepositscript"></script>
 
 
             <script>
@@ -828,7 +861,8 @@
 
                     $('#fromState').change(function () {
                         var fromStateId = $(this).val(); // Get the selected from_state ID
-                         console.log($('#fromState option:selected').text())
+                        console.log(fromStateId)
+                        console.log($('#fromState option:selected').text())
                         if (fromStateId) {
                             // Send AJAX request to get to_port_ids based on from_state_id
                             $.ajax({
@@ -838,19 +872,18 @@
                                     _token: '{{ csrf_token() }}', // CSRF token
                                     from_state_id: fromStateId, // Send selected from_state ID
                                     auction_id: $('#auction').val(),
-                                    location_name:$('#fromState option:selected').text()
+                                    location_name: $('#fromState option:selected').text()
                                 },
                                 success: function (response) {
-                                    console.log(response)
                                     // Populate the to_port_id dropdown with the received ports
                                     $('#to_port_id').empty(); // Clear the existing options
-                                    $('#to_port_id').append(
-                                        '<option value="">Select an option</option>'); // Default option
-
                                     $.each(response.ports, function (key, port) {
-                                        $('#to_port_id').append(
-                                            `<option value="${key}">${port}</option>`);
+                                        console.log(key, port)
+                                        $('#to_port_id').append(`<option value="${key}">${port}</option>`);
                                     });
+                                    $('#to_port_id').append('<option value selected="">Select an option</option>');
+
+
                                 },
                                 error: function (error) {
                                     console.log('Error fetching ports:', error);
@@ -887,7 +920,7 @@
                                 load_type: load_type,
                                 from_state: from_state,
                                 to_port_id: to_port_id,
-                                location_name:$('#fromState option:selected').text(),
+                                location_name: $('#fromState option:selected').text(),
                                 customer_id: customer_id
                             },
                             success: function (response) {
@@ -1098,7 +1131,7 @@
                 $(document).ready(function () {
                     // $('.select2').select2();
                     $('.select2').select2({
-                        matcher: function(params, data) {
+                        matcher: function (params, data) {
                             if ($.trim(params.term) === '') {
                                 return data;
                             }
