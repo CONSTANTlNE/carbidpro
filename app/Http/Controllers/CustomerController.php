@@ -109,6 +109,7 @@ class CustomerController extends Controller
         // Validate the incoming request data before proceeding
         $request->validate([
             'car_id' => 'required', // Ensure the car_id exists in the database
+
         ]);
 
         // Find the car by its ID

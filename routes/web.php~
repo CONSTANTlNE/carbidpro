@@ -303,8 +303,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
     // Credit
     Route::controller(CreditController::class)->group(function () {
-        Route::post('/give-credit', 'giveCredit')->name('give.credit');
-        Route::post('/remove-credit', 'removeCredit')->name('remove.credit');
+        Route::post('/give.credit', 'giveCredit')->name('give.credit');
         Route::post('/total-recalculation', 'totalRecalc')->name('credit.total.recalc');
         Route::post('/change-percent','newPercent')->name('credit.percent.change');
     });

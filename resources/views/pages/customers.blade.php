@@ -12,9 +12,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
     <style>
-        .ts-wrapper{
+        .ts-wrapper {
             min-width: 250px;
-            padding:0;
+            padding: 0;
         }
     </style>
 @endpush
@@ -118,7 +118,7 @@
                                                         </div>
                                                         <div class="col-md-4 form-group">
                                                             <label class="control-label">Car purchase per Month</label>
-                                                            <select name="number_of_cars"  class="form-control">
+                                                            <select name="number_of_cars" class="form-control">
                                                                 <option {{old('number_of_cars')==10 ? 'selected' : ''}} value="10">
                                                                     10
                                                                 </option>
@@ -174,7 +174,8 @@
                                                     <div class="row">
                                                         <div class="col-md-12 form-group">
                                                             <label class="control-label">Comment</label>
-                                                            <textarea class="form-control" name="comment" id=""  rows="5">{{old('comment')}}</textarea>
+                                                            <textarea class="form-control" name="comment" id=""
+                                                                      rows="5">{{old('comment')}}</textarea>
                                                         </div>
                                                     </div>
 
@@ -270,16 +271,30 @@
                                                     $totalAmountDue = 0;
                                                 @endphp
                                                 @foreach ($customer->cars as $key => $car)
-                                                    {{--Calculate Total Amount Due--}}
-                                                    @if($car->latestCredit)
-                                                        @php
-                                                            $totalAmountDue += round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))
-                                                        @endphp
-                                                    @else
-                                                        @php
-                                                            $totalAmountDue += round( $car->amount_due)
-                                                        @endphp
-                                                    @endif
+                                                    @php
+
+                                                        $creditExcludedCost=0;
+                                                        foreach (json_decode($car->balance_accounting)  as $cost) {
+                                                        if($cost->forcredit==0){
+                                                        $creditExcludedCost+=$cost->value;
+                                                        }
+                                                      }
+                                                        // Calculate Total Amount Due
+                                                      if($car->latestCredit){
+                                                          //  if customer paid not fully but cocered charges which where not included in credit
+                                                        if ($car->latestCredit->paid_amount > $car->latestCredit->credit_amount){
+                                                        $singleAmountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id));
+                                                        } else{
+                                                        $singleAmountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))+$creditExcludedCost;
+                                                        }
+                                                       $totalAmountDue += $singleAmountDue;
+                                                    }
+
+                                                    else{
+                                                     $totalAmountDue += round( $car->amount_due);
+                                                    }
+                                                    @endphp
+
                                                     @if($loop->last)
                                                         <div class="w-100 d-flex justify-content-center">
                                                             <p style="min-width:75px!important;padding-right: 2px!important;padding-left: 2px!important"
@@ -303,18 +318,22 @@
                                             <td>{{$customer->extra_for_team}}</td>
                                             <td>
                                                 @if($customer->newwebsitecustomer===1)
-                                                <form action="{{route('customers.autologin')}}" method="post"
-                                                      target="_blank">
-                                                    @csrf
-                                                    <input type="hidden" name="customer_id" value="{{$customer->id}}">
-                                                    <button class="btn btn-info btn-rounded w-md m-b-5">Login(new) </button>
-                                                </form>
+                                                    <form action="{{route('customers.autologin')}}" method="post"
+                                                          target="_blank">
+                                                        @csrf
+                                                        <input type="hidden" name="customer_id"
+                                                               value="{{$customer->id}}">
+                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new)
+                                                        </button>
+                                                    </form>
                                                 @else
                                                     <form action="{{route('customers.autologin')}}" method="post"
                                                           target="_blank">
                                                         @csrf
-                                                        <input type="hidden" name="customer_id" value="{{$customer->id}}">
-                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new) </button>
+                                                        <input type="hidden" name="customer_id"
+                                                               value="{{$customer->id}}">
+                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new)
+                                                        </button>
                                                     </form>
 
                                                     <form action="{{route('generate.link')}}" method="get"
@@ -322,7 +341,9 @@
                                                         @csrf
                                                         <input type="hidden" name="customer_id"
                                                                value="{{$customer->id}}">
-                                                        <button class="btn btn-purple btn-rounded w-md m-b-5">Login (old)</button>
+                                                        <button class="btn btn-purple btn-rounded w-md m-b-5">Login
+                                                            (old)
+                                                        </button>
                                                     </form>
                                                 @endif
                                             </td>
@@ -482,7 +503,9 @@
                                                                     <div class="row">
                                                                         <div class="col-md-12 form-group">
                                                                             <label class="control-label">Comment</label>
-                                                                            <textarea class="form-control" name="comment"   rows="5">{{$customer->comment}}</textarea>
+                                                                            <textarea class="form-control"
+                                                                                      name="comment"
+                                                                                      rows="5">{{$customer->comment}}</textarea>
                                                                         </div>
                                                                     </div>
                                                                 </div>

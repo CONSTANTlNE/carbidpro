@@ -37,7 +37,7 @@ class ArrivedController extends Controller
 
                             // Search for cars by relevant fields (car model, make, etc.)
                             $query
-                                ->where('container_status', 3)
+                                ->where('container_status_id', 3)
                                 ->where(function ($q) use ($searchTerm) {
                                     $q->where('vin', 'like', '%'.$searchTerm.'%');
                                 });
@@ -47,7 +47,7 @@ class ArrivedController extends Controller
         } else {
             $groups = ContainerGroup::with('cars.credit', 'cars.latestCredit')
                 ->whereHas('cars', function ($query) {
-                    $query->where('container_status', 3);  // Filter cars where container_status is 2
+                    $query->where('container_status_id', 3);  // Filter cars where container_status is 2
                 })
                 ->get();
         }

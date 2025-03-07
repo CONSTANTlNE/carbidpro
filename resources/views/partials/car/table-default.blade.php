@@ -71,18 +71,23 @@ use Carbon\Carbon  ;
                 <td>
                     <strong>All Cost:</strong><br>
                     <span style="color: red ">  {{ $car->total_cost }}</span> <br>
-                    <strong>Payments:</strong><br>
-                    <span style="color: green ">   {{ -$car->total_payments }} </span> <br>
                     @if($car->latestCredit)
                         <strong>Interest:</strong><br>
-                        <span style="color: blue ">    {{ round($creditService->totalAccruedInterestTillToday($car))}} </span>
+                        <span style="color: blue "> {{ round($creditService->totalAccruedInterestTillToday($car))}} </span>
                         <br>
                     @endif
+                    <strong>Payments:</strong><br>
+                    <span style="color: green ">   {{ -$car->total_payments }} </span> <br>
+
                     <strong>Amount due:</strong><br>
                     @if($car->latestCredit && $car->amount_due > 0)
-                        <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))+$creditExcludedCost}}</span>
+                        @if($car->latestCredit->credit_amount < $creditExcludedCost)
+                            <span style="color:red">{{round( $car->amount_due) }}</span>
+                        @else
+                            <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car))+$creditExcludedCost}}</span>
+                        @endif
                     @else
-                        <span style="color:red">${{round( $car->amount_due) }}</span>
+                        <span style="color:red">{{round( $car->amount_due) }}</span>
                     @endif
                 </td>
 
@@ -92,75 +97,6 @@ use Carbon\Carbon  ;
                             Edit
                         </button>
                     </a>
-                    {{-- give credit --}}
-                    @if(!$car->latestCredit && $car->amount_due > 0)
-                        <button type="button" class="btn btn-primary  btn-sm"
-                                data-toggle="modal"
-                                data-target="{{$car->latestCredit? '' : '#creditmodal'.$index}}">
-                            Give Credit
-                        </button>
-                        {{-- give credit modal--}}
-                        <div class="modal fade" id="creditmodal{{$index}}" tabindex="-1" role="dialog"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-scrollable" role="document">
-                                <div class="modal-content">
-                                    <section>
-                                        <form action="{{route('give.credit')}}" method="post">
-                                            @csrf
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Give Credit</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-md-4 form-group">
-                                                        <label class="control-label">Amount:</label>
-                                                        <input type="hidden" name="amount"
-                                                               value="{{ $car->amount_due}}">
-                                                        <input type="hidden" name="car_id" value="{{ $car->id}}">
-                                                        <input type="hidden" name="customer_id"
-                                                               value="{{ $car->customer->id}}">
-                                                        <input type="text" disabled
-                                                               value="{{ $car->amount_due}}" class="form-control">
-                                                    </div>
-
-                                                    <div class="col-md-4 form-group">
-                                                        <label class="control-label">Monthly %</label>
-                                                        <input required name="percent" type="number" min="1"
-                                                               placeholder=""
-                                                               class="form-control">
-                                                    </div>
-
-                                                    <div class="col-md-4 form-group">
-                                                        <label class="control-label">Issue Date</label>
-                                                        <input min="{{ $car->created_at->format('Y-m-d') }}" required
-                                                               name="issue_date" type="date" placeholder="Invoice Date"
-                                                               class="form-control">
-                                                    </div>
-
-                                                    <div class="col-md-12 form-group">
-                                                        <label class="control-label">Comment</label>
-                                                        <input name="comment" type="text" placeholder="Comment"
-                                                               class="form-control">
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer justify-content-center">
-                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close
-                                                </button>
-                                                <button class="btn green_btn custom_grreen2">Save changes
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
 
                     {{-- credit info--}}
                     @if($car->latestCredit)
@@ -168,106 +104,111 @@ use Carbon\Carbon  ;
                                 data-target="#creditinfomodal{{$index}}">
                             Credit Info
                         </button>
-                    @endif
+                        {{-- credit info modal--}}
+                        <div class="modal fade " id="creditinfomodal{{$index}}" tabindex="-1" role="dialog"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content ">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Issue Date :
+                                            {{$car->firstCredit?->issue_or_payment_date->format('d-m-Y')}} :
+                                            {{ $car->firstCredit?->credit_amount+$car->firstCredit?->paid_amount }} $ --
+                                            Not including : {{$creditExcludedCost}}$
+                                        </h5>
 
-                    {{-- credit info modal--}}
-                    <div class="modal fade " id="creditinfomodal{{$index}}" tabindex="-1" role="dialog"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content ">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Issue Date :
-                                        {{$car->firstCredit?->issue_or_payment_date->format('d-m-Y')}} :
-                                        {{ $car->firstCredit?->credit_amount+$car->firstCredit?->paid_amount }} $ --
-                                        Not including : {{$creditExcludedCost}}$
-                                    </h5>
-
-                                    {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
-                                    <button type="button" class="close" data-dismiss="modal"
-                                            aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body p-0 "
-                                     style="overflow-x: auto; width: 100%;">
-                                    <table style="margin: auto">
-                                        <thead>
-                                        <tr>
-                                            <th class="p-1 text-center" style="min-width: 100px!important;">Date</th>
-                                            <th class="p-1 text-center" style="width: 100px">Begin Amount due</th>
-                                            <th class="p-1 text-center">Added Amount</th>
-                                            <th class="p-1 text-center" style="width: 80px">Credit Days</th>
-                                            <th class="p-1 text-center" style="width: 100px">Credit Fee</th>
-                                            <th class="p-1 text-center" style="width: 100px">Total Amount</th>
-                                            <th class="p-1 text-center" style="width: 60px">Paid Amount</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($car->credit as $index2=> $credit)
+                                        {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body p-0 "
+                                         style="overflow-x: auto; width: 100%;">
+                                        <table style="margin: auto">
+                                            <thead>
                                             <tr>
-                                                @if($credit->added_amount!==null)
-                                                    <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
-                                                @elseif($index2-1>=0)
-                                                    <td style="min-width: 100px"
-                                                        class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}
+                                                <th class="p-1 text-center" style="min-width: 100px!important;">Date
+                                                </th>
+                                                <th class="p-1 text-center" style="width: 100px">Begin Amount due</th>
+                                                <th class="p-1 text-center">Added Amount</th>
+                                                <th class="p-1 text-center" style="width: 80px">Credit Days</th>
+                                                <th class="p-1 text-center" style="width: 100px">Credit Fee</th>
+                                                <th class="p-1 text-center" style="width: 100px">Total Amount</th>
+                                                <th class="p-1 text-center" style="width: 60px">Paid Amount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($car->credit as $index2=> $credit)
+                                                <tr>
+                                                    @if($credit->added_amount!==null)
+                                                        <td class="p-1 text-center">{{$credit->issue_or_payment_date->format('d-m-Y')}}</td>
+                                                    @elseif($index2-1>=0)
+                                                        <td style="min-width: 100px"
+                                                            class="p-1 text-center">{{$car->credit[$index2]->issue_or_payment_date->format('d-m-Y')}}
+                                                        </td>
+                                                    @endif
+                                                    @if($index2-1>=0)
+                                                        <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>
+                                                    @endif
+                                                    <td class="p-1 text-center" style="width:min-content!important">
+                                                        {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
                                                     </td>
-                                                @endif
-                                                @if($index2-1>=0)
-                                                    <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount)}}</td>
-                                                @endif
-                                                <td class="p-1 text-center" style="width:min-content!important">
-                                                    {{ $credit->comment? $credit->comment .'-': ''}}  {{ $credit->added_amount? $credit->added_amount . ' $ ':'' }}
-                                                </td>
-                                                <td class="p-1 text-center">{{$credit->credit_days}} </td>
-                                                <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}} </td>
-                                                @if($index2-1>=0)
-                                                    <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}} </td>
-                                                @endif
-
-                                                <td class="p-1 text-center"
-                                                    style="width: 60px!important">{{$credit->paid_amount}}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        @if(isset($credit))
-                                            <tr style="background: #f2f2f2">
-                                                <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
-                                                <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
-                                                <td></td>
-                                                <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id)) }}</td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                        @endif
-                                        </tbody>
-                                    </table>
-                                    @if(isset($credit))
-                                        <div class="d-flex justify-content-center gap-3 mt-3">
-                                            @if($credit->credit_amount>0)
-                                            <p>Amount Due Till Today: {{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))+$creditExcludedCost}}</p>
-                                            @else
-                                            <p>Amount Due Till Today: 0 </p>
+                                                    <td class="p-1 text-center">{{$credit->credit_days}} </td>
+                                                    <td class="p-1 text-center">{{$credit->accrued_percent==null? '': round($credit->accrued_percent)}} </td>
+                                                    @if($index2-1>=0)
+                                                        <td class="p-1 text-center">{{round($car->credit[$index2-1]->credit_amount+$credit->accrued_percent+$credit->added_amount)}} </td>
+                                                    @endif
+                                                    <td class="p-1 text-center"
+                                                        style="width: 60px!important">{{$credit->paid_amount}}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            @if(isset($credit))
+                                                <tr style="background: #f2f2f2">
+                                                    <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
+                                                    <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car)))}}</td>
+                                                    <td></td>
+                                                    <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car) }}</td>
+                                                    <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car)) }}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
                                             @endif
-                                        </div>
-                                    @endif
-                                </div>
+                                            </tbody>
+                                        </table>
+                                        @if(isset($credit))
+                                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                                <p>Total Credit Fee
+                                                    Today: {{round(($creditService->totalAccruedInterestTillToday($car)))}}</p>
+                                            </div>
+                                        @endif
+                                    </div>
 
-                                <div class="modal-footer justify-content-center ">
+                                    <div class="modal-footer justify-content-center ">
 
-                                        <form method="post" action="{{route('credit.percent.change')}}" style="margin-right: 20px" class="d-flex gap-3 justify-content-center align-middle border-gray">
+                                        <form method="post" action="{{route('credit.percent.change')}}"
+                                              style="margin-right: 20px"
+                                              class="d-flex gap-3 justify-content-center align-middle border-gray">
                                             @csrf
                                             <input type="hidden" name="car_id" value="{{$car->id}}">
-                                            <input required style="max-width: 65px;margin-right: 15px" type="number" min="1" name="new_percent" class="form-control">
+                                            <input value="{{$car->latestCredit?->monthly_percent*100}}" required
+                                                   style="max-width: 65px;margin-right: 15px" type="number" min="1"
+                                                   name="new_percent" class="form-control">
                                             <button class="btn btn-primary">Change percent</button>
                                         </form>
 
-{{--                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>--}}
+                                        <form action="{{route('remove.credit')}}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="car_id" value="{{$car->id}}">
+                                            <button class="btn btn-danger">Remove Credit</button>
+                                        </form>
+
+                                        {{--                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>--}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    @endif
                     {{--Delete Button--}}
                     @can('CarUpdate')
                         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"

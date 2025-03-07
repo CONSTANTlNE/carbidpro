@@ -1,8 +1,15 @@
 <div>
-    <strong>DEALER:<span>{{ !empty($car->customer) ? $car->customer->contact_name : '' }}</span></strong>
+    <strong>Owner:<span>{{ !empty($car->vehicle_owner_name) ? $car->vehicle_owner_name : 'N/A' }}</span></strong>
     <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
 </div>
-
+<div>
+    <strong>Owner ID:<span>{{ !empty($car->owner_id_number) ? $car->owner_id_number : 'N/A' }}</span></strong>
+    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+</div>
+<div>
+    <strong>Owner Mob:<span>{{ !empty($car->owner_phone_number) ? $car->owner_phone_number : 'N/A' }}</span></strong>
+    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+</div>
 <div>
     <strong>LOT:<span>{{ $car->lot }}</span></strong>
     <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">

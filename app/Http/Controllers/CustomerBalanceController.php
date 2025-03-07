@@ -161,25 +161,10 @@ class CustomerBalanceController extends Controller
 
         $car = car::find($request->car_id);
 
-        // Return error message if Payment is more that total amount Due
-        if ($car->credit->isNotEmpty()) {
-            $creditExcludedCost = 0;
-            foreach (json_decode($car->balance_accounting) as $cost) {
-                if ($cost->forcredit == 0) {
-                    $creditExcludedCost += $cost->value;
-                }
-            }
-            $amountDue = round($car->latestCredit->credit_amount + (new CreditService())->totalInterestFromLastCalc($car->id)) + $creditExcludedCost;
 
-            if ($amountDue < $request->amount) {
-                return back()->with('error', 'You can not pay more than amount due');
-            }
-        } else {
-            if (round($car->amount_due) < $request->amount) {
-                return back()->with('error', 'You can not pay more than amount due');
-            }
+        if (round($car->amount_due) < $request->amount) {
+            return back()->with('error', 'You can not pay more than amount due');
         }
-
 
         $deposit = CustomerBalance::where('customer_id', auth()->user()->id)
             ->where('is_approved', 1)
@@ -203,9 +188,11 @@ class CustomerBalanceController extends Controller
 
             $car->save();
 
-            // if credit was granted also apply the credit payment
-//            $newCredit = (new CreditService())->creditPayment($car, $request, $balance);
-            (new CreditService())->recalc($car->id);
+
+            if($car->latestCredit){
+                (new CreditService())->recalc($car);
+            }
+
 
             $content = [
                 'dealer_name'  => auth()->user()->contact_name,
@@ -254,8 +241,7 @@ class CustomerBalanceController extends Controller
         return back();
     }
 
-    public
-    function deleteBalance(
+    public function deleteBalance(
         Request $request,
     ) {
         $payment = CustomerBalance::find($request->id);
@@ -280,8 +266,7 @@ class CustomerBalanceController extends Controller
      * Dynamic Search with HTMX when creating customer Balance payment in Admin dashboard
      */
 
-    public
-    function searchCustomerHtmx(
+    public function searchCustomerHtmx(
         Request $request,
     ) {
         if (!empty($request->search)) {
@@ -354,8 +339,7 @@ class CustomerBalanceController extends Controller
     /**
      *  payment for particular cars from overall general balance (by admin)
      */
-    public
-    function carPaymentStore(
+    public function carPaymentStore(
         Request $request,
     ) {
         $request->validate([
@@ -368,17 +352,9 @@ class CustomerBalanceController extends Controller
             ->first();
 
 
-        // Return error message if Payment is more that total amount Due
-        if ($car->credit->isNotEmpty()) {
-            if (round($car->latestCredit->credit_amount + (new CreditService())->totalInterestFromLastCalc($car->id)) < $request->amount) {
-                return back()->with('error', 'You can not pay more than amount due');
-            }
-        } else {
-            if (round($car->amount_due) < $request->amount) {
-                return back()->with('error', 'You can not pay more than amount due');
-            }
+        if (round($car->amount_due) < $request->amount) {
+            return back()->with('error', 'You can not pay more than amount due');
         }
-
 
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
             ->where('is_approved', 1)
@@ -407,7 +383,9 @@ class CustomerBalanceController extends Controller
             // if credit was granted also apply the credit payment
 //            (new CreditService())->creditPayment($car, $request, $balance);
 
-            (new CreditService())->recalc($car->id);
+            if ($car->latestCredit) {
+                (new CreditService())->recalc($car);
+            }
 
 
             return back();
@@ -416,8 +394,7 @@ class CustomerBalanceController extends Controller
         return back()->with('error', 'Not enough deposit');
     }
 
-    public
-    function carPaymentUpdate(
+    public function carPaymentUpdate(
         Request $request,
     ) {
         $request->validate([
@@ -430,20 +407,18 @@ class CustomerBalanceController extends Controller
             ->first();
 
         $payment = CustomerBalance::find($request->payment_id);
-
-
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
                 ->where('is_approved', 1)
                 ->sum('amount') + ($payment->amount * -1);
 
-//        dd($deposit);
+
 
         if ($deposit < $request->amount && $payment->amount * -1 < $request->amount) {
             return back()->with('error', 'Not enough deposit');
         }
 
 
-        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car->id), 2);
+        $accruedPercent = round((new CreditService())->totalAccruedInterestTillToday($car), 2);
 
         if ($car->amount_due + $accruedPercent < $request->amount && $payment->amount * -1 < $request->amount) {
             return back()->with('error', 'You can not pay more than amount due');
@@ -457,20 +432,30 @@ class CustomerBalanceController extends Controller
         $payment->save();
 
 
-        (new CreditService())->recalc($car->id);
+        if ($car->latestCredit) {
+            (new CreditService())->recalc($car);
+        } else {
+            $totalPayments=CustomerBalance::where('car_id', $car->id)
+                ->where('type', 'car_payment')
+                ->sum('amount');
+
+            $car->amount_due=$car->total_cost+$totalPayments;
+            $car->save();
+
+        }
 
 
         return back();
     }
 
-    public
-    function carPaymentDelete(
-        Request $request,
-    ) {
+    public function carPaymentDelete(Request $request)
+    {
         $payment = CustomerBalance::find($request->id);
         $car     = Car::where('id', $payment->car_id)->first();
 
+
         $creditrecord = Credit::where('customer_balance_id', $payment->id)->first();
+
         if ($creditrecord) {
             $creditrecord->delete();
         }
@@ -482,7 +467,10 @@ class CustomerBalanceController extends Controller
         $car->save();
         $payment->delete();
 
-        (new CreditService())->recalc($car->id);
+        if ($car->latestCredit) {
+            (new CreditService())->recalc($car);
+        }
+
 
         return back();
     }
@@ -490,8 +478,7 @@ class CustomerBalanceController extends Controller
     /**
      * Dynamic Search with HTMX when creating Payment for Cars in Admin dashboard
      */
-    public
-    function carSearchHtmx(
+    public function carSearchHtmx(
         Request $request,
     ) {
         if (!empty($request->search)) {

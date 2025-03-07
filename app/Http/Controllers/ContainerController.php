@@ -90,7 +90,7 @@ class ContainerController extends Controller
 
                 $cars = $query->paginate(50);
             } else {
-                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port' , 'groups.port'])
+                $cars = Car::with(['dispatch', 'customer', 'state', 'Auction', 'loadType', 'port', 'groups.port'])
                     ->where('container_status_id', 1)->paginate(50);
             }
         } elseif ($slug == 'loading-pending') {
@@ -269,10 +269,9 @@ class ContainerController extends Controller
         }
 
         if ($request->hasFile('bol_photo')) {
-
             //  if changed file by user , delete previous file from storage
-            if ($container->photo!==null){
-                $filepath='public/'.$container->photo;
+            if ($container->photo !== null) {
+                $filepath = 'public/'.$container->photo;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -288,10 +287,9 @@ class ContainerController extends Controller
         }
 
         if ($request->hasFile('invoice_file')) {
-
             //  if changed file by user , delete previous file from storage
-            if ($container->invoice_file!==null){
-                $filepath='public/'.$container->invoice_file;
+            if ($container->invoice_file !== null) {
+                $filepath = 'public/'.$container->invoice_file;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -304,15 +302,12 @@ class ContainerController extends Controller
             $path = $invoice_file->store('invoice_file', 'public');
             // Save the path in the database
             $container->invoice_file = $path;
-
         }
 
         if ($request->hasFile('payment_file_1')) {
-
-
             //  if changed file by user , delete previous file from storage
-            if ($container->payment_file_1!==null){
-                $filepath='public/'.$container->payment_file_1;
+            if ($container->payment_file_1 !== null) {
+                $filepath = 'public/'.$container->payment_file_1;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -329,10 +324,9 @@ class ContainerController extends Controller
         }
 
         if ($request->hasFile('payment_file_2')) {
-
             //  if changed file by user , delete previous file from storage
-            if ($container->payment_file_2!==null){
-                $filepath='public/'.$container->payment_file_2;
+            if ($container->payment_file_2 !== null) {
+                $filepath = 'public/'.$container->payment_file_2;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -349,10 +343,9 @@ class ContainerController extends Controller
         }
 
         if ($request->hasFile('thc_invoice')) {
-
             //  if changed file by user , delete previous file from storage
-            if ($container->thc_invoice!==null){
-                $filepath='public/'.$container->thc_invoice;
+            if ($container->thc_invoice !== null) {
+                $filepath = 'public/'.$container->thc_invoice;
                 if (Storage::exists($filepath)) {
                     Storage::delete($filepath);
                 }
@@ -424,12 +417,12 @@ class ContainerController extends Controller
         $newcarid = $request->input('new_car_id'.$key);
 
         // Fetch the original car
-        $container                = ContainerGroup::findOrFail($request->container_id);
-        $oldcar                   = Car::where('id', $request->oldcar_id)->first();
+        $container                   = ContainerGroup::findOrFail($request->container_id);
+        $oldcar                      = Car::where('id', $request->oldcar_id)->first();
         $oldcar->container_status_id = 1;
         $oldcar->save();
 
-        $newcar                   = Car::where('id', $newcarid)->first();
+        $newcar                      = Car::where('id', $newcarid)->first();
         $newcar->container_status_id = 2;
         $newcar->save();
 
@@ -445,10 +438,10 @@ class ContainerController extends Controller
     public function addCarToGroup(Request $request)
     {
         // Fetch the original car
-        $containerGroup        = ContainerGroup::findOrFail($request->container_id);
-        $key                   = $request->key;
-        $carid                 = $request->input('car_id'.$key);
-        $car                   = Car::find($carid);
+        $containerGroup           = ContainerGroup::findOrFail($request->container_id);
+        $key                      = $request->key;
+        $carid                    = $request->input('car_id'.$key);
+        $car                      = Car::find($carid);
         $car->container_status_id = 2;
         $car->save();
 
@@ -466,7 +459,7 @@ class ContainerController extends Controller
         $car         = Car::where('id', $request->carId)->first();
         // Detach the old car from the group
         $originalCar->cars()->detach($car->id);
-        $car->container_status_id      = 1;
+        $car->container_status_id   = 1;
         $originalCar->is_email_sent = 0;
         $originalCar->save();
         $car->save();
@@ -517,19 +510,27 @@ class ContainerController extends Controller
 
         $cars = Car::whereIn('id', $car_ids)->get();
 
+        $owner = true;
+        foreach ($cars as $car) {
+            if ($car->vehicle_owner_name === null) {
+                $owner=false;
+                break;
+            }
+        }
+//dd($owner);
         // there might be several , but this updates 1
         $container                  = ContainerGroup::findOrFail($request->container_id);
-        $container->is_email_sent   = 1;
-        $container->email_sent_date = Carbon::now();
-        $container->save();
-
         $con      = ContainerGroup::where('id', $request->container_id)->first();
         $getEmail = PortEmail::where('port_id', $con->to_port_id)->first();
-
-        Mail::to($getEmail?->email)->send(new CarGroupEmail($cars));
+        if ($owner) {
+            $container->is_email_sent   = 1;
+            $container->email_sent_date = Carbon::now();
+            $container->save();
+            Mail::to($getEmail?->email)->send(new CarGroupEmail($cars));
+        }
 
         // Return a response for AJAX
-        return view('pages.htmx.htmxSendEmailContainers', compact('container'));
+        return view('pages.htmx.htmxSendEmailContainers', compact('container','owner'));
     }
 
     public function htmxSelectCar(Request $request)
@@ -563,17 +564,17 @@ class ContainerController extends Controller
 
     public function deleteImages($id, $image_type)
     {
+        $group = ContainerGroup::where('id', $id)->first();
 
-        $group=ContainerGroup::where('id', $id)->first();
-
-        if ($group){
+        if ($group) {
             $filename = $group->$image_type;
-            $filepath='public/'.$filename;
+            $filepath = 'public/'.$filename;
 
             if (Storage::exists($filepath)) {
                 Storage::delete($filepath);
                 $group->$image_type = null;
                 $group->save();
+
                 return back()->with('success', 'Image deleted successfully.');
             } else {
                 return back()->with('error', 'File not found.');
@@ -581,6 +582,5 @@ class ContainerController extends Controller
         }
 
         return back()->with('error', 'Group not found.');
-
     }
 }

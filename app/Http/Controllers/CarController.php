@@ -311,6 +311,10 @@ class CarController extends Controller
             'vin'             => 'required|unique:cars,vin',
             'make_model_year' => 'required',
             'status'          => 'required',
+            'vehicle_owner_name' => [
+                'required',
+                'regex:/^[A-Za-z][A-Za-z\s]{3,}[A-Za-z]$/'
+            ],
         ]);
 
 
@@ -351,7 +355,7 @@ class CarController extends Controller
                     'value' => $request->input($extraexpense->name),
                     'date'  => now()->format('Y-m-d'),
                     'id'=> random_int(10000,99999),
-                    'forcredit'=>  true,
+                    'forcredit'=>  1,
                 ];
             }
         }
@@ -602,6 +606,13 @@ class CarController extends Controller
 
     public function update(Request $request)
     {
+        $request->validate([
+            'vehicle_owner_name' => [
+                'required',
+                'regex:/^[A-Za-z][A-Za-z\s]{3,}[A-Za-z]$/'
+            ],
+        ]);
+
         $car = Car::findOrFail($request->id);
 
         // ======= LOG  changes in balance_accounting  ==========
@@ -820,11 +831,6 @@ class CarController extends Controller
 
         $car->updated_at = now();
         $car->save();
-
-
-
-
-
 
 
         return redirect()->back()->with('success', 'Car updated successfully.');

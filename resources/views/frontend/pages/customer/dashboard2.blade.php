@@ -146,52 +146,42 @@ $creditService = new CreditService();
                         <tbody>
                         @php
                             $totalAmountDue = 0;
-
                         @endphp
 
                         @foreach ($cars as $key => $car)
                             @php
-                                $creditExcludedCost=0;
-                                foreach (json_decode($car->balance_accounting)  as $cost) {
-                                if($cost->forcredit==0){
-                                $creditExcludedCost+=$cost->value;
+                                    $creditExcludedCost=0;
+                                        foreach (json_decode($car->balance_accounting)  as $cost) {
+                                        if($cost->forcredit==0){
+                                        $creditExcludedCost+=$cost->value;
+                                    }
+                                  }
+
+                                if($car->latestCredit?->credit_amount>0){
+                                    if ($car->latestCredit->credit_amount < $creditExcludedCost) {
+                                    $singleAmountDue= round( $car->amount_due);
+                                    } else{
+                                    $singleAmountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car))+$creditExcludedCost;
+                                    }
+
+                                   $totalAmountDue += $singleAmountDue;
                                 }
-                              }
+                                else{
+                                    $singleAmountDue= round( $car->amount_due);
+                                 $totalAmountDue += round( $car->amount_due);
+                                }
                             @endphp
-                            {{--Calculate Total Amount Due of all cars--}}
-
-                            @if($car->latestCredit)
-
-                                @php
-                                    $singleAmountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car->id))+$creditExcludedCost;
-                                        $totalAmountDue = $totalAmountDue +  $singleAmountDue
-                                @endphp
-                            @else
-                                @php
-                                    $totalAmountDue = $totalAmountDue + round( $car->amount_due)
-                                @endphp
-                            @endif
 
                             @php
                                 $createdDate = \Carbon\Carbon::parse($car->created_at);
                                 $currentDate = \Carbon\Carbon::now();
                                 $differenceInDays = $createdDate->diffInDays($currentDate);
 
-
-                                    // amount due calclulation for car
-                                      if($car->latestCredit){
-                                       $amountDue= round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car));
-                                        }else {
-                                           $amountDue=  round($car->amount_due);
-                                        }
-
-                                      // tr Colors
-                                      if ($amountDue<1 && $car->record_color!=='#F6CBCC'){
+                                      if ($singleAmountDue <1 && $car->record_color!=='#F6CBCC'){
                                             $color = '#82f98261';
                                       } else {
                                           $color = $car->record_color;
                                       }
-
 
                             @endphp
 
@@ -374,7 +364,12 @@ $creditService = new CreditService();
                                         {{-- Total Cost incl interest if credit granted--}}
                                         <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
                                             <span style="color: black" class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Total Cost']}} :</span>
-                                            <span style="color:red">${{ $car->total_cost }}</span>
+                                            @if($car->latestCredit)
+                                                <span style="color:red">${{ $car->total_cost+$creditService->totalAccruedInterestTillToday($car) }}</span>
+                                            @else
+                                                <span style="color:red">${{ $car->total_cost }}</span>
+                                            @endif
+
                                         </div>
                                         {{-- Total Received on car--}}
                                         <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
@@ -382,18 +377,21 @@ $creditService = new CreditService();
                                             <span style="color:green">${{ $car->payments->sum('amount')*-1 }}</span>
                                         </div>
                                         {{-- Total interest on car --}}
-                                        <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
-                                            <span style="color: black" class="mb-0">Total Interest:</span>
-                                            <span style="color:blue">$ {{$creditService->totalAccruedInterestTillToday($car)}} </span>
-                                        </div>
+{{--                                        <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">--}}
+{{--                                            <span style="color: black" class="mb-0">Total Interest:</span>--}}
+{{--                                            <span style="color:blue">$ {{round( $creditService->totalAccruedInterestTillToday($car))}} </span>--}}
+{{--                                        </div>--}}
                                         {{-- Amount Due on car--}}
                                         <div style="font-size: 15px;width: 150px ">
-                                            <span style="color: black" class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}} :</span>
+                                            <span style="color: black" class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Amount Due']}}: </span>
                                             @if($car->latestCredit && $car->amount_due > 0)
-                                                <span style="color:red">${{$singleAmountDue}}</span>
+                                                @if($car->latestCredit->credit_amount < $creditExcludedCost)
+                                                    <span style="color:red">{{ $singleAmountDue }}</span>
+                                                @else
+                                                    <span style="color: red ">{{$singleAmountDue}}</span>
+                                                @endif
                                             @else
-                                                <span style="color:red">${{ $car->amount_due }}</span>
-
+                                                <span style="color:red">{{ $singleAmountDue }}</span>
                                             @endif
                                         </div>
                                     </td>
@@ -424,12 +422,8 @@ $creditService = new CreditService();
                                                                     {{$car->firstCredit?->issue_or_payment_date->format('d-m-Y')}}
                                                                     :
                                                                     {{ $car->firstCredit?->credit_amount+$car->firstCredit?->paid_amount }}
-                                                                    $ --
 
-                                                                    Not including : {{$creditExcludedCost}}$
                                                                 </h5>
-
-                                                                {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                         aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
@@ -492,10 +486,10 @@ $creditService = new CreditService();
                                                                     @if(isset($credit))
                                                                         <tr style="background: #f2f2f2">
                                                                             <td class="p-1  text-center">{{Carbon::now()->format('d-m-Y')}}</td>
-                                                                            <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))}}</td>
+                                                                            <td class="p-1  text-center">{{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car)))}}</td>
                                                                             <td></td>
-                                                                            <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car->id) }}</td>
-                                                                            <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car->id)) }}</td>
+                                                                            <td class="p-1  text-center">{{$creditService->totalDaysFromLastCalcDate($car) }}</td>
+                                                                            <td class="p-1  text-center">{{round($creditService->totalInterestFromLastCalc($car)) }}</td>
                                                                             <td></td>
                                                                             <td></td>
                                                                         </tr>
@@ -504,8 +498,8 @@ $creditService = new CreditService();
                                                                 </table>
                                                                 @if(isset($credit))
                                                                     <div class="d-flex justify-content-center gap-3 mt-3">
-                                                                        <p>Amount Due Till
-                                                                            Today: {{round($credit->credit_amount+round($creditService->totalInterestFromLastCalc($car->id)))+$creditExcludedCost}}</p>
+                                                                        <p> Total Credit Fee
+                                                                             {{round($creditService->totalAccruedInterestTillToday($car))}}</p>
                                                                     </div>
                                                                 @endif
                                                             </div>
@@ -567,6 +561,13 @@ $creditService = new CreditService();
     </div>
 
     @push('scripts')
+        <script>
+            function changeButtonType() {
+                setTimeout(() => {
+                    document.getElementById('submitBtn').setAttribute('type', 'button');
+                }, 100); // Ensures the form submits before changing the button type
+            }
+        </script>
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
             let table = new DataTable('#myTable', {

@@ -26,7 +26,8 @@ class AdminController extends Controller
         $totalCarsPaid  = Car::where('amount_due', 0)->count();
         $totalCarsDue   = Car::where('amount_due', '!=', 0)->count();
 
-        $cars = Car::with('latestCredit')->get();
+
+        $cars = Car::with('latestCredit','credit')->get();
 
 
         $totalAmountDue = 0;
@@ -41,8 +42,12 @@ class AdminController extends Controller
                     }
                 }
 
-                if ($car->latestCredit) {
-                    $totalAmountDue += round($car->latestCredit->credit_amount + (new CreditService)->totalInterestFromLastCalc($car->id)) + $creditExcludedCost;
+                if($car->latestCredit?->credit_amount>0) {
+                    if ($car->latestCredit->credit_amount < $creditExcludedCost) {
+                        $totalAmountDue += round( $car->amount_due);
+                    }else{
+                        $totalAmountDue += round($car->latestCredit->credit_amount + (new CreditService)->totalInterestFromLastCalc($car)) + $creditExcludedCost;
+                    }
                 } else {
                     $totalAmountDue += round($car->amount_due);
                 }
@@ -50,12 +55,14 @@ class AdminController extends Controller
         }
 
          $totalShipping=0;
+        $totalInterest=0;
         foreach ($cars as $car) {
             foreach (json_decode($car->balance_accounting) as $cost) {
                 if ($cost->name == 'Shipping cost') {
                     $totalShipping += $cost->value;
                 }
             }
+            $totalInterest += (new CreditService())->totalAccruedInterestTillToday($car);
         }
 
         $totalDeposits = number_format(CustomerBalance::where('type', 'fill')->sum('amount'), 0, '.', ',');
@@ -65,7 +72,7 @@ class AdminController extends Controller
 
         return view('dashboard',
             compact('totalCustomers', 'totalCars', 'totalCarsPaid', 'totalCarsDue', 'totalDeposits', 'totalAmountDue',
-                'totalSpent', 'totalShipping'));
+                'totalSpent', 'totalShipping','totalInterest'));
     }
 
     public function customerIndex(Request $request)

@@ -52,7 +52,7 @@
                     <section id="image-carousel" class="splide" aria-label="Beautiful Images">
                         <div class="splide__track">
                             <ul class="splide__list">
-                                @foreach ($car->media as $image)
+                                @foreach ($car->getMedia('images') as $image)
                                     <li class="splide__slide">
                                         <a href="{{ $image->getUrl() }}" data-fancybox="gallery" data-caption="">
                                             <img src="{{ $image->getUrl() }}" alt="">
@@ -69,7 +69,7 @@
                          aria-label="The carousel with thumbnails. Selecting a thumbnail will change the Beautiful Gallery carousel.">
                     <div class="splide__track mt-2">
                         <ul class="splide__list justify-content-center">
-                            @foreach ($car->media as $image)
+                            @foreach ($car->getMedia('images') as $image)
                                 <li class="splide__slide">
                                     <img src="{{ $image->getUrl() }}" alt="">
                                 </li>
@@ -99,20 +99,20 @@
                                 <li>
                                     <span style="color: black!important;"> Car Type :</span> {{ $car->loadType->name}}
                                 </li>
-                                <li><span style="color: black!important;">Fuel : </span> {{ $car->type_of_fuel}}
-                                </li>
-                                <li><span style="color: black!important;">Title :</span> {{ $car->title}} </li>
+                                <li><span style="color: black!important;">Fuel : </span> {{ $car->type_of_fuel}}</li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-lg-5">
                         <div class="ft-project-overview-list-item ul-li-block">
                             <ul>
-                                <li><span style="color: black!important;">State :</span> {{ $car->state->name}}
-                                </li>
+{{--                                <li><span style="color: black!important;">State :</span> {{ $car->state->name}}--}}
+{{--                                </li>--}}
                                 <li><span style="color: black!important;">Auction :</span> {{ $car->Auction->name}}
                                 </li>
                                 <li><span style="color: black!important;">LOT :</span> {{ $car->lot}} </li>
+                                <li><span style="color: black!important;">Title :</span> {{ $car->title}} </li>
+
                             </ul>
                         </div>
                     </div>

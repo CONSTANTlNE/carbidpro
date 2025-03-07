@@ -160,7 +160,6 @@
                         <div class="d-flex flex-column mt-3  ">
                             @php
                                 $extras=json_decode($user->extra_expenses);
-
                             @endphp
                             @foreach($extras as $index => $extra)
                                 @if($index>0)
@@ -351,7 +350,7 @@
 
         const titles = {!! $titles !!};
         const userTitles = {!! $user->titles !!};
-        console.log(userTitles)
+
 
         function titleStatus(id) {
             titles.forEach((title) => {
@@ -418,16 +417,14 @@
         checkboxes.forEach((checkbox) => {
             checkbox.addEventListener('change', function () {
                 let value = parseFloat(this.value);
-
-                if (this.checked) {
-                    totalextras += value;
-                } else {
-                    totalextras -= value;
-                }
-                setTimeout(() => {
-                    document.getElementById('calculate').click();
-                }, 100)
-
+                    if (this.checked) {
+                        totalextras += value;
+                    } else {
+                        totalextras -= value;
+                    }
+                    setTimeout(() => {
+                        document.getElementById('calculate').click();
+                    }, 100)
             });
         });
         @endif

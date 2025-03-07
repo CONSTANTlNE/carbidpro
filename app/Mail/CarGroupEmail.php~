@@ -28,7 +28,7 @@ class CarGroupEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Load Vehicles into the container')
+        return $this->subject('Load Vehicles in container')
             ->view('emails.car-group-email');
     }
 
