@@ -39,8 +39,8 @@ class ShippingPricesController extends Controller
             }
 
             if ($request->filled('location')) {
-                $locationId = $request->input('location');
-                $query->where('from_location_id', $locationId);
+                $auctionId = $request->input('auction');
+                $query->whereJsonContains('auction_id', $auctionId);
             }
 
             if ($request->filled('minprice') && $request->filled('maxprice')) {

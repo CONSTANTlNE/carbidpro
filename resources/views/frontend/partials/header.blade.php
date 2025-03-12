@@ -73,13 +73,14 @@
                                             <a href="{{ route('customer.dashboard') }}" class="dropdown-item">
                                                 {{ $headerStatics['My cars'] }}
                                             </a>
-                                            @if (auth()->user() && !auth()->user()->hasRole('portmanager'))
+                                            @if (auth('customer')->user() && !auth('customer')->user()->hasRole('portmanager'))
                                                 @if (session()->get('auth')->child_of <= 0)
                                                     <a href="{{ route('customer.teamList') }}" class="dropdown-item">
                                                         {{ $headerStatics['Add Team'] }}
                                                     </a>
                                                 @endif
                                             @endif
+                                            <a href="{{ route('customer.terms') }}" class="dropdown-item">My Terms</a>
 
                                             <div class="dropdown-divider"></div>
                                             <a href="{{ route('customer.logout') }}"
@@ -89,7 +90,7 @@
                                         <a href="{{ route('customer.login.get') }}">{{ $headerStatics['Login'] }}</a>
                                     @endif
                                 </li>
-                                @if(!auth()->check())
+                                @if (!auth('customer')->check())
                                 <li>
                                     <a href="{{ route('customer.register.get') }}">{{ $headerStatics['Register'] }}</a>
                                 </li>
@@ -150,7 +151,7 @@
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a href="{{ route('customer.dashboard') }}" class="dropdown-item">My
                                                     cars</a>
-                                                @if (auth()->user() && !auth()->user()->hasRole('portmanager'))
+                                                @if (auth('customer')->user() && !auth('customer')->user()->hasRole('portmanager'))
                                                     @if (session()->get('auth')->child_of <= 0)
                                                         <a href="{{ route('customer.teamList') }}"
                                                            class="dropdown-item">Add
@@ -189,3 +190,6 @@
     </div>
 </header>
 <!-- End of header section -->
+<dialog>
+
+</dialog>

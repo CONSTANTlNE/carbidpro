@@ -58,20 +58,20 @@
         <!-- Repeater Fields in One Row -->
         <template x-for="(item, index) in balance_accounting" :key="index">
             <div class="row repeater-item mt-2 align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-2 col-6">
                     <input type="text" :name="`balance_accounting[${index}][name]`"
                            x-model="item.name"
                            class="name-autocomplete form-control"
                            placeholder="Enter item name" required>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2 col-64">
                     <input type="number"
                            :name="`balance_accounting[${index}][value]`"
                            x-model.number="item.value" class="form-control"
                            placeholder="Enter item value" required>
                 </div>
                 {{-- DATE--}}
-                <div class="col-md-2">
+                <div class="col-md-2 col-6">
                     <input type="date" :name="`balance_accounting[${index}][date]`"
                            style="{{ auth()->user()->hasAnyRole('Developer') ? '' : 'display: none;' }}"
 

@@ -19,9 +19,9 @@
     @section('body-class', 'hold-transition sidebar-mini')
 
     <!--preloader-->
-    {{--<div id="preloader">--}}
-    {{--    <div id="status"></div>--}}
-    {{--</div>--}}
+{{--    <div id="preloader">--}}
+{{--        <div id="status"></div>--}}
+{{--    </div>--}}
 
     <!-- Site wrapper -->
     <div class="wrapper">
@@ -669,6 +669,7 @@
                     'Shipping cost',
                     'Vehicle cost',
                     'Fee amount',
+                    'Bank fee',
                     'Insurance cost',
                     'Hybrid',
                     'Storage',

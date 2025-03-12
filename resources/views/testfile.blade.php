@@ -9,8 +9,6 @@
 </head>
 <body>
 
-@dd($data[2]['data'])
-
 
 </body>
 </html>

@@ -41,6 +41,7 @@
 
 
 @section('content')
+
     {{--    <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"--}}
     {{--             data-background="https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg"--}}
     {{--             style="background-image: url(&quot;https://html.themexriver.com/fastrans/assets/img/bg/bread-bg.jpg&quot;);">--}}
@@ -58,7 +59,6 @@
             <div class="row">
                 <div style="padding: 0" class="col">
                     <div class="load-type-list">
-
                         @foreach ($loadtypes as $key => $loadtype)
                             <div class='load-type'>
                                 <input type="radio"
@@ -75,10 +75,10 @@
                             </div>
                         @endforeach
                     </div>
-
                 </div>
                 <div style="padding: 0" class="col">
                     <div class="auction_select">
+
                         <select class="form-select mb-2" id="AuctionSelect">
                             <option value="-1">{{$calculatorStatics['Select Auction']}}</option>
                             @foreach ($auctions as $auction)
@@ -108,7 +108,6 @@
                         </select>
 
                         <button class="btn btn-success" id="calculate">{{$calculatorStatics['Calculate']}}</button>
-
 
                     </div>
                 </div>
@@ -156,30 +155,30 @@
 
                         </div>
                     </div>
-                    @if($user->extra_expenses != null)
-                        <div class="d-flex flex-column mt-3  ">
-                            @php
-                                $extras=json_decode($user->extra_expenses);
-                            @endphp
-                            @foreach($extras as $index => $extra)
-                                @if($index>0)
-                                    <div class="d-flex justify-content-between align-items-middle mt-2">
-                                        <div class="d-flex justify-content-between align-middle"
-                                             style="min-width:130px; margin-right: 10px ">
-                                            <label style="cursor: pointer" class="mt-1"
-                                                   for="{{$extra->name}}">{{$extra->name}}</label>
-                                            <input style="cursor: pointer" class="form-check-input extra-checkbox"
-                                                   id="{{$extra->name}}"
-                                                   type="checkbox" value="{{$extra->value}}}">
-                                        </div>
-                                        <input disabled class="form-control text-center" style="max-width: 150px"
-                                               type="text"
-                                               value="{{$extra->value}}">
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    @endif
+{{--                    @if($user->extra_expenses != null)--}}
+{{--                        <div class="d-flex flex-column mt-3  ">--}}
+{{--                            @php--}}
+{{--                                $extras=json_decode($user->extra_expenses);--}}
+{{--                            @endphp--}}
+{{--                            @foreach($extras as $index => $extra)--}}
+{{--                                @if($index>0)--}}
+{{--                                    <div class="d-flex justify-content-between align-items-middle mt-2">--}}
+{{--                                        <div class="d-flex justify-content-between align-middle"--}}
+{{--                                             style="min-width:130px; margin-right: 10px ">--}}
+{{--                                            <label style="cursor: pointer" class="mt-1"--}}
+{{--                                                   for="{{$extra->name}}">{{$extra->name}}</label>--}}
+{{--                                            <input style="cursor: pointer" class="form-check-input extra-checkbox"--}}
+{{--                                                   id="{{$extra->name}}"--}}
+{{--                                                   type="checkbox" value="{{$extra->value}}}">--}}
+{{--                                        </div>--}}
+{{--                                        <input disabled class="form-control text-center" style="max-width: 150px"--}}
+{{--                                               type="text"--}}
+{{--                                               value="{{$extra->value}}">--}}
+{{--                                    </div>--}}
+{{--                                @endif--}}
+{{--                            @endforeach--}}
+{{--                        </div>--}}
+{{--                    @endif--}}
                 </div>
                 {{--  titles--}}
                 <div style="display: flex;flex-direction: column; align-content: center!important;justify-content: center;margin-top: 30px">
@@ -407,27 +406,27 @@
 
 
         // Calculate Customers extra expenses and add to shipping price
-        let totalextras = 0;
+        {{--let totalextras = 0;--}}
 
-        @if($user->extra_expenses != null)
-        const extras = {!!$user->extra_expenses !!};
-        // console.log(extras);
+        {{--@if($user->extra_expenses != null)--}}
+        {{--const extras = {!!$user->extra_expenses !!};--}}
+        {{--// console.log(extras);--}}
 
-        const checkboxes = document.querySelectorAll('.extra-checkbox');
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', function () {
-                let value = parseFloat(this.value);
-                    if (this.checked) {
-                        totalextras += value;
-                    } else {
-                        totalextras -= value;
-                    }
-                    setTimeout(() => {
-                        document.getElementById('calculate').click();
-                    }, 100)
-            });
-        });
-        @endif
+        {{--const checkboxes = document.querySelectorAll('.extra-checkbox');--}}
+        {{--checkboxes.forEach((checkbox) => {--}}
+        {{--    checkbox.addEventListener('change', function () {--}}
+        {{--        let value = parseFloat(this.value);--}}
+        {{--            if (this.checked) {--}}
+        {{--                totalextras += value;--}}
+        {{--            } else {--}}
+        {{--                totalextras -= value;--}}
+        {{--            }--}}
+        {{--            setTimeout(() => {--}}
+        {{--                document.getElementById('calculate').click();--}}
+        {{--            }, 100)--}}
+        {{--    });--}}
+        {{--});--}}
+        {{--@endif--}}
 
         // Calculate Shipping price
 
@@ -584,7 +583,8 @@
                     success: function (data) {
 
                         $('#ground_rate').text('$ ' + data.ground_rate);
-                        $('#total').text('$ ' + (data.total + totalextras));
+                        // $('#total').text('$ ' + (data.total + totalextras));
+                        $('#total').text('$ ' + (data.total ));
                         $('#total_original').text('$ ' + data.total);
 
                         jQuery('.direct').fadeIn()

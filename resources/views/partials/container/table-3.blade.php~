@@ -102,8 +102,7 @@
                         <br>
 
                         <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;"
-{{--                                {{ !empty($cargroup->photo) ? '' : 'required' }}--}}
-                        >
+                                {{ !empty($cargroup->photo) ? '' : 'required' }}>
 
                         @if (!empty($cargroup->photo))
                             <a href="{{ Storage::url($cargroup->photo) }}" target="_blank">

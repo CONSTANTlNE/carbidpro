@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Mail\ExceptionOccurred;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -41,8 +44,14 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (Throwable $exception) {
+
+                try {
+                    Mail::to(config('carbiddata.developerMail'))->send(new ExceptionOccurred($exception));
+                } catch (\Exception $mailException) {
+                    Log::error('Failed to send exception email: ' . $mailException->getMessage());
+                }
+
         });
     }
 }

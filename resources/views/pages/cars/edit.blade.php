@@ -23,9 +23,9 @@
 
     @endphp
             <!--preloader-->
-    {{--    <div id="preloader">--}}
-    {{--        <div id="status"></div>--}}
-    {{--    </div>--}}
+{{--        <div id="preloader">--}}
+{{--            <div id="status"></div>--}}
+{{--        </div>--}}
 
     <!-- Site wrapper -->
     <div class="wrapper">
@@ -294,14 +294,14 @@
                                             <!-- Repeater Fields in One Row -->
                                             <template x-for="(item, index) in balance_accounting" :key="index">
                                                 <div class="row repeater-item mt-2 align-items-center">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-2 col-6">
                                                         <input required type="text"
                                                                :name="`balance_accounting[${index}][name]`"
                                                                x-model="item.name"
                                                                class="name-autocomplete form-control"
                                                                placeholder="Enter item name">
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-2 col-6">
                                                         <input required type="number"
                                                                :name="`balance_accounting[${index}][value]`"
                                                                x-model.number="item.value" class="form-control"
@@ -476,7 +476,7 @@
 
                                     <div class="form-group" style="max-width: 100%">
                                         @can('CarUpdate')
-                                            <label>Images</label><br>
+                                            <label>Add Car Images</label><br>
                                             <input type="file" data-car_id="{{ $car->id }}" id="filepond"
                                                    name="images[]" multiple>
                                         @endcan
@@ -490,7 +490,7 @@
 
                                         @if ($car->getMedia('images')->isNotEmpty())
                                             <div class="existing-images mt-4">
-                                                <h6>Existing Images</h6>
+                                                <h6>Car Images</h6>
                                                 <div class="row mt-2">
                                                     @foreach ($car->getMedia('images') as $image)
                                                         <div class=" col-sm-12 col-md-2">
@@ -523,6 +523,41 @@
                                                 </div>
                                             </div>
                                         @endif
+                                            @if ($car->getMedia('bl_images')->isNotEmpty())
+                                                <div class="existing-images mt-4">
+                                                    <h6>BL Images</h6>
+                                                    <div class="row mt-2">
+                                                        @foreach ($car->getMedia('bl_images') as $image)
+                                                            <div class=" col-sm-12 col-md-2">
+                                                                <div class="image-thumbnail mb-2 d-flex justify-content-center">
+                                                                    <a href="{{ $image->getUrl() }}" target="_blank">
+                                                                        <img src="{{ $image->getUrl() }}" class="img-fluid"
+                                                                             alt="Uploaded Image">
+                                                                    </a>
+                                                                </div>
+                                                                @can('CarUpdate')
+                                                                    <div style="display: flex;justify-content: center!important;">
+
+                                                                        <button style="all:unset;cursor: pointer"
+                                                                                hx-post="{{route('arrived.image.delete')}}"
+                                                                                hx-vals='{ "image_id": "{{$image->id}}","_token": "{{csrf_token()}}" }'
+                                                                                onclick="window.location.reload()"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="35"
+                                                                                 height="35" viewBox="0 0 24 24">
+                                                                                <path fill="#b72525"
+                                                                                      d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"/>
+                                                                            </svg>
+                                                                        </button>
+                                                                    </div>
+                                                                @endcan
+                                                            </div>
+
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
                                     </div>
 
                                     <div class="container">
@@ -724,6 +759,7 @@
                     'Vehicle cost',
                     'Shipping cost',
                     'Fee amount',
+                    'Bank fee',
                     'Insurance cost',
                     'Hybrid',
                     'Storage',

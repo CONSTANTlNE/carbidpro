@@ -23,6 +23,18 @@ class CustomerBalanceController extends Controller
 
     public function index(Request $request)
     {
+
+        if ($request->archive==1) {
+            $payment_requests = CustomerBalance::onlyTrashed()->with(['customer.cars', 'media'])
+                ->where('type', 'fill')
+                ->orderBy('created_at', 'desc')
+                ->paginate(50)
+                ->withQueryString();
+
+            return view('pages.balance_fills.index', compact('payment_requests'));
+        }
+
+
         if ($request->has('search') && !empty($request->search)) {
             $payment_requests = CustomerBalance::with(['customer.cars', 'media'])
                 ->where('type', 'fill')
@@ -43,6 +55,8 @@ class CustomerBalanceController extends Controller
 
             return view('pages.balance_fills.index', compact('payment_requests'));
         }
+
+
 
 
         $payment_requests = CustomerBalance::with(['customer.cars', 'media'])
@@ -161,10 +175,16 @@ class CustomerBalanceController extends Controller
 
         $car = car::find($request->car_id);
 
-
-        if (round($car->amount_due) < $request->amount) {
-            return back()->with('error', 'You can not pay more than amount due');
+        if ($car->latestCredit) {
+            if (round($car->amount_due)+(new creditService())->totalAccruedInterestTillToday($car) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
+        } else {
+            if (round($car->amount_due) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
         }
+
 
         $deposit = CustomerBalance::where('customer_id', auth()->user()->id)
             ->where('is_approved', 1)
@@ -189,7 +209,7 @@ class CustomerBalanceController extends Controller
             $car->save();
 
 
-            if($car->latestCredit){
+            if ($car->latestCredit) {
                 (new CreditService())->recalc($car);
             }
 
@@ -352,8 +372,14 @@ class CustomerBalanceController extends Controller
             ->first();
 
 
-        if (round($car->amount_due) < $request->amount) {
-            return back()->with('error', 'You can not pay more than amount due');
+        if ($car->latestCredit) {
+            if (round($car->amount_due)+(new creditService())->totalAccruedInterestTillToday($car) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
+        } else {
+            if (round($car->amount_due) < $request->amount) {
+                return back()->with('error', 'You can not pay more than amount due');
+            }
         }
 
         $deposit = CustomerBalance::where('customer_id', $request->customer_id)
@@ -412,7 +438,6 @@ class CustomerBalanceController extends Controller
                 ->sum('amount') + ($payment->amount * -1);
 
 
-
         if ($deposit < $request->amount && $payment->amount * -1 < $request->amount) {
             return back()->with('error', 'Not enough deposit');
         }
@@ -435,13 +460,12 @@ class CustomerBalanceController extends Controller
         if ($car->latestCredit) {
             (new CreditService())->recalc($car);
         } else {
-            $totalPayments=CustomerBalance::where('car_id', $car->id)
+            $totalPayments = CustomerBalance::where('car_id', $car->id)
                 ->where('type', 'car_payment')
                 ->sum('amount');
 
-            $car->amount_due=$car->total_cost+$totalPayments;
+            $car->amount_due = $car->total_cost + $totalPayments;
             $car->save();
-
         }
 
 
@@ -454,11 +478,7 @@ class CustomerBalanceController extends Controller
         $car     = Car::where('id', $payment->car_id)->first();
 
 
-        $creditrecord = Credit::where('customer_balance_id', $payment->id)->first();
 
-        if ($creditrecord) {
-            $creditrecord->delete();
-        }
 
         if (!$car->latestCredit) {
             $car->amount_due = $car->amount_due + ($payment->amount * -1);
@@ -468,6 +488,11 @@ class CustomerBalanceController extends Controller
         $payment->delete();
 
         if ($car->latestCredit) {
+            $creditrecord = Credit::where('customer_balance_id', $payment->id)->first();
+
+            if ($creditrecord) {
+                $creditrecord->delete();
+            }
             (new CreditService())->recalc($car);
         }
 

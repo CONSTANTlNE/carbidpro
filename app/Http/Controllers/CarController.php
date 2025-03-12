@@ -312,7 +312,7 @@ class CarController extends Controller
             'make_model_year' => 'required',
             'status'          => 'required',
             'vehicle_owner_name' => [
-                'required',
+                'nullable',
                 'regex:/^[A-Za-z][A-Za-z\s]{3,}[A-Za-z]$/'
             ],
         ]);
@@ -608,7 +608,7 @@ class CarController extends Controller
     {
         $request->validate([
             'vehicle_owner_name' => [
-                'required',
+                'nullable',
                 'regex:/^[A-Za-z][A-Za-z\s]{3,}[A-Za-z]$/'
             ],
         ]);

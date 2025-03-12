@@ -54,12 +54,13 @@ class CreditService
 //        $lastcalcalcDate           = $car?->latestCredit?->issue_or_payment_date;
 //        $today                     = Carbon::now()->startOfDay();
         $totaldaysFromLastCalcDays =  $this->totalDaysFromLastCalcDate($car);
-
         $lastCreditAmount = $car?->latestCredit?->credit_amount;
         $percent          = $car?->latestCredit?->monthly_percent;
+
+
 //        $lastTotalAccruedPercent   = $car?->credit->sum('accrued_percent');
         $accruedPercentTillToday = $lastCreditAmount * ($percent * 12 / 365) * round($totaldaysFromLastCalcDays);
-//       dd($accruedPercentTillToday);
+       dd($lastCreditAmount,$accruedPercentTillToday,$totaldaysFromLastCalcDays);
         return $accruedPercentTillToday;
     }
 
@@ -72,9 +73,9 @@ class CreditService
 
 
         $lastcalcalcDate           = $car?->latestCredit?->issue_or_payment_date;
-        $today                     = Carbon::now()->startOfDay();
+        $today                     = Carbon::now();
         $totaldaysFromLastCalcDays = $lastcalcalcDate?->startOfDay()->diffInDays($today);
-
+dd($lastcalcalcDate->format('Y-m-d'),$today->format('Y-m-d'),$totaldaysFromLastCalcDays);
         return round($totaldaysFromLastCalcDays);
     }
 

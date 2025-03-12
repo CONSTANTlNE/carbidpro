@@ -365,9 +365,9 @@ $creditService = new CreditService();
                                         <div style="font-size: 15px;width: 150px;margin-bottom: 2px ">
                                             <span style="color: black" class="mb-0">{{Cache::get('dashboardStatics'.session()->get('locale'))['Total Cost']}} :</span>
                                             @if($car->latestCredit)
-                                                <span style="color:red">${{ round( $car->total_cost+$creditService->totalAccruedInterestTillToday($car)) }}</span>
+                                                <span style="color:red">${{ $car->total_cost+$creditService->totalAccruedInterestTillToday($car) }}</span>
                                             @else
-                                                <span style="color:red">${{ round($car->total_cost) }}</span>
+                                                <span style="color:red">${{ $car->total_cost }}</span>
                                             @endif
 
                                         </div>

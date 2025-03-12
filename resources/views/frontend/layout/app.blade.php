@@ -11,11 +11,8 @@
     <title>Carbidpro</title>
 
     <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
-    <!-- Fonts -->
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css" />
-    <!-- Add the slick-theme.css if you want default styling -->
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css" />
 
 
@@ -33,8 +30,6 @@
     <link rel="stylesheet" href="{{asset('frontendAssets/css/style.css?v=')}}{{ time() }}">
     <link rel="stylesheet" href="{{asset('frontendAssets/css/main.css?v=')}}{{ time() }}">
     @stack('style')
-
-
 
 </head>
 

@@ -77,17 +77,18 @@ use Carbon\Carbon  ;
                         <br>
                     @endif
                     <strong>Payments:</strong><br>
-                    <span style="color: green ">   {{ -$car->total_payments }} </span> <br>
-
+                    @if(!request()->routeIs('cars.index.trashed'))
+                        <span style="color: green ">   {{ -$car->total_payments }} </span> <br>
+                    @endif
                     <strong>Amount due:</strong><br>
                     @if($car->latestCredit && $car->amount_due > 0)
                         @if($car->latestCredit->credit_amount < $creditExcludedCost)
-                            <span style="color:red">{{round( $car->amount_due) }}</span>
+                            <span style="color:red">a {{round( $car->amount_due) }} </span>
                         @else
-                            <span style="color: red ">{{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car))+$creditExcludedCost}}</span>
+                            <span style="color: red "> b {{ round($car->latestCredit->credit_amount+$creditService->totalInterestFromLastCalc($car))+$creditExcludedCost}} </span>
                         @endif
                     @else
-                        <span style="color:red">{{round( $car->amount_due) }}</span>
+                        <span style="color:red">c {{round( $car->amount_due) }} </span>
                     @endif
                 </td>
 

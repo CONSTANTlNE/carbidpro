@@ -23,7 +23,7 @@ class InvoiceController extends Controller
         $invNumber=random_int(1000000,9999999);
 
         $costsdraft = json_decode($car->balance_accounting, true);
-
+//dd($costsdraft);
         $costs = [];
         $vehicleCost = null; // Variable to store Vehicle cost separately
 
@@ -32,26 +32,26 @@ class InvoiceController extends Controller
             $value = (float)$item['value']; // Convert value to numeric
 
             if ($name === 'Vehicle cost') {
-                // Handle Vehicle cost separately
+                // Sum Vehicle cost separately
                 if (!isset($vehicleCost)) {
                     $vehicleCost = ['name' => $name, 'value' => 0];
                 }
                 $vehicleCost['value'] += $value;
             } else {
-                // Handle other costs
-                if (!isset($costs[$name])) {
-                    $costs[$name] = ['name' => $name, 'value' => 0];
-                }
-                $costs[$name]['value'] += $value;
+                // Store all items separately instead of overwriting
+                $costs[] = ['name' => $name, 'value' => $value];
             }
         }
 
-// Add Vehicle cost first to the final array
+// Add Vehicle cost at the beginning if it exists
         if ($vehicleCost) {
-            $costs = ['Vehicle cost' => $vehicleCost] + $costs;
+            array_unshift($costs, $vehicleCost);
         }
 
 
+
+
+//dd    ($costsdraft, $costs);
 
 
         $payment=CustomerBalance::where('car_id',$car->id)

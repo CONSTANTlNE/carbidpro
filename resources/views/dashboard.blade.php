@@ -65,7 +65,7 @@
                                     <span class="slight"><i class="fa fa-play fa-rotate-270"> </i>
                                 </span>
                                 </div>
-                                <h3>Total Interest <span style="color: darkorange">{{$totalInterest}}</span></h3>
+                                <h3>Total Interest <span style="color: darkorange">{{ round($totalInterest)}}</span></h3>
                             </div>
                         </div>
                     </div>

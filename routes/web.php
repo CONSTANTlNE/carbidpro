@@ -75,6 +75,8 @@ Route::get('/oldversionlogin', function ( Illuminate\Http\Request $request) {
 });
 
 
+
+
 Route::get('/lang/{locale}', function ($locale) {
     Session::put('locale', $locale);
 
@@ -199,7 +201,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Balance
     Route::controller(CustomerBalanceController::class)->group(function () {
         // Balance Fills
-        Route::get('/deposits', 'index')->name('customer.balance.index');
+        Route::get('/deposits/{archived?}', 'index')->name('customer.balance.index');
         Route::post('/deposits/aprove', 'approveBalance')->name('customer.balance.approve');
         Route::post('/deposits/store', 'storeBalance')->name('customer.balance.store');
         Route::post('/deposits/update', 'updateBalance')->name('customer.balance.update');
@@ -503,7 +505,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     })->name('user.upload');
 
 
-    route::get('/addid',function(){
+    route::get('/addidtobalanceaccounting',function(){
 
         $cars = Car::all(); // Fetch all cars
 
@@ -525,6 +527,17 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
     });
 
+    route::get('deletecustomers',function(){
+
+        $users=Customer::where('newwebsitecustomer','0')->get();
+
+        $users->each(function($user){
+            $user->delete();
+        });
+
+        Customer::onlyTrashed()->forceDelete();
+
+    });
 
 
 });
@@ -544,6 +557,8 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::get('/record/{id}/table', 'getTableData')->name('record.table');
 
         Route::get('/main', 'showDashboard')->name('customer.dashboard');
+
+        Route::get('/myterms', 'terms')->name('customer.terms');
 
         Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
 
@@ -632,14 +647,43 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
 });
 
+
+
+Route::get('/generate-link', function (Request $request) {
+
+    if ($request->has('customer_id')){
+        $user = $request->get('customer_id');
+    } else{
+        $user = auth()->user()->id;
+    }
+
+
+
+    // Generate token
+    $payload = [
+        'id' => $user,
+        'timestamp' => now()->timestamp
+    ];
+
+    $sharedSecret = env('CARBID_SECRET'); // A shared key between both apps
+    $token = base64_encode(json_encode($payload)); // Base64 encode for easy transmission
+    $signature = hash_hmac('sha256', $token, $sharedSecret); // Sign the token
+
+    $oldSite = 'https://old.carbidpro.com/oldversionlogin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
+
+    return  redirect()->to($oldSite);
+
+})->name('generate.link');
+
+
 //   authorize from this app to  Old Website
 Route::middleware('auth')->group(function () {
-    Route::get('/generate-link', function (Request $request) {
-        if ($request->has('customer_id')){
-            $user = $request->get('customer_id');
-        } else{
+
+    Route::get('/generate-link-admin', function (Request $request) {
+
+
             $user = auth()->user()->id;
-        }
+
 
         // Generate token
         $payload = [
@@ -651,11 +695,11 @@ Route::middleware('auth')->group(function () {
         $token = base64_encode(json_encode($payload)); // Base64 encode for easy transmission
         $signature = hash_hmac('sha256', $token, $sharedSecret); // Sign the token
 
-        $oldSite = 'https://old.carbidpro.com/oldversionlogin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
+        $oldSite = 'https://old.carbidpro.com/oldadmin?token=' . urlencode($token) . '&signature=' . urlencode($signature);
 
         return  redirect()->to($oldSite);
 
-    })->name('generate.link');
+    })->name('generate.link.admin');
 
 
 });
@@ -696,9 +740,13 @@ route::get('/smstest', function () {
     return $message;
 });
 
-route::get('/session', function () {
-    dd(config('session.lifetime')); // Returns session expiration in minutes
+route::get('/carbon', function () {
 
+    $date1= \Carbon\Carbon::create(2025,3,3);
+    $date2= \Carbon\Carbon::now();
+    $dif= $date2->diffInDays($date1);
+
+    dd($dif);
 
 });
 

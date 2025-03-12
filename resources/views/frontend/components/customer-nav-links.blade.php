@@ -6,7 +6,7 @@
                 @if(auth()->user()->newwebsitecustomer===0)
                     <li class="tabs__item ">
                         <form class="m-auto m-md-0" action="{{route('generate.link')}}" target="_blank">
-                            <input type="hidden" name="customer_id" value="{{auth()->user()->id}}">
+                            <input type="hidden" name="customer_id" value="{{auth('customer')->user()->id}}">
                             <button style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;cursor: pointer"
                                     class="m-auto m-md-0">
                                 Old Version
@@ -36,7 +36,8 @@
                     </li>
                 @endif
             </ul>
-            @if(!request()->routeIs('customer.payment_history'))
+
+            @if(!request()->routeIs('customer.payment_history') && !request()->routeIs('customer.terms'))
                 <div style="width: max-content;background: #F2F2F2;" class="p-3 align-self-center">
                     @if($pending)
                         <p style="color:blue; word-wrap: break-word;word-break: break-word;font-size: 14px"
@@ -87,8 +88,7 @@
                                             } else {
                                               errorElement.innerText = '';
                                               errorElement.style.display = 'none';
-                                            }"
-                                    >
+                                            }">
                                 </div>
 
                                 @if(session()->get('locale')==='en')
@@ -97,6 +97,7 @@
                                         {{Cache::get('dashboardStatics' . session()->get('locale'))['Submit']}}
                                     </button>
                                 @endif
+
                             </div>
                             @if(session()->get('locale')==='ru')
                                 <button style="border: none;border-radius: 5px;padding:3px 10px;background: #2f5496;color: white;margin-right: 10px"

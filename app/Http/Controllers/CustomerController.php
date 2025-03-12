@@ -532,7 +532,7 @@ class CustomerController extends Controller
         $payment_report = CustomerBalance::with('car')
             ->where('customer_id', auth()->user()->id)
 //            ->where('is_approved',1)
-                ->orderBy('date', 'desc')
+            ->orderBy('date', 'desc')
             ->get();
 //        dd($payment_report);
 
@@ -590,7 +590,6 @@ class CustomerController extends Controller
 
     public function register(Request $request)
     {
-
         if ($request->filled('must_fill')) {
             return response()->json(['message' => 'Success'], 200);
         }
@@ -709,7 +708,7 @@ class CustomerController extends Controller
     // for main page search by container
     public function trackContainer(Request $request)
     {
-        if(empty($request->container)){
+        if (empty($request->container)) {
             return back()->with('container_error', 'Please enter Container Number');
         }
 
@@ -728,8 +727,14 @@ class CustomerController extends Controller
         };
 
 
-
         return redirect($url);
+    }
+
+    public function terms()
+    {
+        $user = Auth::user();
+
+        return view('frontend.pages.customer.customer_terms', compact('user'));
     }
 
 

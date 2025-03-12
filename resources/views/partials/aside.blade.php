@@ -97,7 +97,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="treeview {{request()->routeIs('users.index') || request()->routeIs('customers.index') || request()->routeIs('customers.archived') ? 'active' : ''}}">
+            <li class="active treeview {{request()->routeIs('users.index') || request()->routeIs('customers.index') || request()->routeIs('customers.archived') ? 'active' : ''}}">
                 <a href="#">
                     <i class="fa fa-user-circle"></i><span>Users</span>
                     <span class="pull-right-container">
