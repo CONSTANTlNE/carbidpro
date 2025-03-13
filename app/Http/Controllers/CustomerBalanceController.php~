@@ -25,7 +25,7 @@ class CustomerBalanceController extends Controller
     {
 
         $trashedCount=CustomerBalance::onlyTrashed()->count();
-
+        dd($trashedCount);
 
         if ($request->has('search') && !empty($request->search) && $request->archived=='true') {
             $payment_requests = CustomerBalance::with(['customer.cars', 'media'])
@@ -53,7 +53,7 @@ class CustomerBalanceController extends Controller
 
 
 
-            return view('pages.balance_fills.index', compact('payment_requests','trashedCount'));
+            return view('pages.balance_fills.index', compact('payment_requests'));
         }
 
 
@@ -65,7 +65,7 @@ class CustomerBalanceController extends Controller
                 ->withQueryString();
             $archive=true;
 
-            return view('pages.balance_fills.index', compact('payment_requests', 'archive','trashedCount'));
+            return view('pages.balance_fills.index', compact('payment_requests', 'archive'));
         }
 
 
@@ -90,7 +90,7 @@ class CustomerBalanceController extends Controller
                 ->withQueryString();
 
 
-            return view('pages.balance_fills.index', compact('payment_requests'.'trashedCount'));
+            return view('pages.balance_fills.index', compact('payment_requests'));
         }
 
 
@@ -102,7 +102,7 @@ class CustomerBalanceController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('pages.balance_fills.index', compact('payment_requests','trashedCount'));
+        return view('pages.balance_fills.index', compact('payment_requests'));
     }
 
     // Store balance fill by admin

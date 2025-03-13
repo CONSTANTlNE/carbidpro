@@ -29,7 +29,7 @@
                 <th style="width: 10%;">Car type</th>
                 <th style="width: 10%;">Fuel type</th>
                 <th>Warehouse</th>
-                <th>Owner</th>
+
                 <th style="width: 10%;">Dispatch days</th>
                 <th style="width: 10%;">Container Info</th>
                 <th style="width: 10%;">Container Cost</th>
@@ -44,7 +44,6 @@
                 <tr class="info">
                     <th></th>
                     <th style="width: 20%;"></th>
-                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -217,20 +216,14 @@
                         <td>{{ isset($car->loadType) ? $car->loadType->name : '' }}</td>
                         <td>@include('partials.container.table_content-parts.fuel-type')</td>
                         <td>
-                            <label for="">Warehouse:</label>
-                            <br>{{$car->warehouse}}<br>
                             <label for="">Port:</label>
-                            {{ !empty($car->port) ? $car->port->name : '' }} <br>
+                            <br>{{$car->warehouse}}<br>
+{{--                            <label for="">Port:</label>--}}
+{{--                            {{ !empty($car->port) ? $car->port->name : '' }} <br>--}}
                             <label for="">Dest Port:</label>
                             <br>
                             POTI
                             <br>
-                        </td>
-
-                        <td>
-                            {{ $car->vehicle_owner_name }}<br>
-                            {{ $car->owner_id_number }}<br>
-                            {{ $car->owner_phone_number }}<br>
                         </td>
 
                         <td>

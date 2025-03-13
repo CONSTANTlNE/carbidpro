@@ -84,7 +84,6 @@
             <th>Fuel type</th>
             <th>Warehouse</th>
             <th>T/status</th>
-            <th>Owner</th>
             <th style="width: 6%;">Dispatch days</th>
         </tr>
         </thead>
@@ -109,10 +108,9 @@
                     <td>
                         <label for="">Warehouse:</label>
                         <br>{{$car->warehouse}}<br>
-                        <label for="">Port:</label>
-                        {{ !empty($car->port) ? $car->port->name : '' }}
-                        <br>
-                        <br>
+{{--                        <label for="">Port:</label>--}}
+{{--                        {{ !empty($car->port) ? $car->port->name : '' }}--}}
+
                         <label for="">Dest Port:</label>
                         <br>
                         POTI
@@ -127,11 +125,6 @@
                             </option>
                             <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO</option>
                         </select>
-                    </td>
-                    <td>
-                        {{ $car->vehicle_owner_name }}<br>
-                        {{ $car->owner_id_number }}<br>
-                        {{ $car->owner_phone_number }}<br>
                     </td>
                     <td>
                         @php

@@ -254,7 +254,12 @@
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
-
+                    <li class="">
+                        <a href="{{ route('insurance.index') }}">
+                            <span>Insurance</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
                     @endhasanyrole
                     @can('StatesAdd')
                         <li class="">

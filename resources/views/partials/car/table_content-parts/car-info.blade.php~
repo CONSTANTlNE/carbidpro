@@ -19,16 +19,16 @@
 </div>
 
 
-@if(!request()->routeIs('car.showStatus') )
+@if(!request()->routeIs('car.showStatus'))
 <div>
     <strong>Owner:<span>{{ !empty($car->vehicle_owner_name) ? $car->vehicle_owner_name .' ' . $car->owner_id_number : 'N/A' }}</span></strong>
     <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
 </div>
 @endif
-@if(request()->routeIs('car.showStatus') || request()->routeIs('container.showStatus') )
+@if(request()->routeIs('car.showStatus'))
 
     <div>
-        <strong>Dealer:<span>{{ $car->customer->contact_name }}</span></strong>
+        <strong>Dealer:<span>{{ $car->customer->contact_person }}</span></strong>
         <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
     </div>
 @endif

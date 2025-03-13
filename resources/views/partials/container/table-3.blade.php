@@ -10,7 +10,7 @@
                 <th>Car type</th>
                 <th>Fuel type</th>
                 <th>Warehouse</th>
-                <th>Owner</th>
+{{--                <th>Owner</th>--}}
                 <th style="width: 10%;">Container Info</th>
 
                 <th style="width: 10%;">Container Cost
@@ -211,11 +211,11 @@
                             POTI<br>
                         </td>
 
-                        <td>
-                            {{ $car->vehicle_owner_name }}<br>
-                            {{ $car->owner_id_number }}<br>
-                            {{ $car->owner_phone_number }}<br>
-                        </td>
+{{--                        <td>--}}
+{{--                            {{ $car->vehicle_owner_name }}<br>--}}
+{{--                            {{ $car->owner_id_number }}<br>--}}
+{{--                            {{ $car->owner_phone_number }}<br>--}}
+{{--                        </td>--}}
 
                         <td>
                             <strong>Booking #</strong><br>

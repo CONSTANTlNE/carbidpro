@@ -7,6 +7,7 @@ use App\Models\Car;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
 use App\Models\Extraexpence;
+use App\Models\Insurance;
 use App\Models\Title;
 use App\Services\CreditService;
 use Illuminate\Http\Request;
@@ -320,6 +321,53 @@ class AdminController extends Controller
         $customer->titles()->detach($request->title_id);
 
         return back();
+    }
+
+    public function insuranceIndex(){
+
+        $insuranceterms=Insurance::all();
+
+       return view('pages.insruranceterms',compact('insuranceterms'));
+    }
+
+    public function insuranceStore(Request $request){
+
+        $insurance=new Insurance();
+        $insurance->text=$request->insurancetext;
+        $insurance->save();
+
+        return back();
+
+    }
+
+    public function insuranceUpdateHtmx(Request $request){
+
+        $insurance = Insurance::where('id', $request->id)->first();
+        $id = $request->id;
+
+        return view('pages.htmx.htmxUpdateInsurance', compact('insurance', 'id'));
+    }
+
+    public function insuranceUpdate(Request $request){
+
+        $insurance=Insurance::where('id',$request->id)->first();
+        $insurance->text=$request->insurancetext;
+        $insurance->save();
+
+        return back();
+
+
+    }
+
+    public function insuranceDelete(Request $request){
+
+    }
+
+    public function showInsurance(){
+
+        $insurance=Insurance::first();
+
+        return view('frontend.pages.insurance',compact('insurance'));
     }
 
 }

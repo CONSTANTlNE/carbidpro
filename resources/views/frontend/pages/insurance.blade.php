@@ -56,74 +56,14 @@
 @endpush
 
 @section('content')
-    @push('style')
-        <style>
-            .container {
-                max-width: 1700px;
-            }
-
-            /*table, th, td {*/
-            /*    border: 1px solid;*/
-            /*}*/
-
-            td {
-                padding: 7px;
-            }
-
-
-            .hideBr {
-                display: none;
-            }
-
-            @media only screen and (max-width: 400px) {
-                .hideBr {
-                    display: block;
-                }
-
-                #bank_payment {
-                    width: 250px !important;
-                }
-
-                #full_name {
-                    width: 250px !important;
-                }
-            }
-
-        </style>
-    @endpush
-
 
     <div class="container">
 
-        {{--PAYMENT AND NAV LINKS FOR DEALER--}}
-        @include('frontend.components.customer-nav-links')
 
+        <div class="ql-editor">
+            {!! $insurance->text !!}
+        </div>
 
-        @if($user->extra_expenses != null)
-            <div class="d-flex flex-column mt-3  " style="max-width: 200px;margin-bottom: 325px" >
-                @php
-                    $extras=json_decode($user->extra_expenses);
-                @endphp
-                @foreach($extras as $index => $extra)
-                    @if($index>0)
-                        <div class="d-flex justify-content-between align-items-middle mt-2">
-                            <div class="d-flex justify-content-between align-middle"
-                                 style="min-width:130px; margin-right: 10px ">
-                                <label style="cursor: pointer" class="mt-1"
-                                       for="{{$extra->name}}">{{$extra->name}}</label>
-{{--                                <input style="cursor: pointer" class="form-check-input extra-checkbox"--}}
-{{--                                       id="{{$extra->name}}"--}}
-{{--                                       type="checkbox" value="{{$extra->value}}}">--}}
-                            </div>
-                            <input disabled class="form-control text-center" style="max-width: 150px"
-                                   type="text"
-                                   value="{{$extra->value}}">
-                        </div>
-                    @endif
-                @endforeach
-            </div>
-
-    @endif
-
+    </div>
 
 @endsection

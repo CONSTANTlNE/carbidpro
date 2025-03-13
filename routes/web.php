@@ -44,7 +44,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
 
-// Just example not using in this project .. but using in old
+// Just example not using in this project .. but using in old .. this code must be in app to which we want to be authoorized
 Route::get('/oldversionlogin', function ( Illuminate\Http\Request $request) {
 
     $token = $request->get('token');
@@ -60,6 +60,7 @@ Route::get('/oldversionlogin', function ( Illuminate\Http\Request $request) {
     $payload = json_decode(base64_decode($token), true);
 
     if (isset($payload['id'] ,$payload['timestamp'])) {
+
         $user = Customer::where('id', $payload['id'])
             ->first();
 
@@ -201,7 +202,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     // Balance
     Route::controller(CustomerBalanceController::class)->group(function () {
         // Balance Fills
-        Route::get('/deposits/{archived?}', 'index')->name('customer.balance.index');
+        Route::get('/deposits', 'index')->name('customer.balance.index');
         Route::post('/deposits/aprove', 'approveBalance')->name('customer.balance.approve');
         Route::post('/deposits/store', 'storeBalance')->name('customer.balance.store');
         Route::post('/deposits/update', 'updateBalance')->name('customer.balance.update');
@@ -356,6 +357,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     //    ======= Website Management Routes =======
+
     Route::controller(SliderController::class)->group(function () {
         Route::get('/sliders', 'index')->name('sliders.index');
         Route::post('/sliders/store', 'store')->name('sliders.store');
@@ -394,8 +396,16 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         route::get('/htmx/select/particular/expense', 'htmxinsertExtraExpense')->name('htmx.get.selectextraexpense');
     });
 
+    Route::controller(AdminController::class)->group(function (){
+        route::get('/insuranse','insuranceIndex')->name('insurance.index');
+        route::post('/insuranse/store','insuranceStore')->name('insurance.store');
+        route::post('/insuranse/update','insuranceUpdate')->name('insurance.update');
+        Route::get('/insuranse/update/htmx', 'insuranceUpdateHtmx')->name('insuranse.update.htmx');
+        route::post('/insuranse/delete','insuranceDelete')->name('insurance.delete');
+    });
 
-    // Manual upload of customers and users OF/From old app
+
+    // Manual upload of customers (exported tables from old db as JSON)
     route::get('/uploadolddata', function () {
 
         $csrfExpiration = config('session.lifetime') * 60;
@@ -550,8 +560,9 @@ Route::get('/container/tracking', [CustomerController::class,'trackContainer'])-
 Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
     Route::get('/calculator', [calculatorController::class, 'index'])->name('calculator.index');
-    Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
+    Route::get('/insurance', [AdminController::class, 'showInsurance'])->name('insurance.show');
 
+    Route::post('/calculator', [calculatorController::class, 'calculate'])->name('calculate');
     Route::controller(CustomerController::class)->group(function () {
 
         Route::get('/record/{id}/table', 'getTableData')->name('record.table');
@@ -583,16 +594,16 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::post('/add-invoice-price', 'addInvoicePrice')->name('customer.addInvoicePrice');
 
     });
-
     Route::controller(CustomerBalanceController::class)->group(function () {
         Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
         // Dealer pays for a particular car from General balance
         Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
     });
-
     route::controller(InvoiceController::class)->group(function (){
         Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');
     });
+
+
 
     // Make deposit transfer call to Old Website
     Route::get('/transfer/deposit', function (Request $request) {
@@ -647,8 +658,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
 
 });
 
-
-
+// Log in to old version for customers
 Route::get('/generate-link', function (Request $request) {
 
     if ($request->has('customer_id')){
@@ -674,7 +684,6 @@ Route::get('/generate-link', function (Request $request) {
     return  redirect()->to($oldSite);
 
 })->name('generate.link');
-
 
 //   authorize from this app to  Old Website
 Route::middleware('auth')->group(function () {
@@ -727,29 +736,6 @@ Route::get('/savelocations', function () {
     // }
 
 })->name('st');
-
-
-route::get('/smstest', function () {
-
-    $car=Car::first();
-
-    $message1=SmsDraft::where('action_name','newCarAdded')->first()->draft;
-
-    $message = str_replace("CAR-NAME", $car->make_model_year, $message1);
-
-    return $message;
-});
-
-route::get('/carbon', function () {
-
-    $date1= \Carbon\Carbon::create(2025,3,3);
-    $date2= \Carbon\Carbon::now();
-    $dif= $date2->diffInDays($date1);
-
-    dd($dif);
-
-});
-
 
 // TEST ROUTES
 

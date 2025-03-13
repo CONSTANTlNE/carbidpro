@@ -8,6 +8,7 @@ use App\Mail\SampleMail;
 use App\Mail\teamRegisterMail;
 use App\Models\ContainerGroup;
 use App\Models\Extraexpence;
+use App\Models\Insurance;
 use Illuminate\Support\Facades\Mail;
 
 use App\Models\Car;
