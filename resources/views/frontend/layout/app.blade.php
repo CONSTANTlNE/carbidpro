@@ -12,8 +12,8 @@
 
     <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css" />
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css" />
+{{--    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css" />--}}
+{{--    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css" />--}}
 
 
     {{-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"> --}}
@@ -27,8 +27,10 @@
     <link rel="stylesheet" href="{{asset('frontendAssets/css/slick.css')}}">
     <link rel="stylesheet" href="{{asset('frontendAssets/css/rs6.css')}}">
     <link rel="stylesheet" href="{{asset('frontendAssets/css/slick-theme.css')}}">
-    <link rel="stylesheet" href="{{asset('frontendAssets/css/style.css?v=')}}{{ time() }}">
-    <link rel="stylesheet" href="{{asset('frontendAssets/css/main.css?v=')}}{{ time() }}">
+{{--    <link rel="stylesheet" href="{{asset('frontendAssets/css/style.css?v=')}}{{ time() }}">--}}
+{{--    <link rel="stylesheet" href="{{asset('frontendAssets/css/main.css?v=')}}{{ time() }}">--}}
+    <link rel="stylesheet" href="{{asset('frontendAssets/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('frontendAssets/css/main.css')}}">
     @stack('style')
 
 </head>
@@ -61,9 +63,8 @@
 
 
 <script src="{{asset('frontendAssets/js/jquery.min.js')}}"></script>
-
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-{{-- <script src="/assets/js/bootstrap.min.js"></script> --}}
+{{--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>--}}
+ <script src="{{asset('frontendAssets/js/bootstrap.min.js')}}"></script>
 <script src="{{asset('frontendAssets/js/popper.min.js')}}"></script>
 <script src="{{asset('frontendAssets/js/jquery.magnific-popup.min.js')}}"></script>
 <script src="{{asset('frontendAssets/js/appear.js')}}"></script>
@@ -76,8 +77,10 @@
 <script src="{{asset('frontendAssets/js/wow.min.js')}}"></script>
 <script src="{{asset('frontendAssets/js/jquery.cssslider.min.js')}}"></script>
 <script src="{{asset('frontendAssets/js/rbtools.min.js')}}"></script>
+
 <script src="{{asset('frontendAssets/js/rs6.min.js')}}"></script>
-<script src="{{asset('frontendAssets/js/script.js?v=')}}{{ time() }}"></script>
+{{--<script src="{{asset('frontendAssets/js/script.js?v=')}}{{ time() }}"></script>--}}
+<script src="{{asset('frontendAssets/js/script.js')}}"></script>
 
 @stack('scripts')
 

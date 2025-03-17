@@ -7,6 +7,7 @@
 
 <body>
     <h2>Contact:</h2>
+<p>test: From new website</p>
 
     <p>Name: {{ $fname }}</p>
     <p>Surname: {{ $lname }}</p>

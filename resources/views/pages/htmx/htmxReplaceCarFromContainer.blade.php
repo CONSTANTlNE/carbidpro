@@ -25,7 +25,7 @@
     <button
             hx-post="{{route('container.replaceCar')}}"
             hx-include="[name='new_car_id{{$key}}']"
-            hx-vals='{ "key": "{{$key}}" , "container_id": "{{$containerid}}","_token": "{{csrf_token()}}","oldcar_id":"{{$oldcar_id}}" }'
+            hx-vals='{ "key": "{{$key}}" , "cargroup_id": "{{$containerid}}","_token": "{{csrf_token()}}","oldcar_id":"{{$oldcar_id}}" }'
             hx-on::after-request="window.location.reload()"
             type="button" class="btn btn-primary"
              >

@@ -16,7 +16,6 @@ class smsService
     public $client_id = 'CARBIDPRO_IN';
     public $service_id = 'service_id';
 
-
     public function info(string $number, string $text)
     {
         $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
@@ -178,7 +177,7 @@ class smsService
 
 
         if ($draft && $draft->is_active === 1) {
-            $message  = str_replace(["DEALER", "FULL-NAME", "DEPOSIT-AMOUNT"], [$customer->company_name, $balance->full_name, $balance->amount], $draft->draft);
+            $message  = str_replace(["DEALER", "FULL-NAME", "DEPOSIT-AMOUNT"], [$customer->contact_name, $balance->full_name, $balance->amount], $draft->draft);
             $response = Http::asForm()->get('http://146.255.253.42:7782/submit', [
                 'username'   => $this->username,
                 'password'   => $this->password,

@@ -23,6 +23,7 @@ use App\Http\Controllers\PortsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ShippingLineController;
 use App\Http\Controllers\ShippingPricesController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SmsController;
@@ -113,7 +114,6 @@ Route::prefix('dealer')->group(function () {
 Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function () {
 
 
-
     // Dasboard Analitics
     Route::controller(AdminController::class)->group(function () {
         Route::get('/', 'adminIndex')
@@ -131,7 +131,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     // Cars
-    Route::controller(CarController::class)->middleware('customRole')->group(function () {
+    Route::controller(CarController::class)->group(function () {
         Route::get('/cars', 'index')->name('cars.index');
         Route::get('/cars/archive', 'index')->name('cars.index.trashed');
         Route::get('/car/create', 'create')->name(name: 'car.create');
@@ -174,6 +174,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/containers/replace-car', 'replaceCar')->name(name: 'container.replaceCar');
         Route::post('/containers/remove-from-list', 'removeFromList')->name(name: 'container.removeFromList');
         Route::post('/containers/add-car-to-group', 'addCarToGroup')->name(name: 'container.addCarToGroup');
+        Route::post('/containers/add-car-to-group2', 'addCarToGroup2')->name(name: 'container.addCarToGroup2');
         Route::get('/containers/delete/images/{car_id}/{image_type}', 'deleteImages')->name(name: 'container.images.delete');
 //        Route::post('/containers/filter', 'addCarToGroup')->name(name: 'container.filter');
         Route::get('/containers/htmx/select/car', 'htmxSelectCar')->name(name: 'container.htmx.select.car');
@@ -207,6 +208,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/deposits/store', 'storeBalance')->name('customer.balance.store');
         Route::post('/deposits/update', 'updateBalance')->name('customer.balance.update');
         Route::post('/deposits/delete', 'deleteBalance')->name('customer.balance.delete');
+        route::post('/deposit/restore','restoreArchived')->name('deposit.archived.restore');
+
         Route::get('/deposits/search/customer/htmx', 'searchCustomerHtmx')->name('customer.search.htmx');
 
         // Car Payments
@@ -218,6 +221,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 
         Route::get('/calculate/percenttilldate',
             'percentTillDateHtmx')->name('car.calculate.percenttilldate');
+
     });
 
     // Auctions
@@ -356,6 +360,14 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         route::post('title/delete','delete')->name('title.delete');
     });
 
+    // Shipping line and thc price
+    Route::controller(ShippingLineController::class)->group(function (){
+        route::get('shippinglines','index')->name('shippinglines');
+        route::post('shippinglines/create','create')->name('shippingline.create');
+        route::post('shippinglines/update','update')->name('shippingline.update');
+        route::post('shippinglines/delete','delete')->name('shippingline.delete');
+    });
+
     //    ======= Website Management Routes =======
 
     Route::controller(SliderController::class)->group(function () {
@@ -392,8 +404,13 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
     });
 
     Route::controller(ExtraexpenceController::class)->group(function () {
+        route::get('extraexpenses','index')->name('extraexpenses');
+        route::post('extraexpense/create','create')->name('extraexpense.create');
+        route::post('extraexpense/update','update')->name('extraexpense.update');
+        route::post('extraexpense/delete','delete')->name('extraexpense.delete');
         route::get('/htmx/get/expenses', 'htmxGetExtraExpense')->name('htmx.get.extraexpense');
         route::get('/htmx/select/particular/expense', 'htmxinsertExtraExpense')->name('htmx.get.selectextraexpense');
+
     });
 
     Route::controller(AdminController::class)->group(function (){
@@ -598,6 +615,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::post('/payment-registration', 'registrPaymentRequest')->name('customer.payment_registration_submit');
         // Dealer pays for a particular car from General balance
         Route::post('/set-car-amount', 'setCarAmount')->name('customer.set_amount');
+
     });
     route::controller(InvoiceController::class)->group(function (){
         Route::get('/generate-invoice', 'generateInvoice')->name('customer.generate_invoice');

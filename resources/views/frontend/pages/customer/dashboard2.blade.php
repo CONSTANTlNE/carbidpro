@@ -31,7 +31,7 @@ $creditService = new CreditService();
                     'Date'=> $tr->translate('Date'),
                     'Make/Model/Year'=> $tr->translate('Make/Model/Year'),
                     'VIN / CONTAINER'=> $tr->translate('VIN / CONTAINER'),
-                    'Release car to'=> $tr->translate('Release car to'),
+                    'Add Car Owner'=> $tr->translate('Add Car Owner'),
                     'Add Team'=> $tr->translate('Add Team'),
                     'Payment'=> $tr->translate('Payment'),
                     'Total Cost'=> $tr->translate('Total Cost'),
@@ -126,7 +126,7 @@ $creditService = new CreditService();
                             <th>{{$dashboardStatics['VIN / CONTAINER']}}</th>
                             {{-- {{Cache::get('dashboardStatics'.session()->get('locale'))['']}} --}}
                             @if (!auth()->user()->hasRole('portmanager'))
-                                <th>{{$dashboardStatics['Release car to']}}</th>
+                                <th>{{$dashboardStatics['Add Car Owner']}}</th>
                             @endif
                             @if (!auth()->user()->hasRole('portmanager'))
                                 @if (session()->get('auth')->child_of <= 0)

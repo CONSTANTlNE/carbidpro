@@ -1,13 +1,14 @@
 @extends('layouts.app')
 @section('content')
     @push('css')
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+        <link href="{{asset('assets/select/select2.min.css')}}" rel="stylesheet"/>
         <!-- FilePond CSS -->
-        <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
-        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+        <link href="{{asset('assets/filepond/filepond.css')}}" rel="stylesheet"/>
+        <link href="{{asset('assets/filepond/filepond-plugin-image-preview.css')}}"
               rel="stylesheet"/>
-        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+        <link href="{{asset('assets/select/tomselect.css')}}" rel="stylesheet">
+        <script src="{{asset('assets/select/tomselect.js')}}"></script>
+
         <style>
             .ts-wrapper {
                 max-width: 250px;
@@ -19,9 +20,9 @@
     @section('body-class', 'hold-transition sidebar-mini')
 
     <!--preloader-->
-{{--    <div id="preloader">--}}
-{{--        <div id="status"></div>--}}
-{{--    </div>--}}
+    {{--    <div id="preloader">--}}
+    {{--        <div id="status"></div>--}}
+    {{--    </div>--}}
 
     <!-- Site wrapper -->
     <div class="wrapper">
@@ -328,7 +329,10 @@
                                                     </div>
                                                     {{-- include charge for credit --}}
                                                     <div class="col-md-1 col-4 text-center mt-1">
-                                                        <input type="hidden" :name="`balance_accounting[${index}][forcredit]`" x-init="item.forcredit = item.forcredit || 1" x-model.number="item.forcredit"  >
+                                                        <input type="hidden"
+                                                               :name="`balance_accounting[${index}][forcredit]`"
+                                                               x-init="item.forcredit = item.forcredit || 1"
+                                                               x-model.number="item.forcredit">
 
                                                         <input type="checkbox"
                                                                style="max-width: 50px"
@@ -502,26 +506,22 @@
         @include('partials.footer')
 
         @push('js')
-            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script src="{{asset('assets/select/select2.min.js')}}"></script>
             <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
             <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-            <script src="https://unpkg.com/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+            <script src="{{asset('assets/alpine/cdn.min.js')}}" defer></script>
             <!-- FilePond JS -->
-            <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+            <script src="{{asset('assets/filepond/filepond.js')}}"></script>
 
             <!-- Plugins for image preview and file type validation -->
-            <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-            <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-            <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-            <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.min.js"></script>
-            <script
-                    src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js">
-            </script>
-            <script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-image-preview.js')}}"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-file-validate-type.js')}}"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-file-validate-size.js')}}"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-file-encode.min.js')}}"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-image-exif-orientation.min.js')}}"></script>
+            <script src="{{asset('assets/filepond/filepond-plugin-image-edit.js')}}"></script>
 
             <script>
-
-
                 document.addEventListener("DOMContentLoaded", function () {
                     // Register FilePond plugins
                     FilePond.registerPlugin(
@@ -583,8 +583,6 @@
                             images2Input.files = dataTransfer.files;
                         })
                     }, 300)
-
-
                 });
             </script>
 

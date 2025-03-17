@@ -80,6 +80,7 @@
 
             <th>ID</th>
             <th>CAR INFO</th>
+            <th>Container Group</th>
             <th>Car type</th>
             <th>Fuel type</th>
             <th>Warehouse</th>
@@ -90,55 +91,71 @@
         <tbody>
 
         @foreach ($cars as $car)
-                <tr>
-                    <td>
-                        <label for="{{$car->vin}}" style="cursor:pointer">
-                            <input id="{{$car->vin}}" type="checkbox" class="car_ids" name="car_ids[]"
-                                   value="{{ $car->id }}">
-                            {{ $car->id }}
-                        </label>
-                    </td>
-                    <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
-                    <input type="hidden" name="status"
-                           value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
-                    <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
-                    <td>
-                        @include('partials.container.table_content-parts.fuel-type')
-                    </td>
-                    <td>
-                        <label for="">Warehouse:</label>
-                        <br>{{$car->warehouse}}<br>
-{{--                        <label for="">Port:</label>--}}
-{{--                        {{ !empty($car->port) ? $car->port->name : '' }}--}}
+            <tr>
+                <td>
+                    <label for="{{$car->vin}}" style="cursor:pointer">
+                        <input id="{{$car->vin}}" type="checkbox" class="car_ids" name="car_ids[]"
+                               value="{{ $car->id }}">
+                        {{ $car->id }}
+                    </label>
+                </td>
+                <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
+                <td>
 
-                        <label for="">Dest Port:</label>
-                        <br>
-                        POTI
-                        <br>
-                    </td>
-                    <td>
-                        <label class="mt-2" for="title">Title</label>
-                        <select name="title" class="form-control title" data-car-id="{{ $car->id }}"
-                                id="title" required>
-                            <option value=""></option>
-                            <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
-                            </option>
-                            <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO</option>
-                        </select>
-                    </td>
-                    <td>
-                        @php
-                            $updatedAt = $car->updated_at;
-                            $daysGone = \Carbon\Carbon::parse($updatedAt->startOfDay())->startOfDay()->diffInDays(\Carbon\Carbon::now()->startOfDay());
-                        @endphp
+                    <select style="width: 250px" name="cargroup_id" class="form-control"
+                            hx-post="{{route('container.addCarToGroup2')}}"
+                            hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
+                            hx-on::after-request="window.location.reload()"
+                    >
+                        <option value="">Add To Container Group</option>
+                        @foreach($groups2 as $cargroup)
+                            @if($cargroup->to_port_id == $car->to_port_id && $car->warehouse==$cargroup->trt)
+                            <option value="{{$cargroup->id}}">{{$cargroup->port->name}} -- {{$cargroup->trt}}</option>
+                            @endif
+                        @endforeach
+                    </select>
 
-                        {{ $daysGone }} Day
-                        <br>
-                        <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
-                        <br>
-                        <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
-                    </td>
-                </tr>
+                </td>
+                <input type="hidden" name="status"
+                       value="{{ isset($_GET['status']) ? $_GET['status'] : 'for-Dispatch' }}">
+                <td>{{ isset($car->loadType) ? $car->loadType->name  : ''}}</td>
+                <td>
+                    @include('partials.container.table_content-parts.fuel-type')
+                </td>
+                <td>
+                    <label for="">Warehouse:</label>
+                    <br>{{$car->warehouse}}<br>
+                    {{--                        <label for="">Port:</label>--}}
+                    {{--                        {{ !empty($car->port) ? $car->port->name : '' }}--}}
+
+                    <label for="">Dest Port:</label>
+                    <br>
+                    POTI
+                    <br>
+                </td>
+                <td>
+                    <label class="mt-2" for="title">Title</label>
+                    <select name="title" class="form-control title" data-car-id="{{ $car->id }}"
+                            id="title" required>
+                        <option value=""></option>
+                        <option value="yes" {{ $car->title == 'yes' ? 'selected' : '' }}>YES
+                        </option>
+                        <option value="no" {{ $car->title == 'no' ? 'selected' : '' }}>NO</option>
+                    </select>
+                </td>
+                <td>
+                    @php
+                        $updatedAt = $car->updated_at;
+                        $daysGone = \Carbon\Carbon::parse($updatedAt->startOfDay())->startOfDay()->diffInDays(\Carbon\Carbon::now()->startOfDay());
+                    @endphp
+
+                    {{ $daysGone }} Day
+                    <br>
+                    <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }}
+                    <br>
+                    <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
+                </td>
+            </tr>
         @endforeach
 
         </tbody>

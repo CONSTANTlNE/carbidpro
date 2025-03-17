@@ -51,7 +51,7 @@
 
       =====================================================================-->
     <link href="{{asset('assets/plugins/modals/component.css')}}" rel="stylesheet"/>
-    <script src="https://unpkg.com/htmx.org@2.0.3"
+    <script src="{{asset('assets/htmx203.min.js')}}"
             integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
             crossorigin="anonymous"></script>
     @stack('css')
@@ -69,6 +69,7 @@
 @yield('shipping-prices')
 @yield('ports')
 @yield('customers')
+@yield('customers.extra')
 @yield('payment_request')
 @yield('allsms')
 @yield('smsdrafts')
@@ -76,6 +77,7 @@
 @yield('roles')
 @yield('states')
 @yield('titles')
+@yield('shipping_lines')
 
 {{-- Site Settings --}}
 @yield('sliders')

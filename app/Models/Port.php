@@ -18,4 +18,8 @@ class Port extends Model
     {
         return $this->hasMany(Car::class);
     }
+
+    public function state(){
+     return   $this->hasOne(State::class );
+    }
 }

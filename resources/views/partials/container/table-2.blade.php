@@ -18,7 +18,7 @@
 
 @foreach ($cars as $key => $cargroup)
 
-    <h4 class="mt-2"> GROUP: {{ $key + 1 }} {{$cargroup->port->name}} -- {{$cargroup->trt}}</h4>
+    <h4 class="mt-2">ID: {{$cargroup->id}} GROUP : {{ $key + 1 }} {{$cargroup->port->name}} -- {{$cargroup->trt}}</h4>
 
     <div class="table-responsive">
         <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
@@ -33,8 +33,8 @@
                 <th style="width: 10%;">Dispatch days</th>
                 <th style="width: 10%;">Container Info</th>
                 <th style="width: 10%;">Container Cost</th>
-                <th style="width: 10%;"> Photo of BOL</th>
-                <th style="width: 50%;">Action</th>
+
+                <th style="width: 100px;">Action</th>
             </tr>
             </thead>
             <thead class="back_table_color" style="background-color: #576cff21">
@@ -51,7 +51,7 @@
                     <th style="width: 10%;">
                         <label for="booking_id">Booking #</label>
                         <input type="text" value="{{ $cargroup->booking_id }}" placeholder="Booking #"
-                               class="form-control" name="booking_id" id="booking_id" required>
+                               class="form-control" name="booking_id" id="booking_id">
                         <label for="container">Container #</label>
                         <input type="text" value="{{ $cargroup->container_id }}" placeholder="Container #"
                                class="form-control" name="container" id="container" required>
@@ -65,14 +65,12 @@
                         <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
                                name="thc_agent" class="form-control thc_agent" id="thc_agent" required>
                         <br>
-                        <br>
                         <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                class="form-control" name="container_cost" id="container_cost" required>
-                    </th>
-                    <th style="width: 10%;">
+                        <br>
+                        <label for="">Photo of BOL</label>
                         <input type="file" name="bol_photo" id="bol_photo" style="width: 200px;"
-                             {{empty($cargroup->photo) ? 'reqiored' : ''}}
-                        >
+                                {{empty($cargroup->photo) ? 'reqiored' : ''}}>
 
                         @if (!empty($cargroup->photo))
                             <a href="{{ Storage::url($cargroup->photo) }}" target="_blank">
@@ -86,11 +84,12 @@
                              style="display:none; max-width: 100px; margin-top:10px;">
                     </th>
 
-                    <th style="width: 50%;">
-                        <div class="d-flex" style="gap:10px;    flex-direction: column;">
+
+                    <th style="width: 100px!important;">
+                        <div class="d-flex" style="gap:10px;width: 100px;    flex-direction: column;">
                             <button
                                     hx-get="{{route('container.htmx.select.car')}}"
-                                    hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$key}}" , "container_id": "{{$cargroup->id }}", "trt": "{{$cargroup->trt}}"  }'
+                                    hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$key}}" , "cargroup_id": "{{$cargroup->id }}", "trt": "{{$cargroup->trt}}"  }'
                                     hx-target="#addcartarget{{$key}}"
                                     data-toggle="modal"
                                     class="btn btn-dark"
@@ -125,7 +124,7 @@
                                     hx-indicator="#spinner{{$key}}"
                                     hx-post="{{ route('container.sendEmail') }}"
                                     hx-target="this" hx-swap="outerHTML"
-                                    hx-vals='{"container_id": "{{ $cargroup->id }}", "_token": "{{ csrf_token() }}" }'
+                                    hx-vals='{"cargroup_id": "{{ $cargroup->id }}", "_token": "{{ csrf_token() }}" }'
                                     class=" btn {{ $cargroup->is_email_sent == 1 ? 'btn-warning' : 'btn-primary' }} btn-sm">
                                 {{ $cargroup->is_email_sent == 1 ? 'Email sent ' . $cargroup->email_sent_date : 'Send email' }}
                             </button>
@@ -218,8 +217,8 @@
                         <td>
                             <label for="">Port:</label>
                             <br>{{$car->warehouse}}<br>
-{{--                            <label for="">Port:</label>--}}
-{{--                            {{ !empty($car->port) ? $car->port->name : '' }} <br>--}}
+                            {{--                            <label for="">Port:</label>--}}
+                            {{--                            {{ !empty($car->port) ? $car->port->name : '' }} <br>--}}
                             <label for="">Dest Port:</label>
                             <br>
                             POTI
@@ -238,39 +237,44 @@
                         <td></td>
 
                         <td>{{ $cargroup->cost }}</td>
-                        <td></td>
-{{--                     replace or remove cars--}}
-                        <td>
-                            <button
-                                    hx-get="{{route('container.htmx.select.car2')}}"
-                                    hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$cargroupindex}}" , "container_id": "{{$cargroup->id }}", "oldcar_id": "{{ $car->id }}" , "trt": "{{$cargroup->trt}}" }'
-                                    hx-target="#replacecartarget{{$cargroupindex}}"
-                                    type="button" class="btn btn-dark" data-toggle="modal" data-target="#mymodals{{$cargroupindex}}">
-                                Replace
-                            </button>
-                            {{--replace car modal--}}
-                            <div class="modal fade" id="mymodals{{$cargroupindex}}" tabindex="-1" role="dialog"  aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-scrollable" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" >Replace car : {{$car->vin}}</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div id="replacecartarget{{$cargroupindex}}" class="modal-body">
 
+                        {{--                     replace or remove cars--}}
+                        <td>
+                            <div style="display: flex;flex-direction: column; max-width: 100px">
+                                <button
+                                        hx-get="{{route('container.htmx.select.car2')}}"
+                                        hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$cargroupindex}}" , "container_id": "{{$cargroup->id }}", "oldcar_id": "{{ $car->id }}" , "trt": "{{$cargroup->trt}}" }'
+                                        hx-target="#replacecartarget{{$cargroupindex}}"
+                                        type="button" class="btn btn-dark" data-toggle="modal"
+                                        data-target="#mymodals{{$cargroupindex}}">
+                                    Replace
+                                </button>
+                                {{--replace car modal--}}
+                                <div class="modal fade" id="mymodals{{$cargroupindex}}" tabindex="-1" role="dialog"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Replace car : {{$car->vin}}</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div id="replacecartarget{{$cargroupindex}}" class="modal-body">
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {{--remove car from container group--}}
-                            <button data-car-id="{{ $car->id }}"
-                                    data-container-id="{{ $cargroup->id }}" class="btn btn-danger removefromlist"
-                                    type="button">
-                                Remove
-                            </button>
+                                {{--remove car from container group--}}
+                                <button data-car-id="{{ $car->id }}"
+                                        data-container-id="{{ $cargroup->id }}" class="btn btn-danger removefromlist mt-2"
+                                        type="button">
+                                    Remove
+                                </button>
+                            </div>
                         </td>
                     </form>
 
@@ -314,7 +318,7 @@
 
             $('.removefromlist').on('click', function () {
                 var carId = $(this).data('car-id');
-                var container_id = $(this).data('container-id');
+                var cargroup_id = $(this).data('container-id');
 
                 // Send an AJAX request to replace the car
                 $.ajax({
@@ -322,7 +326,7 @@
                     method: 'POST',
                     data: {
                         carId: carId,
-                        container_id: container_id,
+                        cargroup_id: cargroup_id,
                         _token: '{{ csrf_token() }}' // Include CSRF token for security
                     },
                     success: function (response) {

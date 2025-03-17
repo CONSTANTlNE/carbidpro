@@ -34,6 +34,11 @@
                                     <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
                                 @endforeach
                             </select>
+                            <a href="{{ route('car.edit', $car->id) }}">
+                                <button type="button" class="btn green_btn btn-sm mt-1">
+                                    Edit Car
+                                </button>
+                            </a>
                         </div>
                     </td>
                     @endhasanyrole
@@ -47,22 +52,17 @@
                         <td>
                             <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
                                 required pattern=".*\S.*" title="This field cannot be empty or contain only spaces" >
-
                         </td>
 
                         <td>{{ $car->title }}</td>
                         <td>
 
                         </td>
-
                         <td>
-                            
                             <button type="submit" class="btn btn-success btn-sm"
                                 {{ $car->is_dispatch == 'no' ? 'disabled' : '' }}>
                                 Next
                             </button>
-                           
-
                             <br>
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>

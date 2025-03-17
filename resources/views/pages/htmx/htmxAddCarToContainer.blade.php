@@ -24,7 +24,7 @@
     <button
             hx-post="{{route('container.addCarToGroup')}}"
             hx-include="[name='car_id{{$key}}']"
-            hx-vals='{ "key": "{{$key}}" , "container_id": "{{$containerid}}","_token": "{{csrf_token()}}" }'
+            hx-vals='{ "key": "{{$key}}" , "cargroup_id": "{{$containerid}}","_token": "{{csrf_token()}}" }'
             hx-on::after-request="window.location.reload()"
             type="button" class="btn btn-primary"
              >

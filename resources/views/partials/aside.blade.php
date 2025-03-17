@@ -260,6 +260,18 @@
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
+                    <li class="">
+                        <a href="{{ route('shippinglines') }}">
+                            <span>Shipping Lines</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{ route('extraexpenses') }}">
+                            <span>Extra Expenses for Customer</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
                     @endhasanyrole
                     @can('StatesAdd')
                         <li class="">

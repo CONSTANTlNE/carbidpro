@@ -59,7 +59,8 @@
 
                                     <form style="display: flex!important;" class="ml-3 "
                                           action="{{route('customer.balance.index')}}">
-                                        <input type="text" name="search" class="form-control" value="{{request()->query('search')}}">
+                                        <input type="text" name="search" class="form-control"
+                                               value="{{request()->query('search')}}">
                                         <input type="hidden" name="archived" value="{{request()->query('archived')}}">
                                         <button type="submit" class="btn green_btn custom_grreen2 ml-2 mb-3 ">Search
                                         </button>
@@ -415,6 +416,23 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        {{-- restore softdeleted --}}
+                                                        @if(request()->query('archived'))
+                                                            <form action="{{route('deposit.archived.restore')}}" style="display: inline" method="post">
+                                                                @csrf
+                                                                <input type="hidden" name="id"
+                                                                       value="{{$prequest->id}}">
+                                                                <button  class="btn btn-warning btn-sm">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="17"
+                                                                         height="17" viewBox="0 0 512 512">
+                                                                        <path fill="#f0e3e3" fill-rule="evenodd"
+                                                                              d="M256 448c-97.974 0-178.808-73.383-190.537-168.183l42.341-5.293c9.123 73.734 71.994 130.809 148.196 130.809c82.475 0 149.333-66.858 149.333-149.333S338.475 106.667 256 106.667c-50.747 0-95.581 25.312-122.567 64h79.9v42.666H64V64h42.667v71.31C141.866 91.812 195.685 64 256 64c106.039 0 192 85.961 192 192s-85.961 192-192 192"
+                                                                              clip-rule="evenodd"/>
+                                                                    </svg>
+                                                                </button>
+                                                            </form>
+                                                        @endif
                                                     </td>
 
                                                 </tr>

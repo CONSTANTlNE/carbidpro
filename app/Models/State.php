@@ -10,4 +10,8 @@ class State extends Model
     use HasFactory;
 
     protected  $guarded = [];
+
+    public function port(){
+        return $this->belongsTo(Port::class);
+    }
 }

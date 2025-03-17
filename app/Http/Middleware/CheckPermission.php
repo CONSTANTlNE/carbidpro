@@ -14,9 +14,10 @@ class CheckPermission
 
         $user = $request->user();
         $currentRoute = $request->route();
-        $currentRouteName = $currentRoute ? $currentRoute->getName() : null;
+        $currentRouteName = $currentRoute->getName();
 
-        if ($user->hasRole('Dispatch') && !$user->hasAnyRole(['Admin', 'Developer']) && $currentRouteName !== 'car.showStatus') {
+
+        if ($user->hasRole('Broker') && !$user->hasAnyRole(['Admin', 'Developer']) && $currentRouteName !== 'car.showStatus') {
             return redirect()->route('car.showStatus',['slug' => 'for-dispatch']);
         }
 

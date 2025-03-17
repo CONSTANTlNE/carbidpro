@@ -36,6 +36,11 @@
                                     <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
                                 @endforeach
                             </select>
+                            <a href="{{ route('car.edit', $car->id) }}">
+                                <button type="button" class="btn green_btn btn-sm mt-1">
+                                    Edit Car
+                                </button>
+                            </a>
                         </div>
                     </td>
                     @endhasanyrole

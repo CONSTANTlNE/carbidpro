@@ -32,7 +32,7 @@ class ImageUploadController extends Controller
     {
         // Validate the request
         $request->validate([
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:9048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:9048',
         ]);
 
         // Find the record

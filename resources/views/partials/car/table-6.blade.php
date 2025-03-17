@@ -1,8 +1,7 @@
 @push('css')
     <!-- FilePond CSS -->
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
-          rel="stylesheet"/>
+    <link href="{{asset('assets/filepond/filepond.css')}}" rel="stylesheet"/>
+    <link href="{{asset('assets/filepond/filepond-plugin-image-preview.css')}}" rel="stylesheet"/>
 
     <style>
         .existing-images img {
@@ -67,6 +66,11 @@
                                 <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
                             @endforeach
                         </select>
+                        <a href="{{ route('car.edit', $car->id) }}">
+                            <button type="button" class="btn green_btn btn-sm mt-1">
+                                Edit Car
+                            </button>
+                        </a>
                     </div>
                 </td>
                 @endhasanyrole
@@ -331,18 +335,17 @@
     </script>
 
     <!-- FilePond JS -->
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    <script src="{{asset('assets/filepond/filepond.js')}}"></script>
 
     <!-- Plugins for image preview and file type validation -->
-    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.min.js"></script>
+    <script src="{{asset('assets/filepond/filepond-plugin-image-preview.js')}}"></script>
+    <script src="{{asset('assets/filepond/filepond-plugin-file-validate-type.js')}}"></script>
+    <script src="{{asset('assets/filepond/filepond-plugin-file-validate-size.js')}}"></script>
+    <script src="{{asset('assets/filepond/filepond-plugin-file-encode.min.js')}}"></script>
     <script
-            src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.min.js">
+            src="{{asset('assets/filepond/filepond-plugin-image-exif-orientation.min.js')}}">
     </script>
-    <script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>
-
+    <script src="{{asset('assets/filepond/filepond-plugin-image-edit.js')}}"></script>
 
 
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>

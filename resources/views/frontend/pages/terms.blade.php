@@ -1,20 +1,5 @@
 @extends('frontend.layout.app')
 
-@php
-    // Cache initialized in Header component and included in layout
-      $termsStatics=Cache::get('termsStatics'.session()->get('locale'));
-
-                if($termsStatics===null){
-                    $data=[
-                        'Terms and Conditions'=> $tr->translate('Terms and Conditions'),
-                    ];
-
-                    Cache::forever('termsStatics'.session()->get('locale'), $data);
-      $termsStatics=Cache::get('termsStatics'.session()->get('locale'));
-
-                }
-@endphp
-
 
 @section('content')
     <section id="ft-breadcrumb" class="ft-breadcrumb-section position-relative" style="padding: 70px 0px 70px"

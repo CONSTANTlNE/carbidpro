@@ -1,5 +1,5 @@
 @foreach ($cars as $key => $cargroup)
-    <h4 class="mt-2"> GROUP: {{ $cargroup->id }} {{$cargroup->port->name}} -- {{$cargroup->trt}}</h4>
+    <h4 class="mt-2">ID: {{$cargroup->id}} GROUP: {{ $cargroup->id }} {{$cargroup->port->name}} -- {{$cargroup->trt}}</h4>
 
     <div class="table-responsive">
         <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
@@ -30,7 +30,6 @@
                 <tr class="info">
                     <th></th>
                     <th style="width: 20%;"></th>
-                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>

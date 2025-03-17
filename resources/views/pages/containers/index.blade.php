@@ -95,7 +95,7 @@
                                             @if (auth()->user()->hasRole('Finance') && $status->slug == 'loaded-payments')
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"
                                                     class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-                                                    {{ $status->name }}
+                                                    {{ $status->name}}
                                                 </a>
                                             @elseif(!auth()->user()->hasRole('Finance'))
                                                 <a href="{{ route('container.showStatus', $status->slug) }}"

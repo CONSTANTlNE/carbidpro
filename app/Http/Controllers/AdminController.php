@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AdminController extends Controller
 {
 
     public function adminIndex()
     {
+
         $totalCustomers = Customer::where('is_active', 1)->count();
         $totalCars      = Car::where('is_active', 1)->count();
         $totalCarsPaid  = Car::where('amount_due', 0)->count();
@@ -55,7 +57,7 @@ class AdminController extends Controller
             }
         }
 
-         $totalShipping=0;
+        $totalShipping=0;
         $totalInterest=0;
         foreach ($cars as $car) {
             foreach (json_decode($car->balance_accounting) as $cost) {
@@ -366,6 +368,8 @@ class AdminController extends Controller
     public function showInsurance(){
 
         $insurance=Insurance::first();
+
+
 
         return view('frontend.pages.insurance',compact('insurance'));
     }

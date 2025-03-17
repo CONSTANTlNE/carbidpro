@@ -59,9 +59,9 @@
                                     <a href="/contact">{{ $headerStatics['Contact'] }}</a>
                                 </li>
                                 @auth()
-                                    <li>
-                                        <a href="{{route('insurance.show')}}">Insurance</a>
-                                    </li>
+{{--                                    <li>--}}
+{{--                                        <a href="{{route('insurance.show')}}">Insurance</a>--}}
+{{--                                    </li>--}}
                                     <li>
                                         <a href="{{route('calculator.index')}}">{{ $headerStatics['Calculator'] }}</a>
                                     </li>

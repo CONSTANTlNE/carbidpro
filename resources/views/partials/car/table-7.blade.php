@@ -30,7 +30,7 @@
             <th>Pickup & Delivery Dates</th>
             <th>Title</th>
             <th>Photos</th>
-            <th>Payment Info</th>
+            <th style="max-width: 200px">Payment Info</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -67,6 +67,11 @@
                                 <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
                             @endforeach
                         </select>
+                        <a href="{{ route('car.edit', $car->id) }}">
+                            <button type="button" class="btn green_btn btn-sm mt-1">
+                                Edit Car
+                            </button>
+                        </a>
                     </div>
                 </td>
                 @endhasanyrole
@@ -239,7 +244,7 @@
                         </div>
                     </td>
 
-                    <td>
+                    <td style="max-width: 200px">
                         <label for="payment_method">Payment method</label>
                         <select name="payment_method" id="payment_method" class="form-control" required>
                             <option value=""></option>

@@ -29,36 +29,36 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(!app()->isProduction());
         Model::preventAccessingMissingAttributes();
+        Model::unguard();
 
 
         Paginator::defaultView('vendor.pagination.bootstrap-4');
 
-        // Bind the composer to a specific view
-        View::composer(['partials.aside', 'partials.header'], function (BaseView $view) {
-            $startTime = microtime(true);
-            $balancecomposers = CustomerBalance::where('type', 'fill')
-                ->with('customer')
-                ->where('is_approved', 0)->get();
-            $deposits         = $balancecomposers->count();
-
-
-            $newcustomers   = Customer::where('is_active', 0)->get();
-            $customerscount = $newcustomers->count();
-            $archivedCount  = Car::onlyTrashed()->count();
-
-            $endTime = microtime(true);
-            $executionTime = $endTime - $startTime;
-
-//            dd($executionTime);
 
 
 
-            $view
-                ->with('balancecomposers', $balancecomposers)
-                ->with('deposits', $deposits)
-                ->with('newcustomers', $newcustomers)
-                ->with('customerscount', $customerscount)
-                ->with('archivedCount', $archivedCount);
-        });
+
+
+
+        $balancecomposers = CustomerBalance::where('type', 'fill')
+            ->with('customer')
+            ->where('is_approved', 0)->get();
+        $deposits         = $balancecomposers->count();
+
+
+        $newcustomers   = Customer::where('is_active', 0)->get(['id','contact_name']);
+        $customerscount = $newcustomers->count();
+        $archivedCount  = Car::onlyTrashed()->count();
+
+
+        View::share([
+            'balancecomposers' => $balancecomposers,
+            'deposits' => $deposits,
+            'newcustomers' => $newcustomers,
+            'customerscount' => $customerscount,
+            'archivedCount' => $archivedCount,
+        ]);
+
+
     }
 }

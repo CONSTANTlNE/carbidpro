@@ -734,8 +734,9 @@ class CustomerController extends Controller
     public function terms()
     {
         $user = Auth::user();
+        $insurance=Insurance::first();
 
-        return view('frontend.pages.customer.customer_terms', compact('user'));
+        return view('frontend.pages.customer.customer_terms', compact('user','insurance'));
     }
 
 

@@ -87,8 +87,8 @@ class calculatorController extends Controller
             if (empty($total_inside)) {
 //                $difflocation = Location::where('name', trim($request->get('location_name')))->where('id', '!=',
 //                    $locationId)->where('is_active', 1)->first();
-                $difflocation = Location::where('name', trim($request->get('location_name')))->where('id', '==',
-                    $locationId)->where('is_active', 1)->first();
+                $difflocation = Location::where('name', trim($request->get('location_name')))->where('id', '!=', $locationId)->where('is_active', 1)->first();
+
                 $total_inside = ShippingPrice::where('from_location_id', $difflocation?->id)->where('to_port_id',
                     $portId)->whereJsonContains('auction_id', $auctionId)->first();
             }

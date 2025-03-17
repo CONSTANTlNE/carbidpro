@@ -15,6 +15,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class CustomerBalanceController extends Controller
 {
@@ -619,5 +621,19 @@ class CustomerBalanceController extends Controller
         $transferAmount->save();
 
         return back();
+    }
+
+    public function restoreArchived(Request $request){
+
+        $deposit=CustomerBalance::withTrashed()->find($request->id);
+
+
+        if ($deposit) {
+            $deposit->restore();
+            return to_route('customer.balance.index');
+        }
+
+        return back()->with('error','Deposit not found');
+
     }
 }
