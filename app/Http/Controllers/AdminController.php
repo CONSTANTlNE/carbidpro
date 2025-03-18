@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AdminController extends Controller
@@ -194,6 +195,7 @@ class AdminController extends Controller
     {
         $customer      = Customer::find($request->id);
         $extraexpenses = Extraexpence::all();
+//       dd($request->all());
 
 
         $request->validate([
@@ -229,15 +231,21 @@ class AdminController extends Controller
 
         $extraExpenseArray   = [];
         $extraExpenseArray[] = ['name' => '', 'value' => 0, 'date' => '','id' => 0,'forcredit' => 1];
+
         foreach ($extraexpenses as $extraexpense) {
-            if ($request->has($extraexpense->name)) {
+//          if ($extraexpense->id===8){
+//             dd( $request->has(str_replace(' ', '_', $extraexpense->name)));
+//          }
+            if ($request->has(str_replace(' ', '_', $extraexpense->name))) {
                 $request->validate([
-                    $extraexpense->name => 'nullable|numeric',
+
+                    str_replace(' ', '_', $extraexpense->name) => 'nullable|numeric',
+
                 ]);
-                if ($request->input($extraexpense->name) > 0) {
+                if ($request->input( str_replace(' ', '_', $extraexpense->name) ) > 0) {
                     $extraExpenseArray[] = [
                         'name'  => $extraexpense->name,
-                        'value' => $request->input($extraexpense->name),
+                        'value' => $request->input(str_replace(' ', '_', $extraexpense->name)),
                     ];
                 }
             }

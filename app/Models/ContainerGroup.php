@@ -24,4 +24,8 @@ class ContainerGroup extends Model  implements HasMedia
 
     }
 
+    public function line(){
+        return $this->belongsTo(ShippingLine::class, 'shipping_line_id');
+    }
+
 }

@@ -40,9 +40,6 @@ class TitleController extends Controller
 
         $title=Title::find($request->id);
 
-        if(!$title){
-            return back()->with('error', 'Title not found');
-        }
         if ($title->is_active==1) {
             $title->is_active=0;
             $title->save();

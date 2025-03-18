@@ -244,6 +244,7 @@
                                 <table class="table table-bordered table-striped table-hover">
                                     <thead class="back_table_color">
                                     <tr class="info text-center">
+                                        <th>ID</th>
                                         <th>Company Name</th>
                                         <th>Contact Person</th>
                                         <th>Amount Due</th>
@@ -264,6 +265,7 @@
                                     <tbody>
                                     @foreach($customers as $index=> $customer)
                                         <tr class="text-center">
+                                            <td>{{$customer->id}}</td>
                                             <td>{{$customer->company_name}}</td>
                                             <td>{{$customer->contact_name}}</td>
                                             <td>

@@ -11,9 +11,15 @@
 
         <style>
             .ts-wrapper {
-                max-width: 250px;
+                max-width: 295px;
                 padding: 0;
             }
+
+            [data-selectable] {
+                font-weight: bold;
+                font-size: 14px;
+            }
+
         </style>
     @endpush
 
@@ -93,12 +99,13 @@
                                                 <div class="form-group">
                                                     <label>Dealer</label>
                                                     <select
+                                                            class="form-control"
                                                             hx-get="{{route('htmx.get.extraexpense')}}"
                                                             hx-target="#extraexpense"
                                                             autocomplete="nope"
                                                             name="customer_id"
-                                                            class="form-control"
-                                                            id="customerTomSelect" required>
+                                                            id="customerTomSelect"
+                                                            required>
                                                         <option value=""></option>
                                                         @foreach ($customers as $customer)
                                                             <option value="{{ $customer->id }}"
@@ -678,14 +685,14 @@
 
                 $(function () {
                     var availableWarehouse = [
-                        // 'TRT - New Jersey',
-                        // 'TRT - TX Texas',
-                        // 'TRT - CA California',
-                        // 'TRT - GA Georgia',
-                        'TRT - GA 31326',
-                        'TRT - CA 90248',
-                        'TRT - NJ 07114',
-                        'TRT - TX 77571'
+                        // 'TRT - GA 31326',
+                        // 'TRT - CA 90248',
+                        // 'TRT - NJ 07114',
+                        // 'TRT - TX 77571',
+                        '250 Port Street,Newark,NJ 07114-TRT',
+                        '501 N 16th St,La Porte,TX 77571-TRT',
+                        '142 Commerce Ct,Rincon,GA 31326-TRT',
+                        '340 W Compton Blvd,Gardena,CA 90248-TRT'
                     ];
 
                     $("#warehouse").autocomplete({
@@ -769,8 +776,12 @@
                                     // Event listener for from_state change
                                     $('#fromState').change(function () {
                                         var fromStateId = $(this).val();
-                                        fetchPortsForEdit(fromStateId,
-                                            null); // Fetch ports but no preselected value on change
+
+                                        setTimeout(() => {
+                                            fetchPortsForEdit(fromStateId,
+                                                null); // Fetch ports but no preselected value on change
+                                        }, 100)
+
                                     });
                                 },
                                 error: function (error) {
@@ -862,6 +873,7 @@
                         var fromStateId = $(this).val(); // Get the selected from_state ID
                         console.log(fromStateId)
                         console.log($('#fromState option:selected').text())
+
                         if (fromStateId) {
                             // Send AJAX request to get to_port_ids based on from_state_id
                             $.ajax({
@@ -876,13 +888,14 @@
                                 success: function (response) {
                                     // Populate the to_port_id dropdown with the received ports
                                     $('#to_port_id').empty(); // Clear the existing options
-                                    $.each(response.ports, function (key, port) {
-                                        console.log(key, port)
-                                        $('#to_port_id').append(`<option value="${key}">${port}</option>`);
-                                    });
-                                    $('#to_port_id').append('<option value selected="">Select an option</option>');
 
-
+                                    setTimeout( () => {
+                                        $.each(response.ports, function (key, port) {
+                                            console.log(key, port)
+                                            $('#to_port_id').append(`<option value="${key}">${port}</option>`);
+                                        });
+                                        $('#to_port_id').append('<option value selected="">Select an option</option>');
+                                    }, 100)
                                 },
                                 error: function (error) {
                                     console.log('Error fetching ports:', error);

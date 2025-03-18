@@ -392,6 +392,11 @@
                                                                                       action="{{route('customer.balance.delete')}}"
                                                                                       method="post">
                                                                                     @csrf
+                                                                                    @if(request()->query('archived'))
+                                                                                        <input type="hidden"
+                                                                                               name="archived"
+                                                                                               value="1">
+                                                                                    @endif
                                                                                     <input type="hidden" name="id"
                                                                                            value="{{$prequest->id}}">
                                                                                     <fieldset>
@@ -419,11 +424,12 @@
 
                                                         {{-- restore softdeleted --}}
                                                         @if(request()->query('archived'))
-                                                            <form action="{{route('deposit.archived.restore')}}" style="display: inline" method="post">
+                                                            <form action="{{route('deposit.archived.restore')}}"
+                                                                  style="display: inline" method="post">
                                                                 @csrf
                                                                 <input type="hidden" name="id"
                                                                        value="{{$prequest->id}}">
-                                                                <button  class="btn btn-warning btn-sm">
+                                                                <button class="btn btn-warning btn-sm">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="17"
                                                                          height="17" viewBox="0 0 512 512">
                                                                         <path fill="#f0e3e3" fill-rule="evenodd"

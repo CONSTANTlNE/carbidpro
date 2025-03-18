@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shipping_lines', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('container_groups', function (Blueprint $table) {
+            $table->foreignId('shipping_line_id')->constrained();
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shipping_lines');
+        Schema::table('container_groups', function (Blueprint $table) {
+            //
+        });
     }
 };

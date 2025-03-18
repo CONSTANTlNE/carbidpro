@@ -10,6 +10,7 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\PortEmail;
+use App\Models\ShippingLine;
 use App\Services\smsService;
 use Carbon\Carbon;
 
@@ -31,9 +32,10 @@ class ContainerController extends Controller
             'dispatch', 'customer', 'state', 'CarStatus', 'auction', 'loadType',
         ])->paginate(50); // Keep eager loading for relationships
         $container_status = ContainerStatus::withCount('cars')->get();
+        $shipping_lines=ShippingLine::where('is_active',1)->get();
 
 
-        return view('pages.containers.index', compact('cars', 'container_status'));
+        return view('pages.containers.index', compact('cars', 'container_status', 'shipping_lines'));
     }
 
     public function showStatus($slug, Request $request)
@@ -48,6 +50,8 @@ class ContainerController extends Controller
             ])->get();
         }
 
+
+        $shipping_lines=ShippingLine::where('is_active',1)->get();
 
         $groups  = '';
         $cars    = '';
@@ -179,6 +183,7 @@ class ContainerController extends Controller
                 'pendingCount',
                 'loadingCount',
                 'groups2',
+                'shipping_lines'
             ),
         );
     }
@@ -369,8 +374,9 @@ class ContainerController extends Controller
             $container->thc_cost = $request->thc_cost;
         }
 
-        if ($request->has('thc_agent')) {
-            $container->thc_agent = $request->thc_agent;
+        if ($request->has('shipping_line_id')) {
+//            $container->thc_agent = $request->thc_agent;
+            $container->shipping_line_id= $request->shipping_line_id;
         }
 
         if ($request->has('is_green')) {
@@ -411,6 +417,7 @@ class ContainerController extends Controller
     }
 
     public function replaceCar(Request $request)
+
     {
         // Validate the request
         $request->validate([

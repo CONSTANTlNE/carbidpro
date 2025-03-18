@@ -83,7 +83,7 @@
                                                     </a>
                                                 @endif
                                             @endif
-                                            <a href="{{ route('customer.terms') }}" class="dropdown-item">My Terms</a>
+                                            <a href="{{ route('customer.terms') }}" class="dropdown-item">My Info</a>
 
                                             <div class="dropdown-divider"></div>
                                             <a href="{{ route('customer.logout') }}"
@@ -157,18 +157,20 @@
                                                 @if (auth('customer')->user() && !auth('customer')->user()->hasRole('portmanager'))
                                                     @if (session()->get('auth')->child_of <= 0)
                                                         <a href="{{ route('customer.teamList') }}"
-                                                           class="dropdown-item">Add
-                                                            Team</a>
+                                                           class="dropdown-item">
+                                                            Add Team
+                                                        </a>
                                                     @endif
                                                 @endif
-
+                                                <a href="{{ route('customer.terms') }}" class="dropdown-item">
+                                                    My Info
+                                                </a>
                                                 <div class="dropdown-divider"></div>
                                                 <a href="{{ route('customer.logout') }}"
                                                    class="dropdown-item">{{ $headerStatics['Logout'] }}</a>
                                             </div>
                                         @else
-                                            <a
-                                                    href="{{ route('customer.login.get') }}">{{$headerStatics['Login'] }}</a>
+                                            <a  href="{{ route('customer.login.get') }}">{{$headerStatics['Login'] }}</a>
                                         @endif
                                     </li>
 

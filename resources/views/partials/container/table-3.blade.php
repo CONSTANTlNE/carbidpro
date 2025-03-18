@@ -117,11 +117,15 @@
                                 </svg>
                             </a>
                         @endif
-
                     </th>
                     <th>
-                        <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
-                               name="thc_agent" class="thc_agent" id="thc_agent">
+                        <select class="form-control" name="shipping_line_id" required>
+                            <option value="">THC AGENT</option>
+                            @foreach($shipping_lines as $line)
+                                <option @selected($cargroup->shipping_line_id === $line->id) value="{{$line->id}}"> {{$line->name}}</option>
+                            @endforeach
+                        </select>
+
 
                         <label for="thc_cost">THC Cost</label>
 

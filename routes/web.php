@@ -110,7 +110,9 @@ Route::prefix('dealer')->group(function () {
 });
 
 
+
 // =======  ADMIN ROUTES  ========
+
 Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function () {
 
 
@@ -366,6 +368,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         route::post('shippinglines/create','create')->name('shippingline.create');
         route::post('shippinglines/update','update')->name('shippingline.update');
         route::post('shippinglines/delete','delete')->name('shippingline.delete');
+        route::post('shippinglines/activate','activate')->name('shippingline.activate');
     });
 
     //    ======= Website Management Routes =======
@@ -572,6 +575,7 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
 // ====  Dealer dashboard  ROUTES  ====
 
 Route::get('/car-info/{vin?}', [CustomerController::class,'showCar'])->name('customer.car-info');
+// Gues user can track container without authorization
 Route::get('/container/tracking', [CustomerController::class,'trackContainer'])->name('guest.track.container');
 
 Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
@@ -587,6 +591,7 @@ Route::prefix('dealer')->middleware(['auth:customer'])->group(function () {
         Route::get('/main', 'showDashboard')->name('customer.dashboard');
 
         Route::get('/myterms', 'terms')->name('customer.terms');
+        Route::get('/insurance', 'insurance')->name('customer.insurance');
 
         Route::get('/archived-cars', 'showDashboard')->name('customer.archivedcars');
 

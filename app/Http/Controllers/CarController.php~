@@ -113,7 +113,7 @@ class CarController extends Controller
                     ->orWhereHas('dispatch', function ($q) use ($searchTerm) {
                         $q->where('name', 'LIKE', "%{$searchTerm}%");
                     })
-                    ->orWhereHas('groups', function ($q) use ($searchTerm) {
+                    ->orWhereHas('group', function ($q) use ($searchTerm) {
                         $q->where('container_id', 'LIKE', "%{$searchTerm}%");
                     })
                     ->orWhere('vin', 'LIKE', "%{$searchTerm}%")

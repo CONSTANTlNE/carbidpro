@@ -50,14 +50,12 @@
                         <td>@include('partials.car.table_content-parts.field-from')</td>
 
                         <td>
-                            <input id="internal_shipping" type="number" class="form-control" name="internal_shipping"
+                            <input id="internal_shipping" type="number" value="{{$car->internal_shipping}}" class="form-control" name="internal_shipping"
                                 required pattern=".*\S.*" title="This field cannot be empty or contain only spaces" >
                         </td>
 
                         <td>{{ $car->title }}</td>
-                        <td>
-
-                        </td>
+                        <td> </td>
                         <td>
                             <button type="submit" class="btn btn-success btn-sm"
                                 {{ $car->is_dispatch == 'no' ? 'disabled' : '' }}>

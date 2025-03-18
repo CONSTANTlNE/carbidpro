@@ -177,6 +177,7 @@
                 <form action="{{ route('guest.track.container') }}" method="GET">
 
                     <div class="booking-form-input-wrapper d-flex flex-wrap justify-content-center">
+
                         <label class="booking-form-input position-relative">
                             <span class="booking-form-icon">
 {{--                                <i class="flaticon-face-detection"></i>--}}

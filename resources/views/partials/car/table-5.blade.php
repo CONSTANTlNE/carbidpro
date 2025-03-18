@@ -238,7 +238,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </td>
 
                     <td>
@@ -271,7 +270,8 @@
                                     event.preventDefault();
                                     alert('Please upload BOL Images')
                                   "
-                                @endif >
+                                @endif
+                        >
                                 Next
                         </button>
 

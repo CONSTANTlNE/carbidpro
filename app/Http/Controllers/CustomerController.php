@@ -377,7 +377,7 @@ class CustomerController extends Controller
 
         if (route('customer.archivedcars') == url()->current()) {
             $cars = Car::with([
-                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups', 'media',
+                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups.line', 'media',
                 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
                 },
@@ -390,7 +390,7 @@ class CustomerController extends Controller
                 ->withQueryString();
         } elseif (auth()->user()->hasRole('portmanager')) {
             $cars = Car::with([
-                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups', 'media',
+                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups.line', 'media',
                 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
                 },
@@ -400,7 +400,7 @@ class CustomerController extends Controller
                 ->withQueryString();
         } else {
             $cars = Car::with([
-                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups', 'media',
+                'state', 'toPort', 'payments', 'latestCredit', 'firstCredit', 'groups.line', 'media',
                 'credit' => function ($query) {
                     $query->orderBy('issue_or_payment_date', 'asc');
                 },
@@ -719,13 +719,15 @@ class CustomerController extends Controller
             return back()->with('container_error', 'Container not found');
         }
 
-        $url = match ($container->thc_agent) {
-            'MAERSK' => 'https://www.maersk.com/tracking/'.$container->container_id,
-            'Hapag-Eisa' => 'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container='.$container->container_id,
-            'COSCO' => 'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number='.$container->container_id,
-            'Turkon-DTS' => 'https://my.turkon.com/container-tracking',
-            'One net-Wilhelmsen' => 'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking',
-        };
+//        $url = match ($container->thc_agent) {
+//            'MAERSK' => 'https://www.maersk.com/tracking/'.$container->container_id,
+//            'Hapag-Eisa' => 'https://www.hapag-lloyd.com/en/online-business/track/track-by-container-solution.html?container='.$container->container_id,
+//            'COSCO' => 'https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number='.$container->container_id,
+//            'Turkon-DTS' => 'https://my.turkon.com/container-tracking',
+//            'One net-Wilhelmsen' => 'https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking',
+//        };
+
+        $url= $container->line->tracking_url.'/'.$container->container_id;
 
 
         return redirect($url);
@@ -736,7 +738,15 @@ class CustomerController extends Controller
         $user = Auth::user();
         $insurance=Insurance::first();
 
-        return view('frontend.pages.customer.customer_terms', compact('user','insurance'));
+        return view('frontend.pages.customer.customer_info', compact('user','insurance'));
+    }
+
+    public function Insurance()
+    {
+
+        $insurance=Insurance::first();
+
+        return view('frontend.pages.customer.insurance', compact('insurance'));
     }
 
 

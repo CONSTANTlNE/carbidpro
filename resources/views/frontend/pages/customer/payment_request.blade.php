@@ -193,7 +193,7 @@
                                         </li>
                                     </ul>
                                 </td>
-                                @if (session()->get('auth')->parent_of <= 0)
+                                @if (session()->get('auth')->child_of <= 0)
                                     <td>
                                         ${{ $car->debit }}
                                     </td>

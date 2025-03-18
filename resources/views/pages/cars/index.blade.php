@@ -68,7 +68,7 @@
                                                 </a>
                                                 <a href="{{ route('cars.index') }}" class="btn btn-primary">
                                                     <i class="fa fa-automobile"></i>
-                                                    Current Cars
+                                                    Current Cars {{$totalCars}}
                                                 </a>
                                                 @endhasanyrole
 
@@ -246,18 +246,16 @@
     </div>
 
     <script>
-        function copyToClipboard(element) {
+        function customCopy(element) {
             // Get the text inside the clicked element
             var text = element.innerText || element.textContent;
             element.style.color = "green";
-            element.style.fontWeight = "bolder";
             // Copy text to clipboard
             navigator.clipboard.writeText(text)
 
             setTimeout(() => {
                 element.style.color = "black";
-                element.style.fontWeight = "normal";
-            }, 1000);
+            }, 300);
         }
     </script>
 @endsection

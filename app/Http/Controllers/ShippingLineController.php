@@ -18,10 +18,13 @@ class ShippingLineController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
+            'tracking_url'=>'nullable|string',
+
         ]);
 
         ShippingLine::create([
             'name' => $request->name,
+            'tracking_url' => $request->tracking_url,
         ]);
 
 
@@ -34,10 +37,12 @@ class ShippingLineController extends Controller
 
         $request->validate([
             'name' => 'required|max:255',
+            'tracking_url'=>'nullable|string',
         ]);
 
         if ($line) {
             $line->name = $request->name;
+            $line->tracking_url = $request->tracking_url;
             $line->save();
 
             return back();
@@ -56,5 +61,25 @@ class ShippingLineController extends Controller
             return back();
         }
         return back()->with('error', 'Line not found');
+    }
+
+
+    public function activate(Request $request){
+
+        $line=ShippingLine::find($request->id);
+
+        if(!$line){
+            return back()->with('error', 'Title not found');
+        }
+
+        if ($line->is_active==1) {
+            $line->is_active=0;
+            $line->save();
+        } else {
+            $line->is_active=1;
+            $line->save();
+        }
+
+        return back();
     }
 }

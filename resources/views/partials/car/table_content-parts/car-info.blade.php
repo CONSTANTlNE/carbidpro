@@ -1,35 +1,35 @@
 <div>
-    <strong>VIN:<span>{{ $car->vin }}</span></strong>
-    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+    <strong>VIN:<span style="cursor: pointer;"  onclick="customCopy(this)">{{ $car->vin }}</span></strong>
+{{--    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
 </div>
 <div>
-    <strong>Model:<span>{{ $car->make_model_year }}</span></strong>
-    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+    <strong>Model:<span style="cursor: pointer;"  onclick="customCopy(this)">{{ $car->make_model_year }}</span></strong>
+{{--    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
 </div>
 @if(request()->routeIs('car.showStatus'))
     <div>
-        <strong>LOT:<span>{{ $car->lot }}</span></strong>
-        <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+        <strong>LOT:<span style="cursor: pointer;"  onclick="customCopy(this)">{{ $car->lot }}</span></strong>
+{{--        <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
     </div>
 @endif
 <div>
     <strong>{{ !empty($car->Auction) ?  $car->Auction->name  : 'Gate/Iaai'}}
-        :<span>{{ $car->gate_or_member }}</span></strong>
-    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+        :<span style="cursor: pointer;"  onclick="customCopy(this)">{{ $car->gate_or_member }}</span></strong>
+{{--    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
 </div>
 
 
 @if(!request()->routeIs('car.showStatus') )
 <div>
-    <strong>Owner:<span>{{ !empty($car->vehicle_owner_name) ? $car->vehicle_owner_name .' ' . $car->owner_id_number : 'N/A' }}</span></strong>
-    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+    <strong>Owner:<span style="cursor: pointer;"  onclick="customCopy(this)">{{ !empty($car->vehicle_owner_name) ? $car->vehicle_owner_name .' ' . $car->owner_id_number : 'N/A' }}</span></strong>
+{{--    <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
 </div>
 @endif
 @if(request()->routeIs('car.showStatus') || request()->routeIs('container.showStatus') )
 
     <div>
-        <strong>Dealer:<span>{{ $car->customer->contact_name }}</span></strong>
-        <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">
+        <strong>Dealer:<span style="cursor: pointer;"  onclick="customCopy(this)">{{ $car->customer->contact_name }}</span></strong>
+{{--        <img src="/assets/dist/img/copy.svg" alt="copy" class="copy">--}}
     </div>
 @endif
 

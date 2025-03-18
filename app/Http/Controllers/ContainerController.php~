@@ -10,6 +10,7 @@ use App\Models\LoadType;
 use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\PortEmail;
+use App\Models\ShippingLine;
 use App\Services\smsService;
 use Carbon\Carbon;
 
@@ -27,20 +28,18 @@ class ContainerController extends Controller
      */
     public function index()
     {
-
         $cars             = Car::with(relations: [
             'dispatch', 'customer', 'state', 'CarStatus', 'auction', 'loadType',
         ])->paginate(50); // Keep eager loading for relationships
         $container_status = ContainerStatus::withCount('cars')->get();
+        $shipping_lines=ShippingLine::all();
 
 
-        return view('pages.containers.index', compact('cars', 'container_status'));
+        return view('pages.containers.index', compact('cars', 'container_status', 'shipping_lines'));
     }
 
     public function showStatus($slug, Request $request)
     {
-
-
         if (auth()->user()->hasRole('Admin')) {
             $container_status = ContainerStatus::withCount('cars')->get();
         } else {
@@ -52,14 +51,15 @@ class ContainerController extends Controller
         }
 
 
-        $groups = '';
-        $cars   = '';
-        $groups2='';
+        $shipping_lines=ShippingLine::all();
+
+        $groups  = '';
+        $cars    = '';
+        $groups2 = '';
 
 //  CONTAINER STATUS IS CHANGED ON CARS and thetn ContainerGroup is filtered according to cars which have cotainer_status
         if ($slug == 'for-load') {
-
-            $groups2 = ContainerGroup::with('cars','port')
+            $groups2 = ContainerGroup::with('cars', 'port')
                 ->whereHas('cars', function ($query) {
                     $query->where('container_status_id', 2); // Filter cars where container_status is 2
                 })->get();
@@ -182,7 +182,8 @@ class ContainerController extends Controller
                 'forLoadCount',
                 'pendingCount',
                 'loadingCount',
-                'groups2'
+                'groups2',
+                'shipping_lines'
             ),
         );
     }
@@ -373,8 +374,9 @@ class ContainerController extends Controller
             $container->thc_cost = $request->thc_cost;
         }
 
-        if ($request->has('thc_agent')) {
-            $container->thc_agent = $request->thc_agent;
+        if ($request->has('shipping_line_id')) {
+//            $container->thc_agent = $request->thc_agent;
+            $container->shipping_line_id= $request->shipping_line_id;
         }
 
         if ($request->has('is_green')) {
@@ -415,6 +417,7 @@ class ContainerController extends Controller
     }
 
     public function replaceCar(Request $request)
+
     {
         // Validate the request
         $request->validate([
@@ -446,7 +449,7 @@ class ContainerController extends Controller
     public function addCarToGroup(Request $request)
     {
         // Fetch the original car
-        $containerGroup           = ContainerGroup::findOrFail($request->cargroup_id);
+        $containerGroup = ContainerGroup::findOrFail($request->cargroup_id);
 
         $key                      = $request->key;
         $carid                    = $request->input('car_id'.$key);
@@ -479,15 +482,22 @@ class ContainerController extends Controller
 
     public function removeFromList(Request $request)
     {
-        // Fetch the original car
         $originalCar = ContainerGroup::findOrFail($request->cargroup_id);
         $car         = Car::where('id', $request->carId)->first();
-        // Detach the old car from the group
+
+// Detach the old car from the group
         $originalCar->cars()->detach($car->id);
+
+// Update car and container status
         $car->container_status_id   = 1;
         $originalCar->is_email_sent = 0;
         $originalCar->save();
         $car->save();
+
+// Check if the group has no more cars and delete it if empty
+        if ($originalCar->cars()->count() === 0) {
+            $originalCar->delete();
+        }
 
 
         return response()->json(['message' => 'Car Removed From List']);
@@ -540,15 +550,15 @@ class ContainerController extends Controller
         $owner = true;
         foreach ($cars as $car) {
             if ($car->vehicle_owner_name === null) {
-                $owner=false;
+                $owner = false;
                 break;
             }
         }
 //dd($owner);
         // there might be several , but this updates 1
-        $container                  = ContainerGroup::findOrFail($request->cargroup_id);
-        $con      = ContainerGroup::where('id', $request->cargroup_id)->first();
-        $getEmail = PortEmail::where('port_id', $con->to_port_id)->first();
+        $container = ContainerGroup::findOrFail($request->cargroup_id);
+        $con       = ContainerGroup::where('id', $request->cargroup_id)->first();
+        $getEmail  = PortEmail::where('port_id', $con->to_port_id)->first();
         if ($owner) {
             $container->is_email_sent   = 1;
             $container->email_sent_date = Carbon::now();
@@ -557,7 +567,7 @@ class ContainerController extends Controller
         }
 
         // Return a response for AJAX
-        return view('pages.htmx.htmxSendEmailContainers', compact('container','owner'));
+        return view('pages.htmx.htmxSendEmailContainers', compact('container', 'owner'));
     }
 
     public function htmxSelectCar(Request $request)

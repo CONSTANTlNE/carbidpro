@@ -228,12 +228,13 @@ $creditService = new CreditService();
                                         <div style="cursor: pointer"
                                              class="  d-flex align-items-start justify-content-center"
                                              onclick="
-                                                    tglbtn= document.getElementById('release_to_{{ $car->id }}');
-                                                    if(tglbtn.style.display == 'none'){
-                                                        tglbtn.style.display = 'block';
-                                                    }else{
-                                                        tglbtn.style.display = 'none';
-                                                    } ">
+                                    tglbtn= document.getElementById('release_to_{{ $car->id }}');
+                                    if(tglbtn.style.display == 'none'){
+                                        tglbtn.style.display = 'block';
+                                    }else{
+                                        tglbtn.style.display = 'none';
+                                    }
+                                    ">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                  viewBox="0 0 24 24">
                                                 <g fill="none" stroke="#1c9b2e" stroke-linecap="round"

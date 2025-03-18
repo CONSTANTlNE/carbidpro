@@ -62,8 +62,16 @@
                                id="arrival_time" {{ $cargroup->arrival_time ? '' : 'required' }}>
                     </th>
                     <th style="width: 10%;">
-                        <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"
-                               name="thc_agent" class="form-control thc_agent" id="thc_agent" required>
+{{--                        <input type="text" placeholder="Shipping Line" value="{{ $cargroup->thc_agent }}"--}}
+{{--                               name="thc_agent" class="form-control thc_agent" id="thc_agent" required>--}}
+
+                        <select class="form-control" name="shipping_line_id" required>
+                            <option value="">THC AGENT</option>
+                            @foreach($shipping_lines as $line)
+                                <option value="{{$line->id}}"> {{$line->name}}</option>
+                            @endforeach
+                        </select>
+
                         <br>
                         <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                class="form-control" name="container_cost" id="container_cost" required>
@@ -299,21 +307,21 @@
             ];
 
             // Initialize jQuery UI autocomplete
-            function initializeAutocomplete() {
-                $(".thc_agent").autocomplete({
-                    source: suggestedWords,
-                    minLength: 0,
-                    select: function (event, ui) {
-                        let selectedWord = ui.item.value; // Get the selected word
-                        $(this).closest('td').find('input[name="cost"]').val('');
-                    }
-                }).focus(function () {
-                    // Force the dropdown to show when the input gains focus
-                    $(this).autocomplete("search", "");
-                });
-            }
-
-            initializeAutocomplete();
+            // function initializeAutocomplete() {
+            //     $(".thc_agent").autocomplete({
+            //         source: suggestedWords,
+            //         minLength: 0,
+            //         select: function (event, ui) {
+            //             let selectedWord = ui.item.value; // Get the selected word
+            //             $(this).closest('td').find('input[name="cost"]').val('');
+            //         }
+            //     }).focus(function () {
+            //         // Force the dropdown to show when the input gains focus
+            //         $(this).autocomplete("search", "");
+            //     });
+            // }
+            //
+            // initializeAutocomplete();
 
 
             $('.removefromlist').on('click', function () {

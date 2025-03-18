@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
             ->with('customer')
             ->where('is_approved', 0)->get();
         $deposits         = $balancecomposers->count();
-        $totalCars = Car::count();
+
 
         $newcustomers   = Customer::where('is_active', 0)->get(['id','contact_name']);
         $customerscount = $newcustomers->count();
@@ -57,7 +57,6 @@ class AppServiceProvider extends ServiceProvider
             'newcustomers' => $newcustomers,
             'customerscount' => $customerscount,
             'archivedCount' => $archivedCount,
-            'totalCars' => $totalCars
         ]);
 
 
