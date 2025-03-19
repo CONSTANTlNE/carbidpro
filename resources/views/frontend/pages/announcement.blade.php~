@@ -9,7 +9,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="accordion" id="accordionExample">
-
+                            
                             @foreach (Cache::get('translatedAnnouncements'.Session::get('locale')) as $key => $announcement)
 
                                 <div class="accordion-item headline pera-content">

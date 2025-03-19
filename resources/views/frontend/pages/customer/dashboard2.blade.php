@@ -211,7 +211,7 @@ $creditService = new CreditService();
                                             @if($car->groups->first()?->container_id )
                                                 <span style="color: black">CONTAINER :</span>
                                                 <a style="color: #1a7fca;font-size: 15px; " target="_blank"
-                                                       href="{{$car->groups->first()->line->tracking_url . $car->groups->first()?->container_id}}" >
+                                                       href="{{$car->groups->first()->line?->tracking_url . $car->groups->first()?->container_id}}" >
                                                     {{$car->groups->first()->container_id}}
                                                 </a>
                                                 <span style="cursor: pointer;" class="p-cursor"

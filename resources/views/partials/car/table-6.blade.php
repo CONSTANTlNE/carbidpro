@@ -341,11 +341,11 @@
     <script src="{{asset('assets/filepond/filepond-plugin-image-preview.js')}}"></script>
     <script src="{{asset('assets/filepond/filepond-plugin-file-validate-type.js')}}"></script>
     <script src="{{asset('assets/filepond/filepond-plugin-file-validate-size.js')}}"></script>
-    <script src="{{asset('assets/filepond/filepond-plugin-file-encode.min.js')}}"></script>
-    <script
-            src="{{asset('assets/filepond/filepond-plugin-image-exif-orientation.min.js')}}">
+    <script src="{{asset('assets/filepond/filepond-plugin-file-encode.js')}}"></script>
+    <script src="{{asset('assets/filepond/filepond-plugin-image-exif-orientation.js')}}">
     </script>
     <script src="{{asset('assets/filepond/filepond-plugin-image-edit.js')}}"></script>
+
 
 
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>

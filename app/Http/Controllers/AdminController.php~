@@ -79,7 +79,6 @@ class AdminController extends Controller
 
 
 
-
        // Total Issued Credit
         $credits = DB::table('credits as c1')
             ->join(DB::raw('(SELECT car_id, MIN(issue_or_payment_date) as first_date 

@@ -18,8 +18,6 @@ class AnnouncementsController extends Controller
             return view('pages.sitesSettings.announcements', compact('announcements'));
         }
 
-
-
         $announcements = Announcement::all();
 
         return view('pages.sitesSettings.announcements', compact('announcements'));
@@ -95,10 +93,12 @@ class AnnouncementsController extends Controller
     }
 
     public function delete(Request $request) {
+
         $announcement = Announcement::find($request->id);
         $announcement->delete();
         Cache::forget('translatedAnnouncementsru');
         Cache::forget('translatedAnnouncementsen');
+
         return back();
     }
 }

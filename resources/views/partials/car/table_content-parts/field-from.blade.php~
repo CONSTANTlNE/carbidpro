@@ -1,0 +1,33 @@
+<span style="cursor: pointer" onclick="customCopy(this)">
+{{ !empty($car->state) ? $car->state->name : '' }}
+</span>
+<br>
+<div style="max-width: 240px" class="mb-1">
+    <strong>ZIP:</strong>
+    <p style="cursor: pointer;word-break: normal"
+       onclick="customCopy(this)">
+        {{ $car->zip_code }}
+    </p>
+</div>
+<div style="max-width: 240px" class="mb-1">
+    <strong>WAREHOUSE:</strong>
+    <p style="cursor: pointer;word-break: normal"
+       onclick="customCopy(this)">
+        {{ $car->warehouse }}
+    </p>
+
+</div>
+@if(request()->routeIs('cars.index') || (request()->routeIs('car.showStatus') && request()->route('slug') === 'dispatched'))
+    <div style="max-width: 240px" class="mb-1">
+        <strong>Container:</strong>
+        @if($car->groups->isNotEmpty())
+            <br>
+            <p style="cursor: pointer;word-break: normal"
+               onclick="customCopy(this)">
+                {{ $car->groups[0]->container_id ?: 'N/A'}}
+            </p>
+            {{--    <br>--}}
+            {{--    Not Grouped Yet--}}
+        @endif
+    </div>
+@endif
