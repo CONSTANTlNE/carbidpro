@@ -277,10 +277,16 @@
 
                                                     <div class="col-md-2">
                                                         <label for="warehouse">Warehouse</label>
-                                                        <input autocomplete="nope" type="text"
-                                                               value="{{ old('warehouse') }}"
-                                                               class="form-control" name="warehouse" id="warehouse"
-                                                               required>
+{{--                                                        <input autocomplete="nope" type="text"--}}
+{{--                                                               value="{{ old('warehouse') }}"--}}
+{{--                                                               class="form-control" name="warehouse" id="warehouse"--}}
+{{--                                                               required>--}}
+                                                        <select style="width: 273px!important" name="warehouse" class="form-control" style="width: min-content" required>
+                                                            <option value="">Select Warehouse</option>
+                                                            @foreach($warehouses as $warehouse)
+                                                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
 
                                                 </div>
@@ -300,6 +306,15 @@
 
                                                 <!-- Display the total of values -->
                                                 <p>Total Value: <span x-text="calculateTotal()"></span></p>
+                                            </div>
+
+                                            <div id="shippingwithoutextra" style="color:blue;display: none" class="row repeater-item mt-2 align-items-center">
+                                                <div class="col-md-2 col-6"  >
+                                                    <input  style="color:blue" disabled  class=" form-control"  value="Without Extra ">
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <input style="color:blue" id="originalshipping" type="number" class="form-control" value="" disabled>
+                                                </div>
                                             </div>
 
                                             <!-- Repeater Fields in One Row -->
@@ -477,7 +492,7 @@
 
                                             <div class="col-md-4">
                                                 <label>CAR Status</label>
-                                                <select name="status" class="form-control" id="customer_id">
+                                                <select name="status" class="form-control" >
                                                     @foreach ($car_status as $status)
                                                         <option @selected($status->name=='For Dispatch') value="{{ $status->id }}">
                                                             {{ $status->name }}
@@ -683,29 +698,29 @@
                     'Credit',
                 ];
 
-                $(function () {
-                    var availableWarehouse = [
-                        // 'TRT - GA 31326',
-                        // 'TRT - CA 90248',
-                        // 'TRT - NJ 07114',
-                        // 'TRT - TX 77571',
-                        '250 Port Street,Newark,NJ 07114-TRT',
-                        '501 N 16th St,La Porte,TX 77571-TRT',
-                        '142 Commerce Ct,Rincon,GA 31326-TRT',
-                        '340 W Compton Blvd,Gardena,CA 90248-TRT'
-                    ];
-
-                    $("#warehouse").autocomplete({
-                        source: availableWarehouse,
-                        minLength: 0 // Set to 0 to show suggestions immediately
-                    });
-
-                    // Trigger the autocomplete suggestions on input focus (click)
-                    $("#warehouse").on('focus', function () {
-                        $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus
-                    });
-
-                });
+                // $(function () {
+                //     var availableWarehouse = [
+                //         // 'TRT - GA 31326',
+                //         // 'TRT - CA 90248',
+                //         // 'TRT - NJ 07114',
+                //         // 'TRT - TX 77571',
+                //         '250 Port Street,Newark,NJ 07114-TRT',
+                //         '501 N 16th St,La Porte,TX 77571-TRT',
+                //         '142 Commerce Ct,Rincon,GA 31326-TRT',
+                //         '340 W Compton Blvd,Gardena,CA 90248-TRT'
+                //     ];
+                //
+                //     $("#warehouse").autocomplete({
+                //         source: availableWarehouse,
+                //         minLength: 0 // Set to 0 to show suggestions immediately
+                //     });
+                //
+                //     // Trigger the autocomplete suggestions on input focus (click)
+                //     $("#warehouse").on('focus', function () {
+                //         $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus
+                //     });
+                //
+                // });
 
                 // Initialize jQuery UI autocomplete
                 function initializeAutocomplete() {
@@ -767,6 +782,8 @@
                                             `<option value="${key}" ${selected}>${state}</option>`);
                                     });
 
+
+
                                     // Trigger fetchPortsForEdit if from_state is preloaded
                                     if (savedFromState) {
                                         fetchPortsForEdit(savedFromState,
@@ -774,17 +791,20 @@
                                     }
 
                                     // Event listener for from_state change
-                                    $('#fromState').change(function () {
-                                        var fromStateId = $(this).val();
-
-                                        setTimeout(() => {
-                                            fetchPortsForEdit(fromStateId,
-                                                null); // Fetch ports but no preselected value on change
-                                        }, 100)
-
-                                    });
+                                    // $('#fromState').change(function () {
+                                    //
+                                    //     var fromStateId = $(this).val();
+                                    //
+                                    //     setTimeout(() => {
+                                    //         fetchPortsForEdit(fromStateId,
+                                    //             null); // Fetch ports but no preselected value on change
+                                    //     }, 100)
+                                    //
+                                    // });
                                 },
                                 error: function (error) {
+                                    alert("Error fetching from states");
+
                                     console.log('Error fetching from states:', error);
                                 }
                             });
@@ -858,6 +878,7 @@
                                     $('#loading').hide();
                                 },
                                 error: function (error) {
+                                    alert('Auction Error')
                                     console.log('Error:', error);
                                     // Hide the loading spinner in case of error
                                     $('#loading').hide();
@@ -898,6 +919,7 @@
                                     }, 100)
                                 },
                                 error: function (error) {
+                                    alert('Error fetching ports')
                                     console.log('Error fetching ports:', error);
                                 }
                             });
@@ -919,7 +941,7 @@
                         var load_type = $('#loadType').val();
                         var from_state = $('#fromState').val();
                         var to_port_id = $('#to_port_id').val();
-                        var customer_id = $('#customer_id').val();
+                        var customer_id = $('#customerTomSelect').val();
                         console.log(customer_id)
 
                         // Send AJAX request to calculate shipping cost
@@ -939,6 +961,8 @@
                                 // Update the shipping cost on the page
                                 $('#shippingCost').text(response.shipping_cost);
                                 console.log(response.shipping_price)
+                                document.getElementById('shippingwithoutextra').style.display = 'flex';
+                                document.getElementById('originalshipping').value = response.original_shipping;
 
                                 // Ensure the Alpine store is accessed correctly
                                 try {
@@ -962,6 +986,7 @@
                                     }
 
                                 } catch (error) {
+                                    alert("Error calculation");
                                     console.log("Error updating Alpine store:", error);
                                 }
 
@@ -975,7 +1000,6 @@
 
                 // Function to update the shipping cost in the repeater
                 function updateShippingCostInRepeater(shippingCost) {
-
 
                     document.addEventListener('alpine:init', () => {
                         Alpine.data('dropdown', () => ({
@@ -1018,7 +1042,6 @@
                     }
                 }
             </script>
-
 
             <script>
                 $(document).ready(function () {

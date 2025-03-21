@@ -1,11 +1,12 @@
+@php
+    use Carbon\Carbon  ;
+@endphp
+
 <div class="table-responsive">
     <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
         <thead class="back_table_color">
             <tr class="info">
                 <th>ID</th>
-                @hasanyrole('Admin|Developer')
-                <th>Change Status</th>
-                @endhasanyrole
                 <th>CAR INFO</th>
                 <th>FROM-TO</th>
 
@@ -17,33 +18,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($cars as $car)
+            @foreach ($cars as $index => $car)
                 <tr>
 
                     <td>
                         {{ $car->id }}
                     </td>
-                    @hasanyrole('Admin|Developer')
-                    <td>
-                        <div class="col-12">
-                            <label>CAR Status</label>
-                            <select name="status" class="form-control" id="customer_id"
-                                    hx-post="{{route('car.change.status')}}"
-                                    hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
-                                    onchange="setTimeout(() => { window.location.reload() }, 200)"
-                            >
-                                @foreach($statuses as $statusindex => $status)
-                                    <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
-                                @endforeach
-                            </select>
-                            <a href="{{ route('car.edit', $car->id) }}">
-                                <button type="button" class="btn green_btn btn-sm mt-1">
-                                    Edit Car
-                                </button>
-                            </a>
-                        </div>
-                    </td>
-                    @endhasanyrole
+
                     <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                     <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                         @csrf
@@ -64,17 +45,17 @@
                         <td>{{ $car->title }}</td>
                         <td>
                             @php
-                                $pickupDates = $car->pickup_dates;
-                                $dateParts = explode(' - ', $pickupDates);
-                                $endDate = isset($dateParts[1])
-                                    ? \Carbon\Carbon::createFromFormat('d.m.Y', trim($dateParts[1]))
-                                    : null;
-                                $isExpired = $endDate && $endDate->isPast();
+                                $pickupDates = $car->pickup_dates; // e.g. "12.03.2025 - 26.03.2025"
+                                list($start, $end) = explode(' - ', $pickupDates);
+
+                                $startDate = Carbon::createFromFormat('d.m.Y', trim($start));
+                                $endDate   = Carbon::createFromFormat('d.m.Y', trim($end));
+
+                                $today = Carbon::today()->startOfDay();
                             @endphp
 
-                            <input type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
-                                name="pickup_dates" class="form-control daterange"
-                                style="background-color: {{ $isExpired ? 'red' : 'white' }};" />
+                            <input   @style($endDate < $today ? 'background-color: red;width: 185px;display:inline-block' : 'width: 185px;display:inline-block')   type="text" data-record-id="{{ $car->id }}" value="{{ $car->pickup_dates }}"
+                                name="pickup_dates" class="form-control daterange" />
 
                         </td>
 
@@ -83,17 +64,15 @@
                                 class="btn btn-success btn-sm">
                                 Next
                             </button>
-                            <br>
-                            <br>
+
+                            @include('partials.car.table_content-parts.edit-modal')
+
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
                             <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
-
                         </td>
                     </form>
-
                 </tr>
             @endforeach
-
         </tbody>
     </table>
 </div>

@@ -28,9 +28,9 @@
         <tbody>
             @foreach ($cars as $car)
                 <tr>
-
                     <td>
-                        {{ $car->id }}</td>
+                        {{ $car->id }}
+                    </td>
                     <td class="car_info">
                         @include('partials.car.table_content-parts.car-info')
                     </td>
@@ -51,15 +51,10 @@
                         </td>
                         <td>
                             @if (!empty($car->CarStatus))
-                                <a
-                                    href="{{ route('car.showStatus', $car->CarStatus->slug) }}">{{ $car->CarStatus->name }}</a>
+                                <a href="{{ route('car.showStatus', $car->CarStatus->slug) }}">{{ $car->CarStatus->name }}</a>
                             @endif
-
                         </td>
-                        <td>
-                             
-                        </td>
-
+                        <td></td>
                         <td>
                             <a href="{{ route('car.edit', $car->id) }}">
                                 <button type="button" class="btn btn-success btn-sm">
@@ -75,13 +70,10 @@
                             <br>
                             <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
                             <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
-
                         </td>
                     </form>
-
                 </tr>
             @endforeach
-
         </tbody>
     </table>
 </div>

@@ -196,7 +196,7 @@ $creditService = new CreditService();
                                     <div class="d-flex flex-column  gap-2">
                                         <div class="d-flex justify-content-start align-items-middle gap-2">
                                             <span style=""
-                                                  class="d-flex align-middle">{{$car->media->isNotEmpty() ? '📷' : ''}}</span>
+                                                  class="d-flex align-middle">{{$car->getMedia('images')->isNotEmpty() ? '📷' : ''}}</span>
                                             <span style="color: black">VIN:</span>
                                             <a style="color: #1a7fca;font-size: 15px;" target="_blank"
                                                href="{{route('customer.car-info', $car->vin)}}">

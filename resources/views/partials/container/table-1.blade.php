@@ -109,8 +109,8 @@
                     >
                         <option value="">Add To Container Group</option>
                         @foreach($groups2 as $cargroup)
-                            @if($cargroup->to_port_id == $car->to_port_id && $car->warehouse==$cargroup->trt)
-                            <option value="{{$cargroup->id}}">{{$cargroup->port->name}} -- {{$cargroup->trt}}</option>
+                            @if($cargroup->warehouse_id == $car->warehouse_id)
+                            <option value="{{$cargroup->id}}">{{$cargroup->port->name}} -- {{$cargroup->warehouse->name}}</option>
                             @endif
                         @endforeach
                     </select>

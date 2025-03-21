@@ -58,9 +58,26 @@ use Carbon\Carbon  ;
                         {{ $car->dispatch->name }}
                     @endif
                 </td>
-                <td>
+                <td class="text-center">
                     @if (!empty($car->customer))
-                        {{ $car->customer->contact_name }}
+                        @if($car->customer->newwebsitecustomer===1)
+                            <form action="{{route('customers.autologin')}}" method="post"
+                                  target="_blank">
+                                @csrf
+                                <input type="hidden" name="customer_id"
+                                       value="{{$car->customer->id}}">
+                                <button class="btn btn-primary" > {{ $car->customer->contact_name }} </button>
+                            </form>
+                        @else
+                            <form action="{{route('customers.autologin')}}" method="post"
+                                  target="_blank">
+                                @csrf
+                                <input type="hidden" name="customer_id"
+                                       value="{{$car->customer->id}}">
+{{--                                style="all: unset;cursor: pointer"--}}
+                                <button  class="btn btn-primary" >{{ $car->customer->contact_name }} </button>
+                            </form>
+                        @endif
                     @endif
                 </td>
                 <td>
@@ -93,6 +110,18 @@ use Carbon\Carbon  ;
                 </td>
 
                 <td class="text-center">
+
+                    @if($car->is_dispatch==='no')
+                        <form action="{{route('start.dispatch')}}" method="post" class="mb-1">
+                            @csrf
+
+                            <input type="hidden" value="{{$car->id}}" name="car_id">
+                            <button class="btn btn-warning btn-sm">
+                                Start Dispatch
+                            </button>
+                        </form>
+                    @endif
+
                     <a href="{{ route('car.edit', $car->id) }}">
                         <button type="button" class="btn green_btn btn-sm">
                             Edit
@@ -116,8 +145,6 @@ use Carbon\Carbon  ;
                                             {{ $car->firstCredit?->credit_amount+$car->firstCredit?->paid_amount }} $ --
                                             Not including : {{$creditExcludedCost}}$
                                         </h5>
-
-                                        {{--                                    <p class="mb-0">{{$car->credit->first()?->issue_or_payment_date->format('d-m-Y')}}</p>--}}
                                         <button type="button" class="close" data-dismiss="modal"
                                                 aria-label="Close">
                                             <span aria-hidden="true">&times;</span>

@@ -325,8 +325,7 @@
                                                         @csrf
                                                         <input type="hidden" name="customer_id"
                                                                value="{{$customer->id}}">
-                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new)
-                                                        </button>
+                                                        <button class="btn btn-info btn-rounded w-md m-b-5">Login(new)</button>
                                                     </form>
                                                 @else
                                                     <form action="{{route('customers.autologin')}}" method="post"

@@ -157,7 +157,7 @@
                                 </div>
                             </div>
                             {{--IBAN AND TOTALS--}}
-                            <div class="display-flex space-between  ">
+                            <div class="display-flex space-between cs-mb5 ">
 
                                 <div id="desktopBanks" class="cs-width_5 ">
                                     <p class="cs-secondary_color cs-text_left cs-f15">Bank of Georgia Swift:

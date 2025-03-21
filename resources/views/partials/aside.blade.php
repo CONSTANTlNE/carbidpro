@@ -22,40 +22,29 @@
             </li>
             @endhasanyrole
 
-            {{--            @hasanyrole('Dispatch')--}}
-            {{--            <li class="{{ Route::is('cars.index') ? 'active' : '' }}">--}}
-            {{--                <a href="{{ route('cars.index') }}"><i class="fa fa-tachometer"></i><span>Cars</span>--}}
-            {{--                    <span class="pull-right-container"></span>--}}
-            {{--                </a>--}}
-            {{--            </li>--}}
-            {{--            @endhasanyrole--}}
             <li class="treeview active {{request()->routeIs('cars.index') || request()->routeIs('carpayment.index') ? 'active' : ''}}">
 
+                @hasanyrole('Admin|Developer')
                 <a href="#">
                     <i class="fa fa-automobile"></i></i><span>Cars</span>
                     <span class="pull-right-container">
                         <i class="fa fa-angle-left float-right"></i>
                         </span>
                 </a>
-
                 <ul class="treeview-menu">
-                    @hasanyrole('Admin|Developer')
+
                     <li class="{{ Route::is('car.create') ? 'active' : '' }}">
                         <a href="{{ route('car.create') }}">
                             <span>Add Car</span>
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
-                    @endhasanyrole
-                    @hasanyrole('Admin|Developer')
                     <li class="{{ Route::is('cars.index') ? 'active' : '' }}">
                         <a href="{{ route('cars.index') }}">
-                            <span>Current Cars</span>
+                            <span>Total Cars</span>
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
-                    @endhasanyrole
-                    @hasanyrole('Admin|Developer')
                     <li class="{{ Route::is('cars.index.trashed') ? 'active' : '' }}">
                         <a href="{{ route('cars.index.trashed', ['archive' => 'archive']) }}">
                             <span>Archived Cars</span>
@@ -66,8 +55,8 @@
                             @endif
                         </a>
                     </li>
-                    @endhasanyrole
                 </ul>
+                @endhasanyrole
             </li>
 
             @hasanyrole('Admin|Developer')
@@ -187,6 +176,7 @@
                 </ul>
             </li>
             @endhasanyrole
+            @hasanyrole('Admin|Developer')
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-gear"></i><span>Data</span>
@@ -196,7 +186,7 @@
                 </a>
                 <ul class="treeview-menu">
 
-                    @hasanyrole('Admin|Developer')
+
                     <li class="">
                         <a href="{{ route('auctions.index') }}">
                             <span>Auctions</span>
@@ -215,6 +205,7 @@
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
+
                     <li class="">
                         <a href="{{ route('load-types.index') }}">
                             <span>Load Types</span>
@@ -267,12 +258,18 @@
                         </a>
                     </li>
                     <li class="">
+                        <a href="{{ route('warehouses') }}">
+                            <span>Warehouses</span>
+                            <span class="pull-right-container"></span>
+                        </a>
+                    </li>
+                    <li class="">
                         <a href="{{ route('extraexpenses') }}">
                             <span>Extra Expenses for Customer</span>
                             <span class="pull-right-container"></span>
                         </a>
                     </li>
-                    @endhasanyrole
+
                     @can('StatesAdd')
                         <li class="">
                             <a href="{{ route('states') }}">
@@ -284,8 +281,7 @@
 
                 </ul>
             </li>
-
-
+            @endhasanyrole
             <hr>
             @hasanyrole('Admin|Developer')
             <li class="treeview">

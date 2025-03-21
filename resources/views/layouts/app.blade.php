@@ -54,11 +54,12 @@
     <script src="{{asset('assets/htmx203.min.js')}}"
             integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
             crossorigin="anonymous"></script>
+
     @stack('css')
 </head>
 
 {{--<body class="@yield('body-class', '')">--}}
-<body class="sidebar-mini  pace-done">
+<body class="sidebar-mini  pace-done   {{auth()->user()?->hasAnyRole('Broker') ? 'sidebar-collapse' : '' }}">
 
 <div id="htmxerrors"></div>
 

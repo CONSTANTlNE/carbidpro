@@ -18,7 +18,7 @@
 
 @foreach ($cars as $key => $cargroup)
 
-    <h4 class="mt-2">ID: {{$cargroup->id}} GROUP : {{ $key + 1 }} {{$cargroup->port->name}} -- {{$cargroup->trt}}</h4>
+    <h4 class="mt-2">ID: {{$cargroup->id}} GROUP : {{ $key + 1 }} {{$cargroup->warehouse->name}}</h4>
 
     <div class="table-responsive">
         <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
@@ -66,13 +66,14 @@
 {{--                               name="thc_agent" class="form-control thc_agent" id="thc_agent" required>--}}
 
                         <select class="form-control" name="shipping_line_id" required>
-                            <option value="">THC AGENT</option>
+                            <option value="">Shipping Line</option>
                             @foreach($shipping_lines as $line)
                                 <option value="{{$line->id}}"> {{$line->name}}</option>
                             @endforeach
                         </select>
 
                         <br>
+
                         <input type="text" value="{{ $cargroup->cost }}" placeholder="Container Cost $"
                                class="form-control" name="container_cost" id="container_cost" required>
                         <br>
@@ -97,7 +98,7 @@
                         <div class="d-flex" style="gap:10px;width: 100px;    flex-direction: column;">
                             <button
                                     hx-get="{{route('container.htmx.select.car')}}"
-                                    hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$key}}" , "cargroup_id": "{{$cargroup->id }}", "trt": "{{$cargroup->trt}}"  }'
+                                    hx-vals='{"warehouse_id": "{{ $cargroup->warehouse_id }}" , "key": "{{$key}}" , "cargroup_id": "{{$cargroup->id }}" }'
                                     hx-target="#addcartarget{{$key}}"
                                     data-toggle="modal"
                                     class="btn btn-dark"
@@ -251,7 +252,8 @@
                             <div style="display: flex;flex-direction: column; max-width: 100px">
                                 <button
                                         hx-get="{{route('container.htmx.select.car2')}}"
-                                        hx-vals='{"to_port_id": "{{ $cargroup->to_port_id }}" , "key": "{{$cargroupindex}}" , "container_id": "{{$cargroup->id }}", "oldcar_id": "{{ $car->id }}" , "trt": "{{$cargroup->trt}}" }'
+                                        hx-vals='{"warehouse_id": "{{ $cargroup->warehouse_id }}" , "key": "{{$cargroupindex}}" , "container_id": "{{$cargroup->id }}", "oldcar_id": "{{ $car->id }}"  }'
+
                                         hx-target="#replacecartarget{{$cargroupindex}}"
                                         type="button" class="btn btn-dark" data-toggle="modal"
                                         data-target="#mymodals{{$cargroupindex}}">

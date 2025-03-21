@@ -3,9 +3,6 @@
         <thead class="back_table_color">
         <tr class="info">
             <th>ID</th>
-            @hasanyrole('Admin|Developer')
-            <th>Change Status</th>
-            @endhasanyrole
             <th>CAR INFO</th>
             <th>FROM-TO</th>
 
@@ -18,33 +15,13 @@
         </tr>
         </thead>
         <tbody>
-        @foreach ($cars as  $car)
+        @foreach ($cars as $index =>  $car)
             <tr>
 
                 <td>
                     {{ $car->id }}
                 </td>
-                @hasanyrole('Admin|Developer')
-                <td>
-                    <div class="col-12">
-                        <label>CAR Status</label>
-                        <select name="status" class="form-control" id="customer_id"
-                                hx-post="{{route('car.change.status')}}"
-                                hx-vals='{"car_id": "{{ $car->id }}", "_token": "{{ csrf_token() }}" }'
-                                onchange="setTimeout(() => { window.location.reload() }, 200)"
-                        >
-                            @foreach($statuses as $statusindex => $status)
-                                <option {{ $car->car_status_id == $status->id ? 'selected' : ''}} value="{{$status->id}}"> {{ $status->name }}</option>
-                            @endforeach
-                        </select>
-                        <a href="{{ route('car.edit', $car->id) }}">
-                            <button type="button" class="btn green_btn btn-sm mt-1">
-                                Edit Car
-                            </button>
-                        </a>
-                    </div>
-                </td>
-                @endhasanyrole
+
                 <td class="car_info"> @include('partials.car.table_content-parts.car-info') </td>
                 <form action="{{ route('car.listupdate', $car->id) }}" method="POST">
                     @csrf
@@ -84,6 +61,7 @@
                         <button data-target="#shipping{{$car->id}}" data-toggle="modal" type="button" class="btn btn-success btn-sm">
                             Next
                         </button>
+{{--                        @include('partials.car.table_content-parts.edit-modal')--}}
 {{--                        internal shipping confirmation modal--}}
                         <div class="modal fade" id="shipping{{$car->id}}" tabindex="-1" role="dialog"  aria-hidden="true">
                             <div class="modal-dialog modal-dialog-scrollable" role="document">
@@ -106,8 +84,7 @@
                                 </div>
                             </div>
                         </div>
-                        <br>
-                        <br>
+
                         <strong>Create:</strong> {{ $car->created_at->format('d.m.y') }} <br>
                         <strong>Update:</strong> {{ $car->updated_at->format('d.m.y') }} <br>
 

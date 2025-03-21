@@ -11,6 +11,7 @@ use App\Models\Port;
 use App\Models\PortCity;
 use App\Models\PortEmail;
 use App\Models\ShippingLine;
+use App\Models\Warehouse;
 use App\Services\smsService;
 use Carbon\Carbon;
 
@@ -32,7 +33,7 @@ class ContainerController extends Controller
             'dispatch', 'customer', 'state', 'CarStatus', 'auction', 'loadType',
         ])->paginate(50); // Keep eager loading for relationships
         $container_status = ContainerStatus::withCount('cars')->get();
-        $shipping_lines=ShippingLine::where('is_active',1)->get();
+        $shipping_lines   = ShippingLine::where('is_active', 1)->get();
 
 
         return view('pages.containers.index', compact('cars', 'container_status', 'shipping_lines'));
@@ -51,7 +52,7 @@ class ContainerController extends Controller
         }
 
 
-        $shipping_lines=ShippingLine::where('is_active',1)->get();
+        $shipping_lines = ShippingLine::where('is_active', 1)->get();
 
         $groups  = '';
         $cars    = '';
@@ -183,7 +184,7 @@ class ContainerController extends Controller
                 'pendingCount',
                 'loadingCount',
                 'groups2',
-                'shipping_lines'
+                'shipping_lines',
             ),
         );
     }
@@ -204,12 +205,18 @@ class ContainerController extends Controller
 
         $carIds        = $validated['car_ids']; // Ensure this is an array of IDs
         $car_ids_array = explode(",", $carIds[0]);
-        $cars          = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title', 'warehouse']);
+//        $cars          = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title', 'warehouse']);
+        $cars = Car::whereIn('id', $car_ids_array)->get(['to_port_id', 'title', 'warehouse_id']);
 
-        // Check if all `to_port_id` are the same
-        if ($cars->pluck('to_port_id')->unique()->count() !== 1 || $cars->pluck('warehouse')->unique()->count() !== 1) {
+//         Check if all `to_port_id` are the same
+//        if ($cars->pluck('to_port_id')->unique()->count() !== 1 || $cars->pluck('warehouse')->unique()->count() !== 1) {
+//            // Return error if `to_port_id` values are not the same
+//            return redirect()->back()->with(['message' => 'Cars Port and TRT need same', 'alert-type' => 'error']);
+//        }
+
+        if ($cars->pluck('warehouse_id')->unique()->count() !== 1) {
             // Return error if `to_port_id` values are not the same
-            return redirect()->back()->with(['message' => 'Cars Port and TRT need same', 'alert-type' => 'error']);
+            return redirect()->back()->with(['message' => 'Cars Must Have Same Warehouse', 'alert-type' => 'error']);
         }
 
         if ($cars->pluck('title')->every(function ($title) {
@@ -222,13 +229,14 @@ class ContainerController extends Controller
 
         // Group and Container group is same as Container , like group of cars for a particular container
         // At this point CONTAINER number is not know...
-        $group = ContainerGroup::create([
-            'group_name' => 'Group '.now()->timestamp,
+        $group     = ContainerGroup::create([
+            'group_name'   => 'Group '.now()->timestamp,
+            'warehouse_id' => $cars[0]->warehouse_id,
         ]);
-
+        $warehouse = Warehouse::find($cars[0]->warehouse_id);
         $group->update(['to_port_id' => $cars[0]->to_port_id]);
         // trt and warehouse have same values and names should be same also ...but we have what we have...
-        $group->update(['trt' => $cars[0]->warehouse]);
+        $group->update(['trt' => $warehouse->name]);
 
 
         Car::whereIn('id', $car_ids_array)->increment('container_status_id', 1);
@@ -376,7 +384,7 @@ class ContainerController extends Controller
 
         if ($request->has('shipping_line_id')) {
 //            $container->thc_agent = $request->thc_agent;
-            $container->shipping_line_id= $request->shipping_line_id;
+            $container->shipping_line_id = $request->shipping_line_id;
         }
 
         if ($request->has('is_green')) {
@@ -417,7 +425,6 @@ class ContainerController extends Controller
     }
 
     public function replaceCar(Request $request)
-
     {
         // Validate the request
         $request->validate([
@@ -573,13 +580,13 @@ class ContainerController extends Controller
     public function htmxSelectCar(Request $request)
     {
         $key         = $request->key;
-        $carstoadd   = Car::where('to_port_id', $request->to_port_id)
-            ->where('warehouse', $request->trt)
+        $carstoadd   = Car::where('warehouse_id', $request->warehouse_id)
             ->where('container_status_id', 1)
             ->get();
         $containerid = $request->cargroup_id;
 
-//dd($carstoadd);
+//        dd($carstoadd);
+
         return view('pages.htmx.htmxAddCarToContainer', compact('carstoadd', 'key', 'containerid'));
     }
 
@@ -587,8 +594,7 @@ class ContainerController extends Controller
     {
         $key = $request->key;
 
-        $carstoadd = Car::where('to_port_id', $request->to_port_id)
-            ->where('warehouse', $request->trt)
+        $carstoadd   = Car::where('warehouse_id', $request->warehouse_id)
             ->where('container_status_id', 1)
             ->get();
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Exceptions;
+
 use Illuminate\Session\TokenMismatchException;
 use App\Mail\ExceptionOccurred;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -47,18 +48,21 @@ class Handler extends ExceptionHandler
 
     {
         $this->reportable(function (Throwable $exception) {
-
-            if ($exception instanceof TokenMismatchException) {
-                return redirect('/');
+            try {
+                Mail::to(config('carbiddata.developerMail'))->send(new ExceptionOccurred($exception));
+            } catch (\Exception $mailException) {
+                Log::error('Failed to send exception email: '.$mailException->getMessage());
             }
-
-                try {
-                    Mail::to(config('carbiddata.developerMail'))->send(new ExceptionOccurred($exception));
-                } catch (\Exception $mailException) {
-                    Log::error('Failed to send exception email: ' . $mailException->getMessage());
-                }
-
         });
+    }
+
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof TokenMismatchException) {
+            return redirect('/');
+        }
+
+        return parent::render($request, $e);
     }
 
 }

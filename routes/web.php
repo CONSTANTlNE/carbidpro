@@ -30,6 +30,7 @@ use App\Http\Controllers\SmsController;
 use App\Http\Controllers\StatesController;
 use App\Http\Controllers\TitleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use App\Models\Car;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
@@ -155,6 +156,8 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         Route::post('/car/image/delete', 'deleteImage')->name('car.image.delete');
         Route::get('/car/payment/image/delete/{id}', 'deletePaymentImage')->name('car.paymentImage.delete');
         Route::post('/car/change/status', 'changeCarStatus')->name('car.change.status');
+        Route::post('/car/start/dispatch', 'startDispatch')->name('start.dispatch');
+        Route::post('/car/minor/updates', 'minorUpdate')->name('car.minor.updates');
 
     });
 
@@ -369,6 +372,14 @@ Route::prefix('dashboard') ->middleware(['auth', 'verified'])->group(function ()
         route::post('shippinglines/update','update')->name('shippingline.update');
         route::post('shippinglines/delete','delete')->name('shippingline.delete');
         route::post('shippinglines/activate','activate')->name('shippingline.activate');
+    });
+
+    Route::controller(WarehouseController::class)->group(function (){
+        route::get('warehouse','index')->name('warehouses');
+        route::post('warehouse/create','create')->name('warehouse.create');
+        route::post('warehouse/update','update')->name('warehouse.update');
+        route::post('warehouse/delete','delete')->name('warehouse.delete');
+        route::post('warehouse/activate','activate')->name('warehouse.activate');
     });
 
     //    ======= Website Management Routes =======
@@ -772,5 +783,8 @@ route::get('/logout', function () {
 });
 
 
+Route::fallback(function () {
+    return redirect()->back()->with('error', 'The page you are looking for does not exist.');
+});
 
 require __DIR__.'/auth.php';

@@ -55,6 +55,15 @@
             <p>Total Value: <span x-text="calculateTotal()"></span></p>
         </div>
 
+        <div id="shippingwithoutextra" style="color:blue;display: none" class="row repeater-item mt-2 align-items-center">
+            <div class="col-md-2 col-6"  >
+                <input  style="color:blue" disabled  class=" form-control"  value="Without Extra ">
+            </div>
+            <div class="col-md-2 col-6">
+                <input style="color:blue" id="originalshipping" type="number" class="form-control" value="" disabled>
+            </div>
+        </div>
+
         <!-- Repeater Fields in One Row -->
         <template x-for="(item, index) in balance_accounting" :key="index">
             <div class="row repeater-item mt-2 align-items-center">

@@ -121,4 +121,8 @@ class Car extends Model implements HasMedia, Sortable
         return $this->belongsTo(User::class, 'dispatch_id');
     }
 
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class);
+    }
+
 }

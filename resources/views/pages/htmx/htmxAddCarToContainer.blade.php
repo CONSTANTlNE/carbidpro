@@ -10,10 +10,10 @@
                     id="car-list">
                 <option value="">Select Car</option>
                 @foreach($carstoadd as $cartoadd)
-                    <option value="{{$cartoadd->id}}" class="p-2">
-                        <p> VIN : {{$cartoadd->vin}}
-                            Model: {{$cartoadd->make_model_year}}
-                        </p>
+                    <option value="{{$cartoadd->id}}" class="p-2 select2">
+                        <p> VIN : {{$cartoadd->vin}} </p>
+                        <p>Model: {{$cartoadd->make_model_year}}</p>
+                        <p>Warehouse: {{$cartoadd->warehouse}}</p>
                     </option>
                 @endforeach
             </select>

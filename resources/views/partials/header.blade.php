@@ -1,12 +1,11 @@
-
 <header class="main-header">
     <a href="{{route('dashboard')}}" class="logo">
         <!-- Logo -->
         <span class="logo-mini">
-            <h2 style="color: white"> CARBIDPRO</h2>
+<img style="height: 50px" src="/invoiceAssets/assets/img/carbidlogo.jpeg" alt="Logo">
         </span>
         <span class="logo-lg">
-            <h2 style="color: white"> CARBIDPRO</h2>
+<img style="height: 50px" src="/invoiceAssets/assets/img/carbidlogo.jpeg" alt="Logo">
         </span>
     </a>
     <!-- Header Navbar -->
@@ -17,26 +16,34 @@
             <span class="pe-7s-angle-left-circle"></span>
         </a>
 
-           <p style="color: white">{{auth()->user()->name}} </p>
-           <p style="color: white;margin-left: 30px" id="countdown"></p>
-
+        <p style="color: white">{{auth()->user()->name}} </p>
+        <p style="color: white;margin-left: 30px" id="countdown"></p>
+        @hasanyrole('Admin|Developer')
+        <a href="{{ route('car.create') }}" class="btn btn-add">
+            <i class="fa fa-plus"></i>
+            Add Car
+        </a>
+        @endhasanyrole
         <div class="collapse navbar-collapse navbar-custom-menu">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown notifications-menu">
-                    <a class="nav-link admin-notification" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link admin-notification" href="#" role="button" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
                         <i class="pe-7s-bell"></i>
                         @if($deposits>0 || $customerscount>0)
-                        <span class="label bg-danger">{{$deposits+$customerscount}}</span>
+                            <span class="label bg-danger">{{$deposits+$customerscount}}</span>
                         @endif
                     </a>
-                    <div class="dropdown-menu drop_drops custom_drop_scroll" tabindex="3" style="overflow: hidden; outline: none;">
+                    <div class="dropdown-menu drop_drops custom_drop_scroll" tabindex="3"
+                         style="overflow: hidden; outline: none;">
                         @if($balancecomposers)
                             @foreach($balancecomposers as $balancecomposer)
                                 <a class="dropdown-item" href="#">
                                     <div class="menues">
                                         <p>
                                             <i class="fa fa-dot-circle-o color-red"></i>
-                                           Deposit : {{$balancecomposer->customer->contact_name}} - {{$balancecomposer->amount}}
+                                            Deposit : {{$balancecomposer->customer->contact_name}}
+                                            - {{$balancecomposer->amount}}
                                         </p>
                                     </div>
                                 </a>
@@ -48,7 +55,7 @@
                                     <div class="menues">
                                         <p>
                                             <i class="fa fa-dot-circle-o color-red"></i>
-                                           New Customer : {{$newcustomer->contact_name}}
+                                            New Customer : {{$newcustomer->contact_name}}
                                         </p>
                                     </div>
                                 </a>
@@ -62,16 +69,16 @@
 
                 <li class="nav-item dropdown dropdown-user">
                     <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
+                       aria-expanded="false">
                         <img src="/assets/dist/img/avatar5.png" class="rounded-circle" width="50" height="50"
-                            alt="user"></a>
+                             alt="user"></a>
 
                     <div class="dropdown-menu drop_down">
                         <div class="menus">
                             <a class="dropdown-item" href="#"><i class="fa fa-user"></i> User Profile</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
-                                    class="fa fa-sign-out"></i>
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
+                                        class="fa fa-sign-out"></i>
                                 Signout</a>
 
                         </div>

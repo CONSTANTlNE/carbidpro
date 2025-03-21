@@ -248,9 +248,17 @@
 
                                                     <div class="col-md-2">
                                                         <label for="warehouse">Warehouse</label>
+
                                                         <input type="text"
-                                                               class="form-control" name="warehouse" id="warehouse"
-                                                               value="{{ old('warehouse', $car->warehouse ?? '') }}" required>
+                                                               class="form-control"  id="warehouse"
+                                                               value="{{ old('warehouse', $car->warehouse ?? '') }}" >
+
+                                                        <select style="width: 273px!important" name="warehouse" class="form-control" style="width: min-content" required>
+                                                            <option value="">Select Warehouse</option>
+                                                            @foreach($warehouses as $warehouse)
+                                                                <option @selected($car->warehouse_id==$warehouse->id) value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="row mt-3" id="extraexpense">
@@ -291,6 +299,14 @@
                                             <!-- Display the total of values -->
                                             <p>Total Value: <span x-text="calculateTotal()"></span></p>
 
+                                            <div id="shippingwithoutextra" style="color:blue;display: none" class="row repeater-item mt-2 align-items-center">
+                                                <div class="col-md-2 col-6"  >
+                                                    <input  style="color:blue" disabled  class=" form-control"  value="Without Extra ">
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <input style="color:blue" id="originalshipping" type="number" class="form-control" value="" disabled>
+                                                </div>
+                                            </div>
                                             <!-- Repeater Fields in One Row -->
                                             <template x-for="(item, index) in balance_accounting" :key="index">
                                                 <div class="row repeater-item mt-2 align-items-center">
@@ -849,6 +865,7 @@
                                     });
                                 },
                                 error: function (error) {
+                                    alert('Error fetching from states')
                                     console.log('Error fetching from states:', error);
                                 }
                             });
@@ -888,6 +905,7 @@
                                     });
                                 },
                                 error: function (error) {
+                                    alert('Error fetching ports')
                                     console.log('Error fetching ports:', error);
                                 }
                             });
@@ -927,6 +945,7 @@
                                     $('#loading').hide();
                                 },
                                 error: function (error) {
+                                    alert('Auction Error')
                                     console.log('Error:', error);
                                     // Hide the loading spinner in case of error
                                     $('#loading').hide();
@@ -964,6 +983,7 @@
 
                                 },
                                 error: function (error) {
+                                    alert('Error fetching ports')
                                     console.log('Error fetching ports:', error);
                                 }
                             });
@@ -985,6 +1005,8 @@
                         var load_type = $('#loadType').val();
                         var from_state = $('#fromState').val();
                         var to_port_id = $('#to_port_id').val();
+                        var customer_id = $('#customerTomSelect').val();
+                        console.log(customer_id)
 
                         // Send AJAX request to calculate shipping cost
                         $.ajax({
@@ -997,10 +1019,13 @@
                                 from_state: from_state,
                                 to_port_id: to_port_id,
                                 location_name: $('#fromState option:selected').text(),
+                                customer_id: customer_id
                             },
                             success: function (response) {
                                 // Update the shipping cost on the page
                                 $('#shippingCost').text(response.shipping_cost);
+                                document.getElementById('shippingwithoutextra').style.display = 'flex';
+                                document.getElementById('originalshipping').value = response.original_shipping;
 
                                 // Ensure the Alpine store is accessed correctly
                                 try {
@@ -1023,6 +1048,7 @@
                                         });
                                     }
                                 } catch (error) {
+                                    alert("Error Calculation");
                                     console.log("Error updating Alpine store:", error);
                                 }
 

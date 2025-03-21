@@ -1,6 +1,10 @@
+@php use Carbon\Carbon; @endphp
 @extends('layouts.app')
 
+
+
 @section('content')
+
     @push('css')
         <style>
             .table-responsive td {
@@ -62,33 +66,32 @@
                                         @if(!request()->has('archive'))
                                             <div class="buttonexport">
                                                 @hasanyrole('Admin|Developer')
-                                                <a href="{{ route('car.create') }}" class="btn btn-add">
-                                                    <i class="fa fa-plus"></i>
-                                                    Add Car
-                                                </a>
+
                                                 <a href="{{ route('cars.index') }}" class="btn btn-primary">
                                                     <i class="fa fa-automobile"></i>
-                                                    Current Cars {{$totalCars}}
+                                                    Total Cars {{$totalCars}}
                                                 </a>
                                                 @endhasanyrole
 
                                                 @foreach ($car_status as $status)
                                                     @php
-                                                        $hasError = '';
+                                                        $hasError = false;
                                                         $errorCount = 0; // Counter to count how many cars have errors
 
-                                                        if ($status->id == 7) {
+                                                    if ($status->slug === 'dispatched') {
                                                             // Check if any car related to this status has title_delivery set to 'no'
                                                             $hasError = $status->cars->contains(function ($car) {
                                                                 return $car->title_delivery == 'no' ||
-                                                                    !$car->getMedia('images')->isNotEmpty();
+                                                                    !$car->getMedia('images')->isNotEmpty() ||
+                                                                     !$car->getMedia('bl_images')->isNotEmpty();
                                                             });
 
                                                             // Check for errors and count them
                                                             $errorCount = $status->cars
                                                                 ->filter(function ($car) {
                                                                     return $car->title_delivery == 'no' ||
-                                                                        !$car->getMedia('images')->isNotEmpty();
+                                                                        !$car->getMedia('images')->isNotEmpty() ||
+                                                                        !$car->getMedia('bl_images')->isNotEmpty();
                                                                 })
                                                                 ->count();
 
@@ -96,35 +99,68 @@
                                                             $hasError = $errorCount > 0;
                                                         }
 
-                                                        if ($status->id == 4 || $status->id == 5) {
-                                                            $hasError = $status->cars->contains(function ($car) {
+                                                    if ($status->slug === 'assign' || $status->slug === 'listed' ){
+
+                                                       $hasError = $status->cars->contains(function ($car) {
                                                                 $pickupDates = $car->pickup_dates;
-                                                                $pickupDateExpired = false;
+                                                                $expired = false;
 
                                                                 if ($pickupDates) {
-                                                                    $dates = explode(' - ', $pickupDates);
-                                                                    if (count($dates) == 2) {
-                                                                        $secondDate = \Carbon\Carbon::createFromFormat(
-                                                                            'd.m.Y',
-                                                                            trim($dates[1]),
-                                                                        );
-                                                                        if ($secondDate && now()->greaterThan($secondDate)) {
-                                                                            $pickupDateExpired = true;
-                                                                        }
+                                                                  list($start, $end) = explode(' - ', $pickupDates);
+
+                                                                    $startDate = Carbon::createFromFormat('d.m.Y', trim($start));
+                                                                    $endDate   = Carbon::createFromFormat('d.m.Y', trim($end));
+                                                                    $today = Carbon::today()->startOfDay();
+                                                                    if ($startDate < $today){
+                                                                        $expired=true;
                                                                     }
                                                                 }
-                                                                return $pickupDateExpired;
+                                                                return $expired;
                                                             });
-                                                        }
+                                                    }
+
+                                                    if ($status->slug === 'pick-up'){
+
+                                                       $hasError = $status->cars->contains(function ($car) {
+                                                                $pickupDates = $car->pickup_dates;
+                                                                $expired = false;
+
+                                                                if ($pickupDates) {
+                                                                  list($start, $end) = explode(' - ', $pickupDates);
+
+                                                                    $startDate = Carbon::createFromFormat('d.m.Y', trim($start));
+                                                                    $endDate   = Carbon::createFromFormat('d.m.Y', trim($end));
+                                                                    $today = Carbon::today()->startOfDay();
+                                                                    if ($endDate < $today){
+                                                                        $expired=true;
+                                                                    }
+                                                                }
+                                                                return $expired;
+                                                            });
+
+                                                    }
+
+//                                                    dd($hasError)
+
                                                     @endphp
+
+
                                                     <a href="{{ route('car.showStatus', $status->slug) }}"
-                                                       class="btn {{ $hasError ? 'btn-danger' : ($currentStatus == $status->slug ? 'btn-primary' : 'btn-secondary') }}">
-{{--                                                        {{ $status->name }} {{ $status->id == 7 ?  $errorCount :  $status->cars_count }}--}}
+                                                       class=" btn
+                                                       @if ($hasError)
+                                                            btn-danger
+                                                        @elseif ($currentStatus === $status->slug)
+                                                            btn-primary
+                                                        @else
+                                                            btn-secondary
+                                                        @endif
+                                                       ">
                                                         {{ $status->name }} {{ $status->cars_count }}
                                                     </a>
                                                 @endforeach
                                             </div>
                                         @endif
+
                                         <div>
                                             <form class="form-inline my-2 my-lg-0" method="GET">
                                                 @if(request()->has('archive'))
@@ -211,25 +247,25 @@
             </script>
 
 
-            <script>
-                $(function () {
-                    var availableWarehouse = [
-                        "MTL- New jersey",
-                        "TRT - New Jersey"
-                    ];
+{{--            <script>--}}
+{{--                $(function () {--}}
+{{--                    var availableWarehouse = [--}}
+{{--                        "MTL- New jersey",--}}
+{{--                        "TRT - New Jersey"--}}
+{{--                    ];--}}
 
-                    $("#warehouse").autocomplete({
-                        source: availableWarehouse,
-                        minLength: 0 // Set to 0 to show suggestions immediately
-                    });
+{{--                    $("#warehouse").autocomplete({--}}
+{{--                        source: availableWarehouse,--}}
+{{--                        minLength: 0 // Set to 0 to show suggestions immediately--}}
+{{--                    });--}}
 
-                    // Trigger the autocomplete suggestions on input focus (click)
-                    $("#warehouse").on('focus', function () {
-                        $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus
-                    });
+{{--                    // Trigger the autocomplete suggestions on input focus (click)--}}
+{{--                    $("#warehouse").on('focus', function () {--}}
+{{--                        $(this).autocomplete('search', ''); // Force the dropdown to show on click/focus--}}
+{{--                    });--}}
 
-                });
-            </script>
+{{--                });--}}
+{{--            </script>--}}
 
 
             <script>
